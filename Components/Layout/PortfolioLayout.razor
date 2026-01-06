@@ -1,0 +1,54 @@
+﻿@inherits LayoutComponentBase
+@inject ThemeService ThemeSvc
+@inject ProjectStateService ProjectState
+
+
+@* This dynamic style block listens to the ThemeService *@
+<style>
+    :root {
+        --accent-glow: @ThemeSvc.CurrentColor;
+        --accent-rgb: @ThemeSvc.GetRgbValues();
+        @* For transparent glows *@
+    }
+</style>
+
+<div class="app-shell" style="--accent-glow: @ThemeSvc.CurrentColor;">
+
+    <header class="system-header">
+        <div class="logo">PORTFOLIO_OS // @(ThemeSvc.CurrentColor == "#39FF14" ? "WPF_MODE" : "WASM_MODE")</div>
+        <nav class="system-controls">
+            <span>RUN</span>
+            <span>DEBUG</span>
+            <div class="battery-status">100% [AC_POWER]</div>
+        </nav>
+    </header>
+
+    <aside class="sidebar-area">
+        <SideBar OnFileSelected="UpdateSelection"/>
+    </aside>
+
+    <main class="content-area">
+        @if (SelectedFile == null)
+        {
+            <EmptyState />
+        }
+        else
+        {
+            @Body
+        }
+    </main>
+
+    <footer class="terminal-area">
+        <TerminalComponent />
+    </footer>
+
+</div>
+
+@code {
+    public ProjectFile? SelectedFile { get; set; } // The variable you saw in Line 20
+
+    private void UpdateSelection(ProjectFile file)
+    {
+        SelectedFile = file; // The variable is "Set" here!
+    }
+}

@@ -1,0 +1,46 @@
+﻿@inject ThemeService ThemeSvc
+
+<div class="empty-state-container">
+    <div class="hud-frame">
+        <div class="corner-top-left"></div>
+        <div class="corner-top-right"></div>
+
+        <div class="central-branding">
+            <h1 class="glitch" data-text="SYSTEM_READY">SYSTEM_READY</h1>
+            <p class="subtitle">SELECT_MODULE_FROM_SIDEBAR_TO_BEGIN</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="label">CORE_STATUS</span>
+                <span class="value">STABLE</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">RUNTIME</span>
+                <span class="value">.NET 9 / WASM</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">UPLINK</span>
+                <span class="value">SECURE</span>
+            </div>
+        </div>
+
+        <div class="rotating-loader"></div>
+    </div>
+</div>
+
+@code {
+    private string Uptime = "00:00:00";
+    private Timer? _timer;
+
+    protected override void OnInitialized()
+    {
+        var startTime = DateTime.Now;
+        _timer = new Timer(_ => 
+        {
+            var diff = DateTime.Now - startTime;
+            Uptime = diff.ToString(@"hh\:mm\:ss");
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
+    }
+}

@@ -1,0 +1,44 @@
+﻿@* <div class="main-stage-container" >
+    @if (aSelectedFile == null)
+    {
+        <div class="empty-state">
+            <div class="glitch-text">SELECT_A_MODULE_TO_INITIALIZE</div>
+        </div>
+    }
+    else
+    {
+        @switch (aSelectedFile.Extension)
+        {
+            case ".xaml":
+                <WpfWindow Project="SelectedFile" />
+                break;
+
+            case ".razor":
+                <BlazorProjectView Project="SelectedFile" />
+                break;
+
+            case ".cs":
+                <CodeEditorView Project="SelectedFile" />
+                break;
+        }
+    }
+</div> *@
+
+@code {
+    // private List<ProjectFile> Projects = new() {
+    //     new ProjectFile { FileName = "Dashboard", Extension = ".razor", Category = "Blazor", AccentColor = "#00F3FF" },
+    //     new ProjectFile { FileName = "InventoryManager", Extension = ".xaml", Category = "WPF", AccentColor = "#39FF14" },
+    //     new ProjectFile { FileName = "DataVault", Extension = ".cs", Category = "FullStack", AccentColor = "#BC13FE" }
+    // };
+    
+
+    [Parameter]
+    public ProjectFile? aSelectedFile { get; set; }
+
+    // private void SelectFile(ProjectFile file)
+    // {
+    //     SelectedFile = file;
+       
+    //     // Here we could also navigate or update the Main Stage logic
+    // }
+}

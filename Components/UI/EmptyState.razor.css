@@ -1,0 +1,55 @@
+﻿.empty-state-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.05) 0%, transparent 70%);
+}
+
+.hud-frame {
+    position: relative;
+    padding: 60px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+/* The Glitch Effect */
+.glitch {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--accent-glow);
+    position: relative;
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.subtitle {
+    font-family: 'Fira Code', monospace;
+    color: #666;
+    letter-spacing: 3px;
+    margin-top: 20px;
+}
+
+/* Decorative Stats */
+.stats-grid {
+    display: flex;
+    gap: 30px;
+    margin-top: 50px;
+    justify-content: center;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.7rem;
+}
+
+    .stat-box .label {
+        color: #444;
+    }
+
+    .stat-box .value {
+        color: var(--accent-glow);
+        font-weight: bold;
+    }

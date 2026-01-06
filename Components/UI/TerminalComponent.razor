@@ -1,0 +1,23 @@
+﻿@inject TerminalService TerminalSvc
+@implements IDisposable
+
+<div class="terminal-container" @ref="terminalRef">
+    @foreach (var log in TerminalSvc.Logs)
+    {
+        <div class="log-entry @log.Type.ToString().ToLower()">
+            <span class="timestamp">[@log.Timestamp.ToString("HH:mm:ss")]</span>
+            <span class="message">> @log.Message</span>
+        </div>
+    }
+    <div class="cursor">_</div>
+</div>
+
+@code {
+    ElementReference terminalRef;
+
+    protected override void OnInitialized() => TerminalSvc.OnLogAdded += StateHasChanged;
+
+    public void Dispose() => TerminalSvc.OnLogAdded -= StateHasChanged;
+
+    // Logic to auto-scroll could be added here via JS Interop
+}

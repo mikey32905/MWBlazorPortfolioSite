@@ -1,0 +1,4 @@
+﻿.homeStyle {
+    background: linear-gradient(to right, rgba(255,255,255,.95) 0%, rgba(0,0,0, .80) 40%, rgba(255,255,255,.95) 100%), url("/img/MWBackdropBG.jpg");
+    color: var(--mw-dark-color);
+}

@@ -1,0 +1,44 @@
+﻿.sidebar-explorer {
+    user-select: none;
+    font-size: 0.9rem;
+}
+
+.explorer-header {
+    padding: 10px 15px;
+    font-size: 0.7rem;
+    color: #666;
+    letter-spacing: 1px;
+}
+
+.category-folder {
+    padding: 8px 10px;
+    color: #888;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.file-item {
+    padding: 4px 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 2px solid transparent;
+    transition: background 0.2s;
+}
+
+    .file-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .file-item.active {
+        background: rgba(255, 255, 255, 0.1);
+        border-left: 2px solid var(--accent-glow);
+        color: var(--accent-glow);
+    }
+
+.file-ext {
+    opacity: 0.5;
+}

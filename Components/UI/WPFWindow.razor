@@ -1,0 +1,28 @@
+﻿<div class="wpf-window hacker-border">
+    <div class="wpf-title-bar" style="background: @Project.AccentColor">
+        <span class="wpf-icon">◈</span>
+        <span class="window-name">@Project.FileName - Windows Presentation Foundation</span>
+        <div class="window-controls">
+            <span>_</span> <span>▢</span> <span>X</span>
+        </div>
+    </div>
+
+    <div class="wpf-content">
+        <div class="demo-overlay">
+            <p>> @($"RUNNING: {Project.FileName}.exe")</p>
+        </div>
+        <img src="path/to/your/screenshot.png" alt="WPF Demo" />
+    </div>
+
+    <div class="wpf-status-bar">
+        <span>Ready</span>
+        <span>Ln 1, Col 1</span>
+        <span>UTF-8</span>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProjectFile Project { get; set; } = default;
+
+}

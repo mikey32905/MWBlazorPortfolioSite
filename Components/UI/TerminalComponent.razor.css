@@ -1,0 +1,39 @@
+﻿.terminal-container {
+    background: #020202;
+    color: var(--terminal-green); /* Classic green */
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.log-entry.success {
+    color: #00F3FF;
+}
+/* Cyan for success */
+.log-entry.warning {
+    color: #BC13FE;
+}
+/* Violet for warnings */
+.log-entry.achievement {
+    color: #FFD700;
+    font-weight: bold;
+}
+/* Gold */
+
+.timestamp {
+    color: #444;
+    margin-right: 10px;
+}
+
+.cursor {
+    display: inline-block;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}

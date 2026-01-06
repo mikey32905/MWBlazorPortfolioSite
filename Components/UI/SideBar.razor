@@ -1,0 +1,65 @@
+﻿@inject ThemeService ThemeSvc
+@inject TerminalService TerminalSvc
+@inject ProjectStateService ProjectState
+
+
+<div class="sidebar-explorer">
+    <div class="explorer-header">EXPLORER: PORTFOLIO_OS</div>
+
+    @foreach (var group in ProjectManifest.GroupBy(p => p.Category))
+    {
+        <div class="category-folder">
+            <span class="arrow">▼</span> @group.Key.ToUpper()
+        </div>
+
+        @foreach (var file in group)
+        {
+            <div class="file-item @(SelectedFile == file ? "active" : "")"
+                 @onclick="() => HandleFileClick(file)">
+                <span class="file-icon">@file.Icon</span>
+                <span class="file-name">@file.FileName</span><span class="file-ext">@file.Extension</span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private ProjectFile? SelectedFile;
+
+    [Parameter] public EventCallback<ProjectFile> OnFileSelected { get; set; }
+
+    // --- YOUR HARDCODED MANIFEST ---
+    private List<ProjectFile> ProjectManifest = new()
+    {
+        new ProjectFile { FileName = "ApexInventory", Extension = ".xaml", Category = "WPF_Desktop", AccentColor = "#39FF14", Icon = "🖥️" },
+        new ProjectFile { FileName = "NexusPortal", Extension = ".razor", Category = "Blazor_WASM", AccentColor = "#00F3FF", Icon = "🌐" },
+        new ProjectFile { FileName = "SentinelGuard", Extension = ".cs", Category = "Full_Stack", AccentColor = "#BC13FE", Icon = "🛡️" },
+        new ProjectFile { FileName = "LuminaUI", Extension = ".razor", Category = "Blazor_WASM", AccentColor = "#00F3FF", Icon = "🎨" },
+        new ProjectFile { FileName = "Identity", Extension = ".cs", Category = "System", AccentColor = "#FFFFFF", Icon = "👤" }
+    };
+
+
+  //  var filteredProjects = ProjectManifest.Where(p => p.FileName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private async Task HandleFileClick(ProjectFile file)
+    {
+        SelectedFile = file;
+
+        // 1. Update the global site glow
+        ThemeSvc.UpdateTheme(file.AccentColor);
+
+        // 2. Log the action to your new Terminal Service
+        TerminalSvc.AddLog($"Loading module: {file.FileName}{file.Extension}...", LogType.System);
+        TerminalSvc.AddLog($"Setting environment accent to {file.AccentColor}.", LogType.Success);
+
+        // 3. (Optional) Navigate or Update Main Stage
+        ProjectState.SelectFile(file); // This is where the variable is "Set"
+        TerminalSvc.AddLog($"Accessing {file.FileName}...", LogType.System);
+
+        await OnFileSelected.InvokeAsync(file); // This triggers the parent's method
+    }
+
+
+    
+   
+}
