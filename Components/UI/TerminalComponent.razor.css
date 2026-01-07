@@ -37,3 +37,34 @@
         opacity: 0;
     }
 }
+
+.command-line {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: rgba(var(--accent-rgb), 0.05);
+    border-top: 1px solid #1a1a1a;
+}
+
+.prompt {
+    color: var(--accent-glow);
+    font-family: 'Fira Code', monospace;
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.terminal-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+    width: 100%;
+    font-size: 0.8rem;
+}
+
+    /* Optional: Make the placeholder look like a ghost command */
+    .terminal-input::placeholder {
+        color: #333;
+        font-style: italic;
+    }

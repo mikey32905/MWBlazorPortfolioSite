@@ -1,0 +1,198 @@
+﻿.identity-wrapper {
+    display: grid;
+    /* This forces two columns: Code takes 60%, Profile takes 40% */
+    grid-template-columns: 60% 40%;
+    height: 100%;
+    width: 100%;
+    background: #000;
+}
+
+.profile-section {
+    background: #080808;
+    padding: 30px;
+    border-left: 1px solid rgba(var(--accent-rgb), 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.code-section {
+    height: 100%;
+    overflow: hidden; /* Let the editor handle its own scrolling */
+}
+
+    /* This is the magic fix: Force the editor to fill its half of the grid */
+    .code-section ::deep .editor-container {
+        height: 100% !important;
+    }
+
+/* The Avatar "Scan" Effect */
+.avatar-box {
+    position: relative;
+    width: 150px; /* Fixed width */
+    height: 150px; /* Fixed height */
+    margin: 0 auto; /* Centers it in the profile column */
+    border: 1px solid var(--accent-glow);
+    background: #000;
+    overflow: hidden; /* CRITICAL: Prevents image from spilling out */
+    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+}
+
+    /* The actual image inside the frame */
+    .avatar-box img {
+        width: 100%; /* Scales width to match the box */
+        height: 100%; /* Scales height to match the box */
+        object-fit: cover; /* Crops the image to fit without stretching */
+        display: block;
+        filter: grayscale(100%) brightness(0.8) contrast(1.2); /* Hacker aesthetic */
+    }
+
+    .avatar-box::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        border-top: 2px solid var(--accent-glow);
+        border-left: 2px solid var(--accent-glow);
+        z-index: 10;
+    }
+
+    .avatar-box::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        border-bottom: 2px solid var(--accent-glow);
+        border-right: 2px solid var(--accent-glow);
+        z-index: 10;
+    }
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-glow);
+    box-shadow: 0 0 10px var(--accent-glow);
+    z-index: 5;
+    top: 0;
+    animation: scan-move 3s infinite linear;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* This keeps the avatar-box centered */
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto; /* Adds a scrollbar if the profile gets too long */
+}
+
+.section-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    color: var(--accent-glow);
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.divider-line {
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--accent-glow), transparent);
+}
+
+.stat-item {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+    .stat-item label {
+        display: block;
+        /* FIX: Change from gray to a bright, readable off-white */
+        color: #F0F0F0;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+        /* OPTIONAL: Add a very slight text-shadow to make it look 'backlit' */
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        text-transform: uppercase;
+    }
+
+.extract-btn {
+    width: 100%;
+    margin-top: 20px;
+    background: transparent;
+    border: 1px solid var(--accent-glow);
+    color: var(--accent-glow);
+    padding: 12px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    cursor: pointer;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.2s ease;
+    /* Creating a notched corner look */
+    clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
+}
+
+    .extract-btn:hover {
+        background: rgba(var(--accent-rgb), 0.1);
+        box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);
+        transform: scale(1.02);
+        color: #FFF; /* Text turns white on hover for maximum contrast */
+    }
+
+    .extract-btn:active {
+        transform: scale(0.98);
+        background: var(--accent-glow);
+        color: #000;
+    }
+
+.btn-icon {
+    margin-right: 10px;
+    font-size: 1rem;
+}
+
+/* Skill Bars */
+.progress-bg {
+    height: 6px; /* Slightly thicker for better visibility */
+    background: #1A1A1A; /* Darker background for the bar to increase contrast */
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-glow);
+    /* Intense glow to draw the eye to the data */
+    box-shadow: 0 0 10px var(--accent-glow), 0 0 20px rgba(var(--accent-rgb), 0.4);
+    transition: width 1.5s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+}
+
+.badge {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+    border: 1px solid var(--accent-glow);
+    color: var(--accent-glow);
+    margin-right: 5px;
+    text-transform: uppercase;
+}
+
+@keyframes scan-move {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: 100%;
+    }
+}

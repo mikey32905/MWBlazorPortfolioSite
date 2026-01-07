@@ -1,70 +1,83 @@
-﻿.uplink-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding: 40px;
-    background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.05) 0%, transparent 80%);
-}
-
-.uplink-header {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.node-grid {
+﻿.uplink-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.node-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
     padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.3s ease;
 }
 
-    .node-card:hover {
-        border-color: var(--accent-glow);
-        background: rgba(var(--accent-rgb), 0.1);
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+.uplink-card {
+    position: relative;
+    background: rgba(15, 15, 15, 0.8);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    padding: 2px; /* For the inner border look */
+    text-decoration: none;
+    color: white;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* The hidden glow that appears on hover */
+.card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.uplink-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--accent-glow);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(var(--accent-rgb), 0.2);
+}
+
+    .uplink-card:hover .card-glow {
+        opacity: 1;
     }
 
-.node-icon {
+/* Icon Hexagon Style */
+.icon-hex {
+    width: 60px;
+    height: 60px;
+    background: rgba(var(--accent-rgb), 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 2rem;
+    border: 1px solid var(--accent-glow);
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
-.node-name {
-    color: var(--accent-glow);
-    font-weight: bold;
-    font-family: 'Fira Code', monospace;
+.bar {
+    width: 4px;
+    height: 12px;
+    background: #333;
+    animation: signal-pulse 1.5s infinite ease-in-out;
 }
 
-.node-desc {
-    font-size: 0.8rem;
-    color: #888;
+    .bar.active {
+        background: var(--accent-glow);
+    }
+
+@keyframes signal-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
 }
 
-.node-status {
-    margin-left: auto;
-    font-size: 0.6rem;
-    color: #444;
-    writing-mode: vertical-rl;
+/* Stagger the bars */
+.bar:nth-child(2) {
+    animation-delay: 0.2s;
 }
 
-.uplink-footer {
-    margin-top: auto;
-    text-align: center;
-    font-size: 0.7rem;
-    color: #444;
-    border-top: 1px solid #1a1a1a;
-    padding-top: 20px;
+.bar:nth-child(3) {
+    animation-delay: 0.4s;
 }

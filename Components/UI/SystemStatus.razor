@@ -1,0 +1,55 @@
+﻿@implements IDisposable
+
+<div class="system-status-widget">
+    <div class="widget-header">SYSTEM_TELEMETRY</div>
+
+    <div class="metric-row">
+        <div class="metric-label">CPU_LOAD</div>
+        <div class="metric-value">@cpuLoad%</div>
+        <div class="metric-bar"><div class="fill" style="width: @cpuLoad%"></div></div>
+    </div>
+
+    <div class="metric-row">
+        <div class="metric-label">MEM_ALLOC</div>
+        <div class="metric-value">@memUsage MB</div>
+        <div class="metric-bar"><div class="fill" style="width: @(memUsage / 10)%"></div></div>
+    </div>
+
+    <div class="metric-row">
+        <div class="metric-label">SYNC_STABILITY</div>
+        <div class="metric-value">@syncStability%</div>
+        <div class="metric-bar"><div class="fill" style="width: @syncStability%"></div></div>
+    </div>
+
+    <div class="status-footer">
+        STATUS: <span class="blink">ENCRYPTED_UPLINK_ACTIVE</span>
+    </div>
+</div>
+
+@code {
+    private int cpuLoad = 12;
+    private int memUsage = 412;
+    private int syncStability = 99;
+    private System.Timers.Timer? timer;
+    private Random rnd = new();
+
+    protected override void OnInitialized()
+    {
+        timer = new System.Timers.Timer(2000); // Update every 2 seconds
+        timer.Elapsed += (s, e) => UpdateMetrics();
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+
+    private void UpdateMetrics()
+    {
+        // Simulate minor fluctuations
+        cpuLoad = rnd.Next(8, 24);
+        memUsage = rnd.Next(410, 425);
+        syncStability = rnd.Next(97, 100);
+
+        InvokeAsync(StateHasChanged); // Push update to UI thread
+    }
+
+    public void Dispose() => timer?.Dispose();
+}

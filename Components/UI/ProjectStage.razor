@@ -13,7 +13,7 @@
         </div>
 
         <div class="stage-viewport">
-            @switch (ProjectState.SelectedFile.Extension.ToLower())
+            @* @switch (ProjectState.SelectedFile.Extension.ToLower())
             {
                 case ".xaml":
                     <WPFWindow Project="ProjectState.SelectedFile" />
@@ -28,11 +28,41 @@
                     <UplinkView />
                     break;
 
+                case "Identity":
+                    <IdentityView Project="ProjectState.SelectedFile" />
+                break;
+
                 default:
-                    <div class="unsupported-error">
-                        <p>[ERROR]: UNKNOWN_FILE_TYPE_ENCOUNTERED</p>
-                    </div>
-                    break;
+                    @if (ProjectState.SelectedFile?.Extension == ".xaml")
+                    {
+                        <WPFWindow Project="ProjectState.SelectedFile" />
+                    }
+                    else if (ProjectState.SelectedFile != null)
+                    {
+                        <CodeEditorView Project="ProjectState.SelectedFile" />
+                    }
+                 break;
+            } *@
+            @if (ProjectState.SelectedFile?.FileName == "Identity")
+            {
+                @* This is the specialized view that contains BOTH the code and the HUD *@
+                <IdentityView />
+            }
+            else
+            {
+                @* Standard logic for all other files *@
+                @switch (ProjectState.SelectedFile?.Extension?.ToLower())
+                {
+                    case ".xaml":
+                        <WPFWindow Project="ProjectState.SelectedFile" />
+                        break;
+                    case ".link":
+                        <UplinkView />
+                        break;
+                    default:
+                        <CodeEditorView Project="ProjectState.SelectedFile" />
+                        break;
+                }
             }
         </div>
 

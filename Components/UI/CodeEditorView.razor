@@ -1,5 +1,6 @@
 ﻿@using System.Text
 @inject TerminalService TerminalSvc
+@inject HttpClient Http
 @implements IDisposable
 
 <div class="editor-container">
@@ -32,41 +33,78 @@
     {
         // Reset and trigger the "Streaming" effect
         HighlightedCode = "";
-        await StreamCode();
+        await LoadSourceCode();
     }
 
-    private async Task StreamCode()
+    private async Task LoadSourceCode()
     {
-        var rawCode = GetProjectCode(Project.FileName);
-        var lines = rawCode.Split('\n');
+        // Project.PhysicalPath would be "Developer/Identity.cs"
+        try
+        {
+            // The Http client uses the BaseAddress we set in Program.cs
+            var content = await Http.GetStringAsync(Project.PhysicalPath);
+            await StreamCodeToUI(content);
+        }
+        catch (Exception ex)
+        {
+            TerminalSvc.AddLog($"ERR: Could not resolve {Project.PhysicalPath}", LogType.Error);
+        }
+    }
+
+    private async Task StreamCodeToUI(string content)
+    {
+        // 1. Clear previous content
+        HighlightedCode = ""; 
+        StateHasChanged();
+
+        // 2. Split the raw file into lines
+        var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
         LineCount = lines.Length;
 
         StringBuilder sb = new();
+
+        // 3. Loop through and "Type" each line
         foreach (var line in lines)
         {
-            // Simple syntax highlighting logic (wrapping keywords in spans)
+            // Highlight the line before appending
             string processedLine = ProcessHighlighting(line);
+        
             sb.AppendLine(processedLine);
             HighlightedCode = sb.ToString();
 
+            // 4. Trigger UI refresh and wait (speed of the stream)
             StateHasChanged();
-            await Task.Delay(15); // Adjust for "typing" speed
+            await Task.Delay(20); 
         }
 
-        TerminalSvc.AddLog($"Source rendering complete: {Project.FileName}", LogType.Success);
+        TerminalSvc.AddLog($"File rendering complete: {Project.FileName}", LogType.Success);
     }
 
     private string ProcessHighlighting(string line)
     {
-        // Simple regex-free highlighting for common C# keywords
-        string[] keywords = { "public", "private", "class", "async", "await", "string", "var", "new", "return", "if" };
+        if (string.IsNullOrWhiteSpace(line)) return line;
+
+        // Simple keyword list for the "Source Code" feel
+        string[] keywords = { "public", "private", "class", "async", "await", "string", "var", "new", "return", "if", "namespace", "using" };
+
+        // Escape HTML characters to prevent rendering bugs
+        line = line.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+
         foreach (var word in keywords)
         {
+            // Use a space or boundary check to ensure we don't highlight words inside other words
             line = line.Replace(word + " ", $"<span class='keyword'>{word}</span> ");
         }
+
+        // Optional: Highlight comments
+        if (line.Trim().StartsWith("//"))
+        {
+            return $"<span class='comment'>{line}</span>";
+        }
+
         return line;
     }
-
+    
     private string GetProjectCode(string fileName)
     {
         // In a real app, you might load this from a .txt file in wwwroot

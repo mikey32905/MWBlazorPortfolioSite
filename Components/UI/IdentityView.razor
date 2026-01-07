@@ -1,0 +1,88 @@
+﻿@inject ProjectStateService ProjectState
+@inject TerminalService TerminalSvc
+@inject IJSRuntime JS
+
+@if (ProjectState.SelectedFile != null)
+{
+    <div class="identity-wrapper">
+        <div class="code-section">
+            <div class="editor-label">SOURCE_FILE: IDENTITY.CS</div>
+            <CodeEditorView Project="ProjectState.SelectedFile" />
+        </div>
+
+        <div class="profile-section">
+            <div class="avatar-box">
+                <div class="scan-line"></div>
+                <img src="img/portfolioImages/MyPortfolioAvatar.png" alt="User Avatar" />
+                <div class="corner-accents"></div>
+            </div>
+
+            <button class="extract-btn" @onclick="HandleResumeDownload">
+                <span class="btn-icon">⬇</span> DATA_EXTRACT.PDF
+            </button>
+
+            <SystemStatus />
+
+            <div class="biometric-stats">
+                <div class="section-divider">
+                    <span>CORE_COMPETENCIES</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <div class="stat-item">
+                    <label>EXPERIENCE_LEVEL</label>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 85%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <label>SYSTEM_ARCHITECTURE</label>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 92%"></div></div>
+                </div>
+                <div class="stat-item">
+                    <label>UI_ENCRYPTION (CSS)</label>
+                    <div class="progress-bg"><div class="progress-fill" style="width: 78%"></div></div>
+                </div>
+            </div>
+
+            <div class="access-badges">
+                <span class="badge">.NET_CERTIFIED</span>
+                <span class="badge">WASM_READY</span>
+                <span class="badge">C#_EXPERT</span>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+@code {
+    [Parameter] public ProjectFile Project { get; set; } = new();
+
+
+
+    private async Task HandleResumeDownload()
+    {
+        // 1. Play the "Hacker" role in the terminal
+        TerminalSvc.AddLog("INITIATING_SECURE_EXTRACT...", LogType.System);
+        await Task.Delay(800);
+
+        TerminalSvc.AddLog("BYPASSING_ENCRYPTION_LAYERS...", LogType.Warning);
+        await Task.Delay(600);
+
+        // 2. Trigger the actual browser download
+        // Ensure your resume is at wwwroot/data/resume.pdf
+        await JS.InvokeVoidAsync("open", "data/resume.pdf", "_blank");
+
+        TerminalSvc.AddLog("EXTRACT_SUCCESSFUL: Local copy generated.", LogType.Success);
+    }
+
+    // Ensure this component re-renders if the state changes
+    protected override void OnInitialized()
+    {
+        ProjectState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ProjectState.OnChange -= StateHasChanged;
+    }
+}

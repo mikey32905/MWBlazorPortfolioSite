@@ -1,23 +1,72 @@
 ﻿@inject TerminalService TerminalSvc
+@inject IJSRuntime JS
 @implements IDisposable
 
 <div class="terminal-container" @ref="terminalRef">
-    @foreach (var log in TerminalSvc.Logs)
-    {
-        <div class="log-entry @log.Type.ToString().ToLower()">
-            <span class="timestamp">[@log.Timestamp.ToString("HH:mm:ss")]</span>
-            <span class="message">> @log.Message</span>
-        </div>
-    }
-    <div class="cursor">_</div>
+    <div class="terminal-output">
+        @foreach (var log in TerminalSvc.Logs)
+        {
+            <div class="log-entry @log.Type.ToString().ToLower()">
+                <span class="timestamp">[@log.Timestamp.ToString("HH:mm:ss")]</span>
+                <span class="message">@log.Message</span>
+            </div>
+        }
+    </div>
+
+    @* THE NEW COMMAND INPUT *@
+    <div class="command-line">
+        <span class="prompt">guest@portfolio:~$</span>
+        <input @bind="userInput"
+               @onkeyup="HandleKeyPress"
+               placeholder="ENTER_COMMAND..."
+               spellcheck="false"
+               class="terminal-input" />
+    </div>
 </div>
 
 @code {
     ElementReference terminalRef;
 
-    protected override void OnInitialized() => TerminalSvc.OnLogAdded += StateHasChanged;
+    protected override void OnInitialized()
+    {
+        // Subscribe to the "Routine"
+        TerminalSvc.OnNewLog += HandleNewLog;
+    }
 
-    public void Dispose() => TerminalSvc.OnLogAdded -= StateHasChanged;
+    public void Dispose()
+    {
+        // Unsubscribe to prevent memory leaks
+        TerminalSvc.OnNewLog -= HandleNewLog;
+    }
 
     // Logic to auto-scroll could be added here via JS Interop
+
+    private string userInput = "";
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(userInput))
+        {
+            TerminalSvc.ProcessCommand(userInput);
+            userInput = ""; // Clear the input for the next command
+        }
+    }
+
+    // This is the actual routine that runs when the event fires
+    private async void HandleNewLog()
+    {
+        // Force the UI to refresh with the new logs
+        InvokeAsync(StateHasChanged);
+        // Wait a tiny bit for the HTML to render, then scroll
+        await Task.Delay(50);
+        await JS.InvokeVoidAsync("scrollToBottom", "terminal-output-id");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("focusElement", "terminalInput");
+        }
+    }
 }

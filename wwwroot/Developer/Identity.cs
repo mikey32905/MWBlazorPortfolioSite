@@ -1,6 +1,6 @@
 ﻿using MWBlazorPortfolioSite.Interfaces;
 
-namespace MWBlazorPortfolioSite.Developer
+namespace MWBlazorPortfolioSite.wwwroot.Developer
 {
     public class Identity : IDeveloper, IProblemSolver
     {

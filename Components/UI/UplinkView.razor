@@ -2,27 +2,37 @@
 @inject ThemeService ThemeSvc
 
 <div class="uplink-container">
-    <div class="uplink-header">
-        <h2 class="glitch" data-text="EXTERNAL_UPLINK_ESTABLISHED">EXTERNAL_UPLINK_ESTABLISHED</h2>
-        <p class="node-id">LOCAL_NODE: @Environment.MachineName // PROTOCOL: HTTPS_SECURE</p>
-    </div>
-
-    <div class="node-grid">
+    <div class="uplink-grid">
         @foreach (var link in SocialLinks)
         {
-            <a href="@link.Url" target="_blank" class="node-card" @onmouseover="() => LogHover(link.Name)">
-                <div class="node-icon">@link.Icon</div>
-                <div class="node-info">
-                    <div class="node-name">@link.Name.ToUpper()</div>
-                    <div class="node-desc">@link.Description</div>
+            <a href="@link.Url" target="_blank" class="uplink-card">
+                <div class="card-glow"></div>
+                <div class="card-content">
+                    <div class="card-top">
+                        <span class="node-status">● LIVE_SIGNAL</span>
+                        <div class="signal-bars">
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar active"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="icon-hex">@link.Icon</div>
+                        <div class="text-group">
+                            <h3 class="node-title">@link.Name.ToUpper()</h3>
+                            <p class="node-path">https://ext.node/@link.Name.ToLower()</p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="access-text">ESTABLISH_CONNECTION</span>
+                        <span class="arrow">→</span>
+                    </div>
                 </div>
-                <div class="node-status">CONNECT_ON_CLICK</div>
             </a>
         }
-    </div>
-
-    <div class="uplink-footer">
-        <p>CAUTION: Accessing external domains outside of PORTFOLIO_OS firewall.</p>
     </div>
 </div>
 
@@ -37,5 +47,10 @@
     private void LogHover(string target)
     {
         TerminalSvc.AddLog($"Pinging external node: {target}...", LogType.System);
+    }
+
+    private void NotifyTerminal(string platform)
+    {
+        TerminalSvc.AddLog($"SCANNING_LINK: Initializing handshake with {platform} servers...", LogType.System);
     }
 }
