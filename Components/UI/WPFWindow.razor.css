@@ -1,30 +1,78 @@
-﻿.main-stage-container::before {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 10;
-    pointer-events: none;
-    background-size: 100% 2px, 3px 100%;
+﻿.wpf-window {
+    width: 90%;
+    height: 85%;
+    margin: auto;
+    /* FIX: Slightly lighter background to create separation from the site's black background */
+    background: rgba(25, 25, 25, 0.95);
+    backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    /* FIX: Stronger glow to define the window edges */
+    border: 2px solid var(--accent-glow);
+    box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.25);
+    animation: window-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Add a quick "Power On" animation when a project loads */
-.wpf-window {
-    animation: monitorIn 0.4s ease-out;
+.wpf-title-bar {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* FIX: Use a high-contrast background for the title bar */
+    background: rgba(var(--accent-rgb), 0.15);
+    border-bottom: 2px solid var(--accent-glow)
 }
 
-@keyframes monitorIn {
+.window-title {
+    font-size: 0.75rem;
+    /* FIX: Brighter text for readability */
+    color: #FFFFFF;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.window-controls {
+    display: flex;
+    gap: 15px;
+    color: #555;
+}
+
+.wpf-viewport {
+    flex-grow: 1;
+    position: relative;
+    /* FIX: A very subtle inner glow to make the content "pop" */
+    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.05) 0%, transparent 80%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wpf-app-content img {
+    max-width: 95%;
+    border: 2px solid #444;
+    /* FIX: Boost image brightness so the screenshots are clear */
+    filter: brightness(1.1) contrast(1.1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.wpf-status-bar {
+    padding: 5px 15px;
+    background: #000;
+    border-top: 1px solid #222;
+    display: flex;
+    gap: 20px;
+    font-size: 0.7rem;
+    color: #444;
+}
+
+@keyframes window-pop {
     from {
-        transform: scaleY(0.005) scaleX(0);
-        filter: brightness(3);
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
     }
 
     to {
-        transform: scaleY(1) scaleX(1);
-        filter: brightness(1);
+        opacity: 1;
+        transform: scale(1) translateY(0);
     }
 }

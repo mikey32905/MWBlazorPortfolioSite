@@ -1,4 +1,7 @@
-﻿<div class="wpf-window hacker-border">
+﻿@inject ThemeService ThemeSvc
+@inject TerminalService TerminalSvc
+
+<div class="wpf-window hacker-border">
     <div class="wpf-title-bar" style="background: @Project.AccentColor">
         <span class="wpf-icon">◈</span>
         <span class="window-name">@Project.FileName - Windows Presentation Foundation</span>
@@ -22,7 +25,19 @@
 </div>
 
 @code {
-    [Parameter]
-    public ProjectFile Project { get; set; } = default;
+    [Parameter] public ProjectFile Project { get; set; } = new();
+    private bool IsBooting = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsBooting = true;
+        TerminalSvc.AddLog($"Launching WPF Sandbox: {Project.FileName}.exe", LogType.System);
+
+        // Simulate the "Heavy" WPF startup time
+        await Task.Delay(800);
+        IsBooting = false;
+
+        TerminalSvc.AddLog($"{Project.FileName} UI Thread Started.", LogType.Success);
+    }
 
 }

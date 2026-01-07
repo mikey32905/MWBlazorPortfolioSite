@@ -1,0 +1,62 @@
+﻿.editor-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #050505;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+}
+
+.editor-tabs {
+    display: flex;
+    background: #0d0d0d;
+    padding-top: 5px;
+}
+
+.tab {
+    padding: 8px 15px;
+    background: #1e1e1e;
+    color: #fff;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-top: 2px solid var(--accent-glow);
+}
+
+.code-viewport {
+    display: flex;
+    flex-grow: 1;
+    overflow: auto;
+    padding: 10px 0;
+}
+
+.line-numbers {
+    width: 50px;
+    text-align: right;
+    padding-right: 15px;
+    color: #444;
+    user-select: none;
+    border-right: 1px solid #1a1a1a;
+}
+
+.code-content {
+    margin: 0;
+    padding-left: 15px;
+    color: #d4d4d4;
+    font-size: 0.9rem;
+    white-space: pre;
+}
+
+/* Syntax Highlighting Classes */
+::deep .keyword {
+    color: var(--accent-glow);
+    font-weight: bold;
+}
+
+::deep .comment {
+    color: #6a9955;
+}
+
+::deep .string {
+    color: #ce9178;
+}

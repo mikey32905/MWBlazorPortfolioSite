@@ -1,0 +1,79 @@
+﻿@using System.Text
+@inject TerminalService TerminalSvc
+@implements IDisposable
+
+<div class="editor-container">
+    <div class="editor-tabs">
+        <div class="tab active">
+            <span class="file-icon">@Project.Icon</span>
+            @Project.FileName@Project.Extension
+            <span class="tab-close">×</span>
+        </div>
+    </div>
+
+    <div class="code-viewport">
+        <div class="line-numbers">
+            @for (int i = 1; i <= LineCount; i++)
+            {
+                <div class="line-num">@i</div>
+            }
+        </div>
+        <pre class="code-content"><code>@((MarkupString)HighlightedCode)</code></pre>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ProjectFile Project { get; set; } = new();
+
+    private string HighlightedCode = "";
+    private int LineCount = 1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Reset and trigger the "Streaming" effect
+        HighlightedCode = "";
+        await StreamCode();
+    }
+
+    private async Task StreamCode()
+    {
+        var rawCode = GetProjectCode(Project.FileName);
+        var lines = rawCode.Split('\n');
+        LineCount = lines.Length;
+
+        StringBuilder sb = new();
+        foreach (var line in lines)
+        {
+            // Simple syntax highlighting logic (wrapping keywords in spans)
+            string processedLine = ProcessHighlighting(line);
+            sb.AppendLine(processedLine);
+            HighlightedCode = sb.ToString();
+
+            StateHasChanged();
+            await Task.Delay(15); // Adjust for "typing" speed
+        }
+
+        TerminalSvc.AddLog($"Source rendering complete: {Project.FileName}", LogType.Success);
+    }
+
+    private string ProcessHighlighting(string line)
+    {
+        // Simple regex-free highlighting for common C# keywords
+        string[] keywords = { "public", "private", "class", "async", "await", "string", "var", "new", "return", "if" };
+        foreach (var word in keywords)
+        {
+            line = line.Replace(word + " ", $"<span class='keyword'>{word}</span> ");
+        }
+        return line;
+    }
+
+    private string GetProjectCode(string fileName)
+    {
+        // In a real app, you might load this from a .txt file in wwwroot
+        // For now, return a placeholder or the Identity.cs string we wrote
+        if (fileName == "Identity") return "// Identity.cs loaded...\npublic class ProfessionalProfile ...";
+        return "// Loading module source code...";
+    }
+
+    public void Dispose() { }
+}

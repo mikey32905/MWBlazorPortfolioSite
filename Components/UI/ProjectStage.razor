@@ -1,0 +1,58 @@
+﻿@inject ProjectStateService ProjectState
+
+
+<div class="stage-container">
+    @if (ProjectState.SelectedFile == null)
+    {
+        <EmptyState />
+    }
+    else
+    {
+        <div class="stage-header">
+            <span class="breadcrumb">SYSTEM / @ProjectState.SelectedFile.Category.ToUpper() / @ProjectState.SelectedFile.FileName@ProjectState.SelectedFile.Extension</span>
+        </div>
+
+        <div class="stage-viewport">
+            @switch (ProjectState.SelectedFile.Extension.ToLower())
+            {
+                case ".xaml":
+                    <WPFWindow Project="ProjectState.SelectedFile" />
+                    break;
+                
+                case ".razor":
+                case ".cs":
+                    <CodeEditorView Project="ProjectState.SelectedFile" />
+                    break;
+
+                case ".link":
+                    <UplinkView />
+                    break;
+
+                default:
+                    <div class="unsupported-error">
+                        <p>[ERROR]: UNKNOWN_FILE_TYPE_ENCOUNTERED</p>
+                    </div>
+                    break;
+            }
+        </div>
+
+        <style>
+            .wpf-active {
+                /* This creates a soft halo behind the WPF window */
+                background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
+            }
+        </style>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        ProjectState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ProjectState.OnChange -= StateHasChanged;
+    }
+}

@@ -1,0 +1,50 @@
+﻿.boot-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 9999; /* Ensure it covers everything */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Fira Code', monospace;
+    color: #39FF14; /* Matrix Green for the boot */
+}
+
+.boot-content {
+    width: 80%;
+    max-width: 600px;
+}
+
+.line {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.identity-stamp {
+    margin-top: 40px;
+    color: #fff;
+    text-shadow: 0 0 10px #39FF14;
+    animation: flicker 0.1s infinite;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.8s ease-out;
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 0.9;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.95;
+    }
+}

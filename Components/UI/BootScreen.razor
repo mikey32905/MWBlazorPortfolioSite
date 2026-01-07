@@ -1,0 +1,75 @@
+﻿@inject TerminalService TerminalSvc
+@inject IJSRuntime JSRuntime
+
+@if (!isComplete)
+{
+    <div class="boot-overlay @(isFading ? "fade-out" : "")">
+        <div class="boot-content">
+            <div class="boot-log">
+                @foreach (var line in displayedLines)
+                {
+                    <div class="line">@line</div>
+                }
+                <div class="cursor">_</div>
+            </div>
+
+            @if (showIdentity)
+            {
+                <div class="identity-stamp">
+                    <pre>
+        ██████╗ ██████╗  █████╗ ██╗███╗   ██╗
+        ██╔══██╗██╔══██╗██╔══██╗██║████╗  ██║
+        ██████╔╝██████╔╝███████║██║██╔██╗ ██║
+        ██╔══██╗██╔══██╗██╔══██║██║██║╚██╗██║
+        ██████╔╝██║  ██║██║  ██║██║██║ ╚████║
+        ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
+                            </pre>
+                    <div class="status">ACCESS_GRANTED: @DateTime.Now.ToString("yyyy-MM-dd HH:mm")</div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+private List<string> displayedLines = new();
+    private bool isComplete = false;
+    private bool isFading = false;
+    private bool showIdentity = false;
+
+    private string[] bootSequence = {
+        "[  OK  ] INITIALIZING_DOTNET_RUNTIME_v9.0.2",
+        "[  OK  ] ESTABLISHING_WASM_UPLINK",
+        "[  OK  ] LOADING_PROJECT_MANIFEST",
+        "[ WARN ] UNKNOWN_ACCESS_POINT_DETECTED",
+        "[  OK  ] BYPASSING_FIREWALL...",
+        "[  OK  ] DECRYPTING_IDENTITY_CORE..."
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            foreach (var line in bootSequence)
+            {
+                displayedLines.Add(line);
+                StateHasChanged();
+                await Task.Delay(400); // Timing of the hacker "scroll"
+            }
+
+            showIdentity = true;
+            StateHasChanged();
+            await Task.Delay(1500); // Let the logo sit for a second
+
+            isFading = true;
+            StateHasChanged();
+            await Task.Delay(800); // Match CSS fade-out time
+
+            isComplete = true;
+            StateHasChanged();
+            
+            // Log the successful boot to the permanent terminal footer
+            TerminalSvc.AddLog("System bypass successful. Welcome, User.", LogType.Success);
+        }
+    }
+}

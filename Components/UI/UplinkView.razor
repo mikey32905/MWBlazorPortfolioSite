@@ -1,0 +1,41 @@
+﻿@inject TerminalService TerminalSvc
+@inject ThemeService ThemeSvc
+
+<div class="uplink-container">
+    <div class="uplink-header">
+        <h2 class="glitch" data-text="EXTERNAL_UPLINK_ESTABLISHED">EXTERNAL_UPLINK_ESTABLISHED</h2>
+        <p class="node-id">LOCAL_NODE: @Environment.MachineName // PROTOCOL: HTTPS_SECURE</p>
+    </div>
+
+    <div class="node-grid">
+        @foreach (var link in SocialLinks)
+        {
+            <a href="@link.Url" target="_blank" class="node-card" @onmouseover="() => LogHover(link.Name)">
+                <div class="node-icon">@link.Icon</div>
+                <div class="node-info">
+                    <div class="node-name">@link.Name.ToUpper()</div>
+                    <div class="node-desc">@link.Description</div>
+                </div>
+                <div class="node-status">CONNECT_ON_CLICK</div>
+            </a>
+        }
+    </div>
+
+    <div class="uplink-footer">
+        <p>CAUTION: Accessing external domains outside of PORTFOLIO_OS firewall.</p>
+    </div>
+</div>
+
+@code {
+    private List<SocialLink> SocialLinks = new()
+    {
+        new SocialLink { Name = "GitHub", Url = "https://github.com/mikey32905", Icon = "📂", Description = "Source repositories & open-source contributions." },
+        new SocialLink { Name = "LinkedIn", Url = "https://www.linkedin.com/in/mike-williams-0511835/", Icon = "🔗", Description = "Professional network & career history." },
+        new SocialLink { Name = "Twitter/X", Url = "https://x.com/mikey32905", Icon = "🐦", Description = "Tech insights & community engagement." }
+    };
+
+    private void LogHover(string target)
+    {
+        TerminalSvc.AddLog($"Pinging external node: {target}...", LogType.System);
+    }
+}

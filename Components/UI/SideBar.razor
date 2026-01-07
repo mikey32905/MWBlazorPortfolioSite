@@ -30,16 +30,51 @@
 
     // --- YOUR HARDCODED MANIFEST ---
     private List<ProjectFile> ProjectManifest = new()
+{
+    // SYSTEM & IDENTITY
+    new ProjectFile { FileName = "Identity", Extension = ".cs", Category = "SYSTEM", AccentColor = "#FFFFFF", Icon = "👤" },
+    new ProjectFile { FileName = "Uplink", Extension = ".link", Category = "SYSTEM", AccentColor = "#FFD700", Icon = "📡" },
+
+    // WPF DESKTOP APPLICATIONS (Triggers the WpfWindow)
+    new ProjectFile {
+        FileName = "TitanVault",
+        Extension = ".xaml",
+        Category = "WPF_CORE",
+        AccentColor = "#39FF14", // Matrix Green
+        Icon = "🛡️"
+    },
+    new ProjectFile {
+        FileName = "HydraAnalytics",
+        Extension = ".xaml",
+        Category = "WPF_CORE",
+        AccentColor = "#00F3FF", // Cyan
+        Icon = "📊"
+    },
+
+    // BLAZOR WEB PROJECTS (Triggers the CodeEditor/LiveView)
+    new ProjectFile {
+        FileName = "NeuralNet_Dashboard",
+        Extension = ".razor",
+        Category = "BLAZOR_WASM",
+        AccentColor = "#BC13FE", // Voltage Violet
+        Icon = "🧠"
+    },
+    new ProjectFile {
+        FileName = "SignalR_Chat_Node",
+        Extension = ".razor",
+        Category = "BLAZOR_WASM",
+        AccentColor = "#FF3131", // Neon Red
+        Icon = "⚡"
+    }
+};
+
+    protected override void OnInitialized()
     {
-        new ProjectFile { FileName = "ApexInventory", Extension = ".xaml", Category = "WPF_Desktop", AccentColor = "#39FF14", Icon = "🖥️" },
-        new ProjectFile { FileName = "NexusPortal", Extension = ".razor", Category = "Blazor_WASM", AccentColor = "#00F3FF", Icon = "🌐" },
-        new ProjectFile { FileName = "SentinelGuard", Extension = ".cs", Category = "Full_Stack", AccentColor = "#BC13FE", Icon = "🛡️" },
-        new ProjectFile { FileName = "LuminaUI", Extension = ".razor", Category = "Blazor_WASM", AccentColor = "#00F3FF", Icon = "🎨" },
-        new ProjectFile { FileName = "Identity", Extension = ".cs", Category = "System", AccentColor = "#FFFFFF", Icon = "👤" }
-    };
+        // Optionally, select the first file by default
+        ProjectState.SelectFile(ProjectManifest.First(p => p.FileName == "Uplink"));
+    }
 
-
-  //  var filteredProjects = ProjectManifest.Where(p => p.FileName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+    //  var filteredProjects = ProjectManifest.Where(p => p.FileName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
 
     private async Task HandleFileClick(ProjectFile file)
     {
@@ -54,12 +89,21 @@
 
         // 3. (Optional) Navigate or Update Main Stage
         ProjectState.SelectFile(file); // This is where the variable is "Set"
-        TerminalSvc.AddLog($"Accessing {file.FileName}...", LogType.System);
+
+        if (file.Extension == ".link")
+        {
+            TerminalSvc.AddLog("WARNING: Establishing unencrypted bridge to external nodes...", LogType.Warning);
+            TerminalSvc.AddLog("UPLINK_PROTOCOL: Active.", LogType.Success);
+        }
+        else
+        {
+            TerminalSvc.AddLog($"Accessing {file.FileName}...", LogType.System);
+        }
 
         await OnFileSelected.InvokeAsync(file); // This triggers the parent's method
     }
 
-
+    
     
    
 }

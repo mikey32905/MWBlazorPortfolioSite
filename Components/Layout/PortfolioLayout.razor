@@ -2,6 +2,7 @@
 @inject ThemeService ThemeSvc
 @inject ProjectStateService ProjectState
 
+<BootScreen />
 
 @* This dynamic style block listens to the ThemeService *@
 <style>
@@ -28,14 +29,15 @@
     </aside>
 
     <main class="content-area">
-        @if (SelectedFile == null)
+        <ProjectStage />
+        @* @if (SelectedFile == null)
         {
             <EmptyState />
         }
         else
         {
             @Body
-        }
+        } *@
     </main>
 
     <footer class="terminal-area">

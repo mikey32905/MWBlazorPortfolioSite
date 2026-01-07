@@ -1,0 +1,36 @@
+﻿.stage-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.stage-header {
+    background: #111;
+    padding: 8px 15px;
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.2);
+    font-size: 0.75rem;
+    color: #666;
+    font-family: 'Fira Code', monospace;
+}
+
+.stage-viewport {
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden;
+    /* This creates a "Power On" animation whenever the content changes */
+    animation: viewport-flash 0.3s ease-out;
+}
+
+@keyframes viewport-flash {
+    0% {
+        opacity: 0;
+        filter: brightness(3);
+        transform: scale(0.99);
+    }
+
+    100% {
+        opacity: 1;
+        filter: brightness(1);
+        transform: scale(1);
+    }
+}
