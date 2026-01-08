@@ -1,25 +1,23 @@
 ﻿@inject ThemeService ThemeSvc
 @inject TerminalService TerminalSvc
 @inject ProjectStateService ProjectState
-
+@inject ProjectManifestService Manifest
 
 <div class="sidebar-explorer">
-    <div class="explorer-header">EXPLORER: PORTFOLIO_OS</div>
-
-    @foreach (var group in ProjectManifest.GroupBy(p => p.Category))
+    @foreach (var group in Manifest.GetGroupedProjects())
     {
         <div class="category-folder">
-            <span class="arrow">▼</span> @group.Key.ToUpper()
-        </div>
+            <span class="folder-label">@group.Key</span>
 
-        @foreach (var file in group)
-        {
-            <div class="file-item @(SelectedFile == file ? "active" : "")"
-                 @onclick="() => HandleFileClick(file)">
-                <span class="file-icon">@file.Icon</span>
-                <span class="file-name">@file.FileName</span><span class="file-ext">@file.Extension</span>
-            </div>
-        }
+            @foreach (var file in group)
+            {
+                <div class="file-item @(IsSelected(file) ? "active" : "")"
+                     @onclick="() => HandleFileClick(file)">
+                    <span class="file-icon">@file.Icon</span>
+                    <span class="file-name">@file.FileName@file.Extension</span>
+                </div>
+            }
+        </div>
     }
 </div>
 
@@ -28,60 +26,24 @@
 
     [Parameter] public EventCallback<ProjectFile> OnFileSelected { get; set; }
 
-    // --- YOUR HARDCODED MANIFEST ---
-    private List<ProjectFile> ProjectManifest = new()
-{
-    // SYSTEM & IDENTITY
-    new ProjectFile { FileName = "Identity", Extension = ".cs", Category = "SYSTEM", PhysicalPath="Developer/Identity.cs", AccentColor = "#FFFFFF", Icon = "👤" },
-    new ProjectFile { FileName = "Uplink", Extension = ".link", Category = "SYSTEM", AccentColor = "#FFD700", Icon = "📡" },
-
-    // WPF DESKTOP APPLICATIONS (Triggers the WpfWindow)
-    new ProjectFile {
-        FileName = "TitanVault",
-        Extension = ".xaml",
-        Category = "WPF_CORE",
-        AccentColor = "#39FF14", // Matrix Green
-        Icon = "🛡️"
-    },
-    new ProjectFile {
-        FileName = "HydraAnalytics",
-        Extension = ".xaml",
-        Category = "WPF_CORE",
-        AccentColor = "#00F3FF", // Cyan
-        Icon = "📊"
-    },
-
-    // BLAZOR WEB PROJECTS (Triggers the CodeEditor/LiveView)
-    new ProjectFile {
-        FileName = "NeuralNet_Dashboard",
-        Extension = ".razor",
-        Category = "BLAZOR_WASM",
-        AccentColor = "#BC13FE", // Voltage Violet
-        Icon = "🧠"
-    },
-    new ProjectFile {
-        FileName = "SignalR_Chat_Node",
-        Extension = ".razor",
-        Category = "BLAZOR_WASM",
-        AccentColor = "#FF3131", // Neon Red
-        Icon = "⚡"
-    }
-};
+    private bool IsSelected(ProjectFile file) =>
+        ProjectState.SelectedFile?.FileName == file.FileName;
+   
 
     protected override void OnInitialized()
     {
         // Optionally, select the first file by default
-        ProjectState.SelectFile(ProjectManifest.First(p => p.FileName == "Uplink"));
+       // ProjectState.SelectFile(ProjectManifest.First(p => p.FileName == "Uplink"));
     }
 
     //  var filteredProjects = ProjectManifest.Where(p => p.FileName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
 
     private async Task HandleFileClick(ProjectFile file)
     {
-        SelectedFile = file;
-
+        ProjectState.SelectFile(file);
         // 1. Update the global site glow
         ThemeSvc.UpdateTheme(file.AccentColor);
+        TerminalSvc.AddLog($"MOUNTING_MODULE: {file.FileName.ToUpper()}", LogType.System);
 
         // 2. Log the action to your new Terminal Service
         TerminalSvc.AddLog($"Loading module: {file.FileName}{file.Extension}...", LogType.System);

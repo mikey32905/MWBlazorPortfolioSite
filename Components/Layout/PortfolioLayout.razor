@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject ThemeService ThemeSvc
 @inject ProjectStateService ProjectState
+@inject ProjectManifestService Manifest
 
 <BootScreen />
 
@@ -46,8 +47,15 @@
 
 </div>
 
+<div class="crt-overlay"></div>
+
 @code {
     public ProjectFile? SelectedFile { get; set; } // The variable you saw in Line 20
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Manifest.InitializeAsync();
+    }
 
     private void UpdateSelection(ProjectFile file)
     {

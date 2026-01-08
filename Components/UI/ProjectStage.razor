@@ -53,6 +53,12 @@
                 @* Standard logic for all other files *@
                 @switch (ProjectState.SelectedFile?.Extension?.ToLower())
                 {
+                    case ".razor" when !string.IsNullOrEmpty(ProjectState.SelectedFile.LiveUrl):
+                        <LiveAppViewer ProjectUrl="@ProjectState.SelectedFile.LiveUrl" />
+                        break;
+                    case ".diag":
+                        <SystemDiagnostic />
+                        break;
                     case ".xaml":
                         <WPFWindow Project="ProjectState.SelectedFile" />
                         break;

@@ -1,0 +1,65 @@
+﻿.diag-container {
+    padding: 30px;
+    height: 100%;
+    background-image: linear-gradient(rgba(var(--accent-rgb), 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--accent-rgb), 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+}
+
+.diag-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent-glow);
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+}
+
+.diag-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.diag-card {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    padding: 20px;
+}
+
+.big-value {
+    font-size: 2.5rem;
+    color: var(--accent-glow);
+    text-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* The Mini-Graph */
+.diag-graph {
+    height: 60px;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    margin-top: 15px;
+}
+
+.bar {
+    flex: 1;
+    background: var(--accent-glow);
+    min-width: 4px;
+    transition: height 0.3s ease;
+}
+
+.log-output {
+    margin-top: 30px;
+    background: #050505;
+    padding: 15px;
+    border: 1px solid #222;
+    height: 200px;
+}
+
+.log-line {
+    font-size: 0.7rem;
+    color: #00FF41;
+    margin-bottom: 4px;
+}

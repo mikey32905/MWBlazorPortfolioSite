@@ -1,0 +1,130 @@
+﻿@page "/tip-calculator"
+
+<PageTitle>Tip Calculator</PageTitle>
+
+<div class="container-xxl my-3">
+     <div class="calculator-container">
+        <div class="calculator-card">
+            <div class="icon-header">
+                @* <div class="icon-circle"> *@
+                    <img src="/img/TipTop_icon(1).png" class="img-fluid" />
+               @*  </div> *@
+            </div>
+            <h1 class="title">TipTop: The Tip Calculator</h1>
+            <p class="subtitle">Calculate your tip quickly and easily</p>
+
+            <div class="input-section">
+                <label class="input-label">Bill Amount</label>
+                <div class="input-wrapper">
+                    <span class="dollar-sign">$</span>
+                    <input type="number"
+                           @bind="BillAmount"
+                           @bind:event="oninput"
+                           placeholder="0.00"
+                           step="0.01"
+                           class="bill-input" />
+                </div>
+            </div>
+
+            <div class="tip-section">
+                <label class="input-label">Select Tip Percentage</label>
+                <div class="tip-buttons">
+                    @foreach (var percentage in TipPercentages)
+                    {
+                        <button @onclick="() => SelectedTip = percentage"
+                                class="@GetTipButtonClass(percentage)">
+                            @percentage%
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="results-card">
+                <div class="result-row border-bottom">
+                    <span class="result-label">Tip Amount (@SelectedTip%)</span>
+                    <span class="result-value tip-value">
+                        $@TipAmount.ToString("F2")
+                    </span>
+                </div>
+
+                <div class="result-row border-bottom">
+                    <span class="result-label">Bill Amount</span>
+                    <span class="result-value bill-value">
+                        $@BillAmount.ToString("F2")
+                    </span>
+                </div>
+
+                <div class="result-row">
+                    <span class="result-label total-label">Total</span>
+                    <span class="result-value total-value">
+                        $@DisplayTotal.ToString("F2")
+                    </span>
+                </div>
+            </div>
+
+            <div class="toggle-section">
+                <div class="toggle-label-wrapper">
+                    <svg class="plus-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span class="toggle-label">Include tip in total</span>
+                </div>
+                <button @onclick="ToggleIncludeTip" class="@GetToggleClass()">
+                    <span class="@GetToggleButtonClass()"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private decimal billAmount = 0;
+    private int selectedTip = 15;
+    private bool includeInTotal = true;
+    private int[] TipPercentages = { 10, 15, 20, 30 };
+
+    private decimal BillAmount
+    {
+        get => billAmount;
+        set => billAmount = value >= 0 ? value : 0;
+    }
+
+    private int SelectedTip
+    {
+        get => selectedTip;
+        set => selectedTip = value;
+    }
+
+    private decimal TipAmount => BillAmount * SelectedTip / 100;
+
+    private decimal FinalTotal => BillAmount + TipAmount;
+
+    private decimal DisplayTotal => includeInTotal ? FinalTotal : BillAmount;
+
+    private void ToggleIncludeTip()
+    {
+        includeInTotal = !includeInTotal;
+    }
+
+    private string GetTipButtonClass(int percentage)
+    {
+        return SelectedTip == percentage
+            ? "tip-button tip-button-active"
+            : "tip-button tip-button-inactive";
+    }
+
+    private string GetToggleClass()
+    {
+        return includeInTotal
+            ? "toggle-button toggle-button-active"
+            : "toggle-button toggle-button-inactive";
+    }
+
+    private string GetToggleButtonClass()
+    {
+        return includeInTotal
+            ? "toggle-circle toggle-circle-active"
+            : "toggle-circle toggle-circle-inactive";
+    }
+}

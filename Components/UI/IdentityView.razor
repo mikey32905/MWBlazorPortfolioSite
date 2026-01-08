@@ -12,9 +12,17 @@
 
         <div class="profile-section">
             <div class="avatar-box">
+                <div class="avatar-flipper @(isFlipped ? "is-flipped" : "")">
+                    <div class="avatar-face avatar-front">
+                        <img src="img/portfolioImages/MyPortfolioAvatar.png" alt="AI Profile" />
+                    </div>
+
+                    <div class="avatar-face avatar-back">
+                        <img src="img/portfolioImages/portfolo-pic1(a).jpg" alt="Real Profile" />
+                    </div>
+                </div>
+
                 <div class="scan-line"></div>
-                <img src="img/portfolioImages/MyPortfolioAvatar.png" alt="User Avatar" />
-                <div class="corner-accents"></div>
             </div>
 
             <button class="extract-btn" @onclick="HandleResumeDownload">
@@ -56,7 +64,8 @@
 
 @code {
     [Parameter] public ProjectFile Project { get; set; } = new();
-
+    private bool isFlipped = false;
+    private System.Timers.Timer? flipTimer;
 
 
     private async Task HandleResumeDownload()
@@ -79,6 +88,16 @@
     protected override void OnInitialized()
     {
         ProjectState.OnChange += StateHasChanged;
+
+        // Flip every 4 seconds (matching the scan-move animation duration)
+        flipTimer = new System.Timers.Timer(4000);
+        flipTimer.Elapsed += (s, e) =>
+        {
+            isFlipped = !isFlipped;
+            InvokeAsync(StateHasChanged);
+        };
+        flipTimer.AutoReset = true;
+        flipTimer.Enabled = true;
     }
 
     public void Dispose()

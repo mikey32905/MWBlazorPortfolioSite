@@ -13,5 +13,6 @@ builder.Services.AddScoped<ThemeService>();
 builder.Services.AddScoped<TerminalService>();
 builder.Services.AddScoped<ProjectStateService>();
 builder.Services.AddScoped<PortfolioImageService>();
+builder.Services.AddScoped<ProjectManifestService>();
 
 await builder.Build().RunAsync();

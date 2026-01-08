@@ -3,42 +3,63 @@
     font-size: 0.9rem;
 }
 
-.explorer-header {
-    padding: 10px 15px;
-    font-size: 0.7rem;
-    color: #666;
-    letter-spacing: 1px;
+.sidebar-content {
+    padding: 10px 0;
+    user-select: none;
+    font-family: 'Fira Code', monospace;
 }
 
+/* Category Headers (Folders) */
 .category-folder {
-    padding: 8px 10px;
-    color: #888;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    margin-bottom: 15px;
 }
 
+.folder-label {
+    display: block;
+    padding: 5px 15px;
+    font-size: 0.65rem;
+    color: #555; /* Muted color for the "System" labels */
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #1a1a1a;
+    margin-bottom: 5px;
+}
+
+/* Individual File Items */
 .file-item {
-    padding: 4px 25px;
-    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-left: 2px solid transparent;
-    transition: background 0.2s;
+    padding: 6px 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: #aaa;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
     .file-item:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.03);
+        color: #fff;
+        padding-left: 25px; /* Subtle "slide" effect on hover */
     }
 
+    /* The Active/Selected State */
     .file-item.active {
-        background: rgba(255, 255, 255, 0.1);
-        border-left: 2px solid var(--accent-glow);
+        background: rgba(var(--accent-rgb), 0.1);
         color: var(--accent-glow);
+        border-left: 3px solid var(--accent-glow);
+        text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5);
     }
 
-.file-ext {
-    opacity: 0.5;
+.file-icon {
+    margin-right: 10px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

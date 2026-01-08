@@ -1,13 +1,31 @@
-﻿namespace MWBlazorPortfolioSite.Models
+﻿using System.Text.Json.Serialization;
+
+namespace MWBlazorPortfolioSite.Models
 {
     public class ProjectFile
     {
-        public string FileName { get; set; } = string.Empty;
-        public string Extension { get; set; } = ".razor"; // .xaml, .cs, etc.
-        public string Category { get; set; } = "Blazor"; // For grouping
-        public string AccentColor { get; set; } = "#00F3FF";
-        public string PhysicalPath { get; set; } = string.Empty;
-        public string Icon { get; set; } = "📄"; 
-        public string Description { get; set; } = string.Empty;
+        [JsonPropertyName("FileName")]
+        public string FileName { get; set; } = "";
+
+        [JsonPropertyName("Extension")]
+        public string Extension { get; set; } = "";
+
+        [JsonPropertyName("Category")]
+        public string Category { get; set; } = "GENERAL";
+
+        [JsonPropertyName("PhysicalPath")]
+        public string PhysicalPath { get; set; } = "";
+
+        [JsonPropertyName("LiveUrl")]
+        public string LiveUrl { get; set; } = "";
+
+        [JsonPropertyName("AccentColor")]
+        public string AccentColor { get; set; } = "#00FF41";
+
+        [JsonPropertyName("Icon")]
+        public string Icon { get; set; } = "📄";
+
+        [JsonPropertyName("Description")]
+        public string Description { get; set; } = "";
     }
 }
