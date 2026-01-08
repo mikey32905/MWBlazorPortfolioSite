@@ -1,0 +1,53 @@
+[
+  {
+    "FileName": "Identity",
+    "Extension": ".cs",
+    "Category": "SYSTEM",
+    "PhysicalPath": "Developer/Identity.cs",
+    "AccentColor": "#FFFFFF",
+    "Icon": "👤",
+    "Description": "CORE_IDENTITY_PROTOCOL"
+  },
+  {
+    "FileName": "System_Diagnostic",
+    "Extension": ".diag",
+    "Category": "SYSTEM",
+    "AccentColor": "#00FF41",
+    "Icon": "📊",
+    "Description": "RUNTIME_INTEGRITY_CHECK"
+  },
+  {
+    "FileName": "TipTop",
+    "Extension": ".razor",
+    "Category": "LIVE_APPS",
+    "LiveUrl": "https://tiptopcalculator.netlify.app/",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": "WEB_ASSEMBLY_TIPCALCULATOR"
+  },
+  {
+    "FileName": "TipTop",
+    "Extension": ".razor",
+    "Category": "BLAZOR_WASM",
+    "PhysicalPath": "Projects/TipTopApp/TipCalculator.razor",
+    "AccentColor": "#BC13FE",
+    "Icon": "🧠",
+    "Description": "WEB_ASSEMBLY_TIPCALCULATOR"
+  },
+  {
+    "FileName": "Uplink",
+    "Extension": ".link",
+    "Category": "SYSTEM",
+    "AccentColor": "#FFD700",
+    "Icon": "📡",
+    "Description": "SOCIAL_LINKS"
+  },
+  {
+    "FileName": "TitanVault",
+    "Extension": ".xaml",
+    "Category": "WPF_CORE",
+    "AccentColor": "#00F3FF",
+    "Icon": "📊",
+    "Description": "WPF_CORE_APP"
+  }
+]
