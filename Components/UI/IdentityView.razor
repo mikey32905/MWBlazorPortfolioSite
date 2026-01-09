@@ -3,41 +3,42 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 
-@if (ProjectState.SelectedFile != null)
+@if (ProjectState.SelectedFile == null)
 {
-    <div class="identity-wrapper">
-        <div class="code-section">
-            @if (identityFile != null)
-            {
-                @* Use the name we fixed: SelectedFile *@
-                <CodeEditorView SelectedFile="identityFile" />
-            }
-            else
-            {
-                <p>ERR: IDENTITY_SOURCE_NOT_MAPPED</p>
-            }
-            @* <div class="editor-label">SOURCE_FILE: IDENTITY.CS</div>
-            <CodeEditorView Project="ProjectState.SelectedFile" /> *@
-        </div>
-
+    <p>Loading System Profile...</p>
+}
+else
+{
+    <div class="identity-horizontal-wrapper">
+  
         <div class="profile-section">
-            <div class="avatar-box">
-                <div class="avatar-flipper @(isFlipped ? "is-flipped" : "")">
-                    <div class="avatar-face avatar-front">
-                        <img src="@($"{Nav.BaseUri}img/portfolioImages/MyPortfolioAvatar.png")" alt="AI Profile" />
-                    </div>
+            <div class="profile-sidebar-section">
+                <div class="avatar-flip-box">
+                    <div class="avatar-inner">
+                        <div class="avatar-face avatar-front">
+                            <img src="@($"{Nav.BaseUri}img/portfolioImages/MyPortfolioAvatar.png")" class="profile-img" alt="AI Profile" />
+                        </div>
 
-                    <div class="avatar-face avatar-back">
-                        <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" alt="Real Profile" />
+                        <div class="avatar-face avatar-back">
+                            <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" class="profile-img" alt="Real Profile" />
+                            <div class="scan-line"></div>
+                        </div>
                     </div>
                 </div>
+                <h2 class="dev-name">DEVELOPER_ID: MW</h2>
+                <p class="glitch-text" data-text="WPF/FULL_STACK_ENGINEER">WPF / FULL_STACK_ENGINEER</p>
+                
+                <a href="downloads/DATA_EXTRACT.pdf" target="_blank" class="sidebar-extract-btn">
+                    <span class="btn-icon">📥</span> [DATA_EXTRACT.PDF]
+                </a>
 
-                <div class="scan-line"></div>
+                
             </div>
 
-            <button class="extract-btn" @onclick="HandleResumeDownload">
+
+            @* <button class="extract-btn" @onclick="HandleResumeDownload">
                 <span class="btn-icon">⬇</span> DATA_EXTRACT.PDF
-            </button>
+            </button> *@
 
             <SystemStatus />
 
@@ -67,8 +68,24 @@
                 <span class="badge">C#_EXPERT</span>
             </div>
         </div>
+
+        <div class="code-main-section">
+            @if (identityFile != null)
+            {
+                @* Use the name we fixed: SelectedFile *@
+                <CodeEditorView SelectedFile="identityFile" />
+            }
+            else
+            {
+                <p>ERR: IDENTITY_SOURCE_NOT_MAPPED</p>
+            }
+            @* <div class="editor-label">SOURCE_FILE: IDENTITY.CS</div>
+            <CodeEditorView Project="ProjectState.SelectedFile" /> *@
+        </div>
+
     </div>
 
+    
 }
 
 

@@ -79,9 +79,10 @@
 }
 
 .content-area {
-    grid-area: content;
+    display: block; /* Remove display: flex if it's there */
+    overflow-y: auto;
+    height: 100vh; /* Ensure the frame takes the full window height */
     position: relative;
-    overflow: auto;
 }
 
 .terminal-area {

@@ -13,36 +13,6 @@
         </div>
 
         <div class="stage-viewport">
-            @* @switch (ProjectState.SelectedFile.Extension.ToLower())
-            {
-                case ".xaml":
-                    <WPFWindow Project="ProjectState.SelectedFile" />
-                    break;
-                
-                case ".razor":
-                case ".cs":
-                    <CodeEditorView Project="ProjectState.SelectedFile" />
-                    break;
-
-                case ".link":
-                    <UplinkView />
-                    break;
-
-                case "Identity":
-                    <IdentityView Project="ProjectState.SelectedFile" />
-                break;
-
-                default:
-                    @if (ProjectState.SelectedFile?.Extension == ".xaml")
-                    {
-                        <WPFWindow Project="ProjectState.SelectedFile" />
-                    }
-                    else if (ProjectState.SelectedFile != null)
-                    {
-                        <CodeEditorView Project="ProjectState.SelectedFile" />
-                    }
-                 break;
-            } *@
             @if (ProjectState.SelectedFile?.FileName == "Identity")
             {
                 @* This is the specialized view that contains BOTH the code and the HUD *@
