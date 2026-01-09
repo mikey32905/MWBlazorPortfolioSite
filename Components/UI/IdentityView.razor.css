@@ -1,4 +1,4 @@
-﻿.identity-wrapper {
+﻿﻿.identity-wrapper {
     display: grid;
     /* This forces two columns: Code takes 60%, Profile takes 40% */
     grid-template-columns: 60% 40%;

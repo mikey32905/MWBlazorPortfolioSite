@@ -2,6 +2,7 @@
 @inject ThemeService ThemeSvc
 @inject ProjectStateService ProjectState
 @inject ProjectManifestService Manifest
+@implements IDisposable
 
 <BootScreen />
 
@@ -15,7 +16,8 @@
 </style>
 
 <div class="app-shell" style="--accent-glow: @ThemeSvc.CurrentColor;">
-
+   
+ 
     <header class="system-header">
         <div class="logo">PORTFOLIO_OS // @(ThemeSvc.CurrentColor == "#39FF14" ? "WPF_MODE" : "WASM_MODE")</div>
         <nav class="system-controls">
@@ -25,9 +27,13 @@
         </nav>
     </header>
 
-    <aside class="sidebar-area">
+    <aside class="sidebar">
         <SideBar OnFileSelected="UpdateSelection"/>
     </aside>
+    @* The Sidebar with dynamic classes *@
+   @*  <div class="sidebar @(isMenuOpen ? "mobile-open" : "mobile-collapsed")">
+        <SideBar OnFileSelected="UpdateSelection"/>
+    </div> *@
 
     <main class="content-area">
         <ProjectStage />
@@ -50,15 +56,32 @@
 <div class="crt-overlay"></div>
 
 @code {
+    // 1. Declare the missing variable
+    // bool isMenuOpen = false;
+    // private void ToggleMobileMenu() => isMenuOpen = !isMenuOpen;
+
     public ProjectFile? SelectedFile { get; set; } // The variable you saw in Line 20
 
     protected override async Task OnInitializedAsync()
     {
         await Manifest.InitializeAsync();
+        // Subscribe to selection changes
+        ProjectState.OnSelectedFileChanged += HandleFileSelection;
+    }
+
+    private void HandleFileSelection()
+    {
+      //  isMenuOpen = false; // Automatically close the drawer
+        StateHasChanged();  // Refresh the UI
     }
 
     private void UpdateSelection(ProjectFile file)
     {
         SelectedFile = file; // The variable is "Set" here!
+    }
+
+    public void Dispose()
+    {
+        ProjectState.OnSelectedFileChanged -= HandleFileSelection;
     }
 }
