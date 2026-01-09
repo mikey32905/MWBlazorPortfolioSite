@@ -54,114 +54,37 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (SelectedFile == null) return;
+        // 1. Guard against nulls
+        if (SelectedFile == null || string.IsNullOrEmpty(SelectedFile.PhysicalPath))
+        {
+            FileContent = "NO_FILE_SELECTED";
+            return;
+        }
 
         try
         {
-            // Clear old content so the user knows a switch is happening
-            FileContent = "FETCHING_SOURCE_CODE...";
+            // 2. Clear old text so the user sees it's working
+            FileContent = "LOADING_SOURCE...";
             StateHasChanged();
 
-            // Fetch the new file
-            FileContent = await Http.GetStringAsync(SelectedFile.PhysicalPath);
+            // 3. Fetch the new file
+            // Note: Adding a timestamp (?v=) helps bypass GitHub's cache during testing
+            var versionedPath = $"{SelectedFile.PhysicalPath}?v={DateTime.Now.Ticks}";
+            FileContent = await Http.GetStringAsync(versionedPath);
 
-            // Let the UI render the text
             StateHasChanged();
 
-            // Wait a tiny bit for the DOM to update, then highlight
-            await Task.Delay(50);
+            // 4. Trigger the JS Highlighting
+            // We wait a tiny bit to ensure the HTML has rendered the new text
+            await Task.Delay(100);
             await JS.InvokeVoidAsync("applyHighlighting", "highlight-target");
         }
         catch (Exception ex)
         {
             FileContent = $"SYSTEM_ERROR: Could not load {SelectedFile.PhysicalPath}. Check GitHub case-sensitivity.";
+            StateHasChanged();
         }
     }
 
-    // private async Task LoadSourceCode()
-    // {
-    //     // Project.PhysicalPath would be "Developer/Identity.cs"
-    //     try
-    //     {
-    //         // Use the PhysicalPath (e.g., Projects/App/File.razor.txt)
-    //         FileContent = await Http.GetStringAsync(SelectedFile.PhysicalPath);
-            
-    //         // Allow the UI to render the code before calling JS
-    //         StateHasChanged(); 
-            
-    //         // Short delay ensures the DOM is ready for the highlighter
-    //         await Task.Delay(50); 
-    //         await JS.InvokeVoidAsync("applyHighlighting", "highlight-target", SelectedFile.Language);
-    //         // await StreamCodeToUI(FileContent);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         FileContent = $"CRITICAL_ERROR: Unable to mount {SelectedFile.PhysicalPath}. Error: {ex.Message}";
-    //         StateHasChanged();
-    //     }
-    // }
-
-    // private async Task StreamCodeToUI(string content)
-    // {
-    //     // 1. Clear previous content
-    //     HighlightedCode = ""; 
-    //     StateHasChanged();
-
-    //     // 2. Split the raw file into lines
-    //     var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-    //     LineCount = lines.Length;
-
-    //     StringBuilder sb = new();
-
-    //     // 3. Loop through and "Type" each line
-    //     foreach (var line in lines)
-    //     {
-    //         // Highlight the line before appending
-    //         string processedLine = ProcessHighlighting(line);
-        
-    //         sb.AppendLine(processedLine);
-    //         HighlightedCode = sb.ToString();
-
-    //         // 4. Trigger UI refresh and wait (speed of the stream)
-    //         StateHasChanged();
-    //         await Task.Delay(20); 
-    //     }
-
-    //     TerminalSvc.AddLog($"File rendering complete: {SelectedFile.FileName}", LogType.Success);
-    // }
-
-    // private string ProcessHighlighting(string line)
-    // {
-    //     if (string.IsNullOrWhiteSpace(line)) return line;
-
-    //     // Simple keyword list for the "Source Code" feel
-    //     string[] keywords = { "public", "private", "class", "async", "await", "string", "var", "new", "return", "if", "namespace", "using" };
-
-    //     // Escape HTML characters to prevent rendering bugs
-    //     line = line.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
-
-    //     foreach (var word in keywords)
-    //     {
-    //         // Use a space or boundary check to ensure we don't highlight words inside other words
-    //         line = line.Replace(word + " ", $"<span class='keyword'>{word}</span> ");
-    //     }
-
-    //     // Optional: Highlight comments
-    //     if (line.Trim().StartsWith("//"))
-    //     {
-    //         return $"<span class='comment'>{line}</span>";
-    //     }
-
-    //     return line;
-    // }
-    
-    // private string GetProjectCode(string fileName)
-    // {
-    //     // In a real app, you might load this from a .txt file in wwwroot
-    //     // For now, return a placeholder or the Identity.cs string we wrote
-    //     if (fileName == "Identity") return "// Identity.cs loaded...\npublic class ProfessionalProfile ...";
-    //     return "// Loading module source code...";
-    // }
-
-    public void Dispose() { }
+     public void Dispose() { }
 }
