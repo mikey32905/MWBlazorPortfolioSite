@@ -4,9 +4,45 @@
 @inject ProjectManifestService Manifest
 
 <div class="sidebar-explorer">
-    @foreach (var group in Manifest.GetGroupedProjects())
+    <div class="sidebar-header">EXPLORER</div>
+
+    <div class="file-tree">
+        @if (ProjectState.ProjectFiles != null)
+        {
+            @foreach (var categoryGroup in ProjectState.ProjectFiles.GroupBy(f => f.Category))
+            {
+                var category = categoryGroup.Key;
+                bool isOpen = expandedCategories.Contains(category);
+
+                <div class="folder-section">
+                    @* Toggle folder state on click *@
+                    <div class="folder-header" @onclick="() => ToggleFolder(category)" style="cursor: pointer;">
+                        <span class="folder-arrow">@(isOpen ? "▼" : "▶")</span>
+                        <span class="folder-icon">@(isOpen ? "📂" : "📁")</span>
+                        <span class="folder-name">@category</span>
+                    </div>
+
+                    @if (isOpen)
+                    {
+                        <div class="folder-content">
+                            @foreach (var file in categoryGroup)
+                            {
+                                <div class="file-item @(ProjectState.SelectedFile == file ? "active" : "")"
+                                     @onclick="() => ProjectState.SelectFile(file)">
+                                    <span class="file-icon" style="color: @file.AccentColor">@file.Icon</span>
+                                    <span class="file-name">@file.FileName@file.Extension</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+    @*   @foreach (var group in Manifest.GetGroupedProjects())
     {
-        <div class="category-folder">
+
+       <div class="category-folder">
             <span class="folder-label">@group.Key</span>
 
             @foreach (var file in group)
@@ -17,18 +53,14 @@
                     <span class="file-name">@file.FileName@file.Extension</span>
                 </div>
             }
-        </div>
-    }
+        </div> 
+    }*@
 </div>
 
 
 @code {
-    // private bool isCollapsed = true; // Sidebar starts closed on mobile
-
-    // private void ToggleSidebar()
-    // {
-    //     isCollapsed = !isCollapsed;
-    // }
+    // Stores the names of the folders that are currently expanded
+    private HashSet<string> expandedCategories = new();
     
     private ProjectFile? SelectedFile;
 
@@ -40,11 +72,32 @@
 
     protected override void OnInitialized()
     {
-        // Optionally, select the first file by default
-       // ProjectState.SelectFile(ProjectManifest.First(p => p.FileName == "Uplink"));
+        // Optional: Start with all folders expanded
+        if (ProjectState.ProjectFiles != null)
+        {
+            foreach (var cat in ProjectState.ProjectFiles.Select(f => f.Category).Distinct())
+            {
+                expandedCategories.Add(cat);
+            }
+        }
     }
 
-    //  var filteredProjects = ProjectManifest.Where(p => p.FileName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+    protected override async Task OnParametersSetAsync()
+    {
+        expandedCategories.Add(ProjectState.SelectedFile.Category);
+    }
+
+    private void ToggleFolder(string category)
+    {
+        if (expandedCategories.Contains(category))
+        {
+            expandedCategories.Remove(category);
+        }
+        else
+        {
+            expandedCategories.Add(category);
+        }
+    }
 
     private async Task HandleFileClick(ProjectFile file)
     {

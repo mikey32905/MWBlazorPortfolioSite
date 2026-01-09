@@ -2,6 +2,7 @@
 @inject ThemeService ThemeSvc
 @inject ProjectStateService ProjectState
 @inject ProjectManifestService Manifest
+@inject HttpClient Http
 @implements IDisposable
 
 <BootScreen />
@@ -64,7 +65,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Manifest.InitializeAsync();
+        // Only load if the list is currently empty
+        if (ProjectState.ProjectFiles == null || !ProjectState.ProjectFiles.Any())
+        {
+            var rawData = await Http.GetFromJsonAsync<List<ProjectFile>>("Data/projects.json");
+            if (rawData != null)
+            {
+                ProjectState.LoadProjects(rawData);
+                StateHasChanged(); // Tell the sidebar to wake up and show the files
+            }
+        }
+       // await Manifest.InitializeAsync();
         // Subscribe to selection changes
         ProjectState.OnSelectedFileChanged += HandleFileSelection;
     }

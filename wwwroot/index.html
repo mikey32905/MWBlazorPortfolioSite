@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="css/themes.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link href="MWBlazorPortfolioSite.styles.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
 
     <!--Favicon-->
     <link rel="icon" type="image/png" href="favicon(3)-40x40.png" />
@@ -49,13 +50,31 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
+    <!--<script src="_framework/blazor.webassembly.js"></script>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+
     <script>
         window.setTheme = (theme) => {
             document.querySelector('[data-cf-theme]').setAttribute('data-cf-theme', theme);
         };
+
+        window.applyHighlighting = (elementId, language) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                // If you are using Prism.js:
+                Prism.highlightElement(element);
+
+                // If you are using Highlight.js:
+                // hljs.highlightElement(element);
+            }
+        };
     </script>
 
-    <script src="_framework/blazor.webassembly.js"></script>
+    <!--<script src="_framework/blazor.webassembly.js"></script>-->
 
     <script>
         // Place your helper functions here
@@ -71,6 +90,8 @@
             if (element) element.focus();
         };
     </script>
+
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>

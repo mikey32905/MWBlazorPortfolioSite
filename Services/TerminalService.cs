@@ -25,6 +25,12 @@ namespace MWBlazorPortfolioSite.Services
             OnNewLog?.Invoke();
         }
 
+        public void LogRequest(string path)
+        {
+            // This helps you see the absolute URL in the terminal
+            AddLog($"FETCH_ATTEMPT: {path}", LogType.System);
+        }
+
         public void ProcessCommand(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return;

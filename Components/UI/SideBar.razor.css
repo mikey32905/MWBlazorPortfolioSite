@@ -10,46 +10,74 @@
 }
 
 /* Category Headers (Folders) */
-.category-folder {
-    margin-bottom: 15px;
+.folder-section {
+    margin-bottom: 10px;
 }
 
-.folder-label {
-    display: block;
-    padding: 5px 15px;
-    font-size: 0.65rem;
-    color: #555; /* Muted color for the "System" labels */
-    font-weight: bold;
-    letter-spacing: 1.5px;
+.folder-header {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    font-size: 0.7rem;
+    color: #a0a0a0;
     text-transform: uppercase;
-    border-bottom: 1px solid #1a1a1a;
-    margin-bottom: 5px;
+    transition: color 0.2s, background 0.2s;
+    user-select: none; /* Prevents text selection on double click */
+}
+
+    .folder-header:hover {
+        color: var(--accent-glow);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+.folder-arrow {
+    font-size: 0.6rem;
+    margin-right: 6px;
+    width: 10px;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.folder-icon {
+    margin-right: 8px;
+}
+
+/* Optional: Add a subtle animation to the folder content appearing */
+.folder-content {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Individual File Items */
 .file-item {
     display: flex;
     align-items: center;
-    padding: 6px 20px;
+    padding: 6px 10px;
     cursor: pointer;
-    font-size: 0.8rem;
-    color: #aaa;
-    transition: all 0.2s ease;
-    border-left: 3px solid transparent;
+    transition: background 0.2s ease;
+    border-radius: 4px;
+    margin: 2px 0;
 }
 
     .file-item:hover {
-        background: rgba(255, 255, 255, 0.03);
-        color: #fff;
-        padding-left: 25px; /* Subtle "slide" effect on hover */
+        background: rgba(var(--accent-rgb), 0.1);
     }
 
     /* The Active/Selected State */
     .file-item.active {
-        background: rgba(var(--accent-rgb), 0.1);
+        background: rgba(var(--accent-rgb), 0.2);
         color: var(--accent-glow);
-        border-left: 3px solid var(--accent-glow);
-        text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5);
     }
 
 .file-icon {

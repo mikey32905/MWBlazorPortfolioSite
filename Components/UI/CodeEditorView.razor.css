@@ -1,4 +1,23 @@
-﻿.editor-container {
+﻿.editor-wrapper {
+    height: 100%;
+    width: 100%;
+    background: #050505;
+    overflow: auto; /* Ensures scrollbars appear if code is long */
+}
+
+pre {
+    margin: 0;
+    padding: 20px;
+    height: 100%;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.editor-container {
     display: flex;
     flex-direction: column;
     height: 100%;

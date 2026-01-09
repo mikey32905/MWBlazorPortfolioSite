@@ -6,8 +6,17 @@
 {
     <div class="identity-wrapper">
         <div class="code-section">
-            <div class="editor-label">SOURCE_FILE: IDENTITY.CS</div>
-            <CodeEditorView Project="ProjectState.SelectedFile" />
+            @if (identityFile != null)
+            {
+                @* Use the name we fixed: SelectedFile *@
+                <CodeEditorView SelectedFile="identityFile" />
+            }
+            else
+            {
+                <p>ERR: IDENTITY_SOURCE_NOT_MAPPED</p>
+            }
+            @* <div class="editor-label">SOURCE_FILE: IDENTITY.CS</div>
+            <CodeEditorView Project="ProjectState.SelectedFile" /> *@
         </div>
 
         <div class="profile-section">
@@ -64,6 +73,7 @@
 
 @code {
     [Parameter] public ProjectFile Project { get; set; } = new();
+    private ProjectFile? identityFile;
     private bool isFlipped = false;
     private System.Timers.Timer? flipTimer;
 
@@ -87,6 +97,23 @@
     // Ensure this component re-renders if the state changes
     protected override void OnInitialized()
     {
+        // Option A: Find it in your loaded manifest
+        identityFile = ProjectState.ProjectFiles
+            .FirstOrDefault(f => f.FileName == "Identity");
+
+        // Option B: Manual fallback if manifest isn't loaded yet
+        if (identityFile == null)
+        {
+            Console.WriteLine("DEBUG: Identity file not found in ProjectState list.");
+            // identityFile = new ProjectFile
+            // {
+            //     FileName = "Identity",
+            //     Extension = ".cs",
+            //     PhysicalPath = "Developer/identity.cs",
+            //     Language = "csharp"
+            // };
+        }
+
         ProjectState.OnChange += StateHasChanged;
 
         // Flip every 4 seconds (matching the scan-move animation duration)

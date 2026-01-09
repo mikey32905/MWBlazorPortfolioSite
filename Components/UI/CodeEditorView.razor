@@ -1,13 +1,28 @@
 ﻿@using System.Text
 @inject TerminalService TerminalSvc
 @inject HttpClient Http
+@inject IJSRuntime JS
 @implements IDisposable
+
+<div class="editor-wrapper">
+    @if (string.IsNullOrEmpty(FileContent))
+    {
+        @* This prevents the "Invisible" state *@
+        <div class="loading-overlay">
+            <span class="glitch-text">FETCHING_SOURCE_DATA...</span>
+        </div>
+    }
+    else
+    {
+        <pre><code id="highlight-target" class="language-@SelectedFile.Language">@FileContent</code></pre>
+    }
+</div>
 
 <div class="editor-container">
     <div class="editor-tabs">
         <div class="tab active">
-            <span class="file-icon">@Project.Icon</span>
-            @Project.FileName@Project.Extension
+            <span class="file-icon">@SelectedFile.Icon</span>
+            @SelectedFile.FileName@SelectedFile.Extension
             <span class="tab-close">×</span>
         </div>
     </div>
@@ -24,94 +39,130 @@
 </div>
 
 @code {
-    [Parameter] public ProjectFile Project { get; set; } = new();
+    [Parameter] public ProjectFile SelectedFile { get; set; }
+
+    // This is the "Safety Net" that prevents the VS 2026 crash
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? UnmatchedParameters { get; set; }
+
+    // Add this one as an "Alias" to catch the Identity.cs call
+    [Parameter] public ProjectFile Project { get; set; }
+    private string? FileContent;
 
     private string HighlightedCode = "";
     private int LineCount = 1;
 
     protected override async Task OnParametersSetAsync()
     {
-        // Reset and trigger the "Streaming" effect
-        HighlightedCode = "";
-        await LoadSourceCode();
-    }
+        // Use whichever one isn't null
+        var activeFile = SelectedFile;
 
-    private async Task LoadSourceCode()
-    {
-        // Project.PhysicalPath would be "Developer/Identity.cs"
+        if (activeFile == null && UnmatchedParameters != null && UnmatchedParameters.ContainsKey("Project"))
+        {
+            activeFile = UnmatchedParameters["Project"] as ProjectFile;
+        }
+
         try
         {
-            // The Http client uses the BaseAddress we set in Program.cs
-            var content = await Http.GetStringAsync(Project.PhysicalPath);
-            await StreamCodeToUI(content);
+            FileContent = await Http.GetStringAsync(activeFile.PhysicalPath);
+            StateHasChanged();
+            await Task.Delay(100);
+            await JS.InvokeVoidAsync("applyHighlighting", "highlight-target");
         }
         catch (Exception ex)
         {
-            TerminalSvc.AddLog($"ERR: Could not resolve {Project.PhysicalPath}", LogType.Error);
-        }
-    }
-
-    private async Task StreamCodeToUI(string content)
-    {
-        // 1. Clear previous content
-        HighlightedCode = ""; 
-        StateHasChanged();
-
-        // 2. Split the raw file into lines
-        var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-        LineCount = lines.Length;
-
-        StringBuilder sb = new();
-
-        // 3. Loop through and "Type" each line
-        foreach (var line in lines)
-        {
-            // Highlight the line before appending
-            string processedLine = ProcessHighlighting(line);
-        
-            sb.AppendLine(processedLine);
-            HighlightedCode = sb.ToString();
-
-            // 4. Trigger UI refresh and wait (speed of the stream)
+            FileContent = $"ERR: Could not resolve {activeFile.PhysicalPath}";
             StateHasChanged();
-            await Task.Delay(20); 
         }
-
-        TerminalSvc.AddLog($"File rendering complete: {Project.FileName}", LogType.Success);
+        // Reset and trigger the "Streaming" effect
+        // HighlightedCode = "";
+        // await LoadSourceCode();
     }
 
-    private string ProcessHighlighting(string line)
-    {
-        if (string.IsNullOrWhiteSpace(line)) return line;
+    // private async Task LoadSourceCode()
+    // {
+    //     // Project.PhysicalPath would be "Developer/Identity.cs"
+    //     try
+    //     {
+    //         // Use the PhysicalPath (e.g., Projects/App/File.razor.txt)
+    //         FileContent = await Http.GetStringAsync(SelectedFile.PhysicalPath);
+            
+    //         // Allow the UI to render the code before calling JS
+    //         StateHasChanged(); 
+            
+    //         // Short delay ensures the DOM is ready for the highlighter
+    //         await Task.Delay(50); 
+    //         await JS.InvokeVoidAsync("applyHighlighting", "highlight-target", SelectedFile.Language);
+    //         // await StreamCodeToUI(FileContent);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         FileContent = $"CRITICAL_ERROR: Unable to mount {SelectedFile.PhysicalPath}. Error: {ex.Message}";
+    //         StateHasChanged();
+    //     }
+    // }
 
-        // Simple keyword list for the "Source Code" feel
-        string[] keywords = { "public", "private", "class", "async", "await", "string", "var", "new", "return", "if", "namespace", "using" };
+    // private async Task StreamCodeToUI(string content)
+    // {
+    //     // 1. Clear previous content
+    //     HighlightedCode = ""; 
+    //     StateHasChanged();
 
-        // Escape HTML characters to prevent rendering bugs
-        line = line.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+    //     // 2. Split the raw file into lines
+    //     var lines = content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+    //     LineCount = lines.Length;
 
-        foreach (var word in keywords)
-        {
-            // Use a space or boundary check to ensure we don't highlight words inside other words
-            line = line.Replace(word + " ", $"<span class='keyword'>{word}</span> ");
-        }
+    //     StringBuilder sb = new();
 
-        // Optional: Highlight comments
-        if (line.Trim().StartsWith("//"))
-        {
-            return $"<span class='comment'>{line}</span>";
-        }
+    //     // 3. Loop through and "Type" each line
+    //     foreach (var line in lines)
+    //     {
+    //         // Highlight the line before appending
+    //         string processedLine = ProcessHighlighting(line);
+        
+    //         sb.AppendLine(processedLine);
+    //         HighlightedCode = sb.ToString();
 
-        return line;
-    }
+    //         // 4. Trigger UI refresh and wait (speed of the stream)
+    //         StateHasChanged();
+    //         await Task.Delay(20); 
+    //     }
+
+    //     TerminalSvc.AddLog($"File rendering complete: {SelectedFile.FileName}", LogType.Success);
+    // }
+
+    // private string ProcessHighlighting(string line)
+    // {
+    //     if (string.IsNullOrWhiteSpace(line)) return line;
+
+    //     // Simple keyword list for the "Source Code" feel
+    //     string[] keywords = { "public", "private", "class", "async", "await", "string", "var", "new", "return", "if", "namespace", "using" };
+
+    //     // Escape HTML characters to prevent rendering bugs
+    //     line = line.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+
+    //     foreach (var word in keywords)
+    //     {
+    //         // Use a space or boundary check to ensure we don't highlight words inside other words
+    //         line = line.Replace(word + " ", $"<span class='keyword'>{word}</span> ");
+    //     }
+
+    //     // Optional: Highlight comments
+    //     if (line.Trim().StartsWith("//"))
+    //     {
+    //         return $"<span class='comment'>{line}</span>";
+    //     }
+
+    //     return line;
+    // }
     
-    private string GetProjectCode(string fileName)
-    {
-        // In a real app, you might load this from a .txt file in wwwroot
-        // For now, return a placeholder or the Identity.cs string we wrote
-        if (fileName == "Identity") return "// Identity.cs loaded...\npublic class ProfessionalProfile ...";
-        return "// Loading module source code...";
-    }
+    // private string GetProjectCode(string fileName)
+    // {
+    //     // In a real app, you might load this from a .txt file in wwwroot
+    //     // For now, return a placeholder or the Identity.cs string we wrote
+    //     if (fileName == "Identity") return "// Identity.cs loaded...\npublic class ProfessionalProfile ...";
+    //     return "// Loading module source code...";
+    // }
 
     public void Dispose() { }
 }
