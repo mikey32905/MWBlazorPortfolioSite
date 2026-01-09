@@ -250,9 +250,10 @@ main[b-lrfajviucr] {
 }
 
 .content-area[b-qtrtjoljry] {
-    grid-area: content;
+    display: block; /* Remove display: flex if it's there */
+    overflow-y: auto;
+    height: 100vh; /* Ensure the frame takes the full window height */
     position: relative;
-    overflow: auto;
 }
 
 .terminal-area[b-qtrtjoljry] {
@@ -637,127 +638,143 @@ code[b-4fghmiwsjv] {
 body[b-t1r3hyusy4] {
 }
 /* /Components/UI/IdentityView.razor.rz.scp.css */
-.identity-wrapper[b-isbcod7e7j] {
-    display: grid;
-    /* This forces two columns: Code takes 60%, Profile takes 40% */
-    grid-template-columns: 60% 40%;
-    height: 100%;
+.identity-horizontal-wrapper[b-isbcod7e7j] {
+    display: flex;
+    flex-direction: row; /* Side-by-side */
     width: 100%;
+    height: 100%;
     background: #000;
+    overflow: hidden; /* Let the individual sections handle their own scrolling */
 }
 
-.profile-section[b-isbcod7e7j] {
-    background: #080808;
-    padding: 30px;
-    border-left: 1px solid rgba(var(--accent-rgb), 0.3);
+.profile-sidebar-section[b-isbcod7e7j] {
+    flex: 0 0 350px; /* Fixed width: 350px, won't grow or shrink */
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 60px 20px;
+    border-right: 1px solid rgba(var(--accent-rgb), 0.2);
+    overflow-y: auto; /* Scroll if the sidebar content is too tall */
 }
 
-.code-section[b-isbcod7e7j] {
+.code-main-section[b-isbcod7e7j] {
+    flex: 1; /* Take up all remaining width */
     height: 100%;
-    overflow: hidden; /* Let the editor handle its own scrolling */
+    overflow: hidden;
 }
 
-    /* This is the magic fix: Force the editor to fill its half of the grid */
-    .code-section[b-isbcod7e7j]  .editor-container {
-        height: 100% !important;
-    }
 
-/* The Avatar "Scan" Effect */
-.avatar-box[b-isbcod7e7j] {
-    width: 150px;
-    height: 150px;
-    perspective: 1000px; /* Gives the 3D depth effect */
-    position: relative;
-    border: 1px solid var(--accent-glow);
-    background: #000;
+
+/* Fix for the beheading on wide monitors */
+.dev-name[b-isbcod7e7j] {
+    margin-top: 15px;
+    color: var(--accent-glow);
+    font-family: 'Fira Code', monospace;
 }
 
-    /* The actual image inside the frame */
-    .avatar-box img[b-isbcod7e7j] {
-        width: 100%; /* Scales width to match the box */
-        height: 100%; /* Scales height to match the box */
-        object-fit: cover; /* Crops the image to fit without stretching */
-        display: block;
-        filter: grayscale(100%) brightness(0.8) contrast(1.2); /* Hacker aesthetic */
-    }
 
-    .avatar-box[b-isbcod7e7j]::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 10px;
-        height: 10px;
-        border-top: 2px solid var(--accent-glow);
-        border-left: 2px solid var(--accent-glow);
-        z-index: 10;
-    }
+/* Container to define the perspective */
+.avatar-flip-box[b-isbcod7e7j] {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 25px;
+}
 
-    .avatar-box[b-isbcod7e7j]::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 10px;
-        height: 10px;
-        border-bottom: 2px solid var(--accent-glow);
-        border-right: 2px solid var(--accent-glow);
-        z-index: 10;
-    }
-
-.avatar-flipper[b-isbcod7e7j] {
+/* The element that actually rotates */
+.avatar-inner[b-isbcod7e7j] {
     position: relative;
     width: 100%;
     height: 100%;
+    text-align: center;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
 }
 
-    /* Toggle this class via C# */
-    .avatar-flipper.is-flipped[b-isbcod7e7j] {
-        transform: rotateY(180deg);
+/* Hover effect: Flip the inner box */
+.avatar-flip-box:hover .avatar-inner[b-isbcod7e7j] {
+    transform: rotateY(180deg);
+}
+
+/* Positioning for both sides */
+.avatar-front[b-isbcod7e7j], .avatar-back[b-isbcod7e7j] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Hides the back when front is showing */
+    backface-visibility: hidden;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--accent-glow);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+/* The Back Side starts already rotated */
+.avatar-back[b-isbcod7e7j] {
+    /* 1. This "anchors" the scan line to this circle */
+    position: relative;
+    /* 2. This "clips" the line so it can't be seen outside the circle */
+    overflow: hidden;
+    background-color: #0a0a0a;
+    transform: rotateY(180deg);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid var(--accent-glow);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* When the screen height is less than 700px */
+@media (max-height: 700px) {
+    .identity-page-wrapper[b-isbcod7e7j] {
+        padding-top: 20px; /* Reduce top gap */
     }
 
-.avatar-face[b-isbcod7e7j] {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden; /* Hides the reverse side */
+    .avatar-flip-box[b-isbcod7e7j] {
+        width: 140px; /* Shrink the avatar */
+        height: 140px;
+    }
+
+    .bio-card h2[b-isbcod7e7j] {
+        font-size: 1.2rem; /* Shrink the text */
+        margin-top: 10px;
+    }
 }
 
-.avatar-back[b-isbcod7e7j] {
-    transform: rotateY(180deg); /* Pre-rotate the back image */
-}
 
-.avatar-face img[b-isbcod7e7j] {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: grayscale(100%) brightness(0.8);
-}
-
+/* Optional: Adding a "Scanning" effect to the back side */
 .scan-line[b-isbcod7e7j] {
     position: absolute;
-    width: 100%;
+    left: 0;
+    width: 100%; /* Now 100% refers only to the avatar width */
     height: 2px;
     background: var(--accent-glow);
-    box-shadow: 0 0 15px var(--accent-glow);
+    opacity: 0.7;
+    box-shadow: 0 0 8px var(--accent-glow);
+    /* Animation stays the same */
+    animation: scan-b-isbcod7e7j 2.5s linear infinite;
     z-index: 10;
-    top: 0;
-    animation: scan-move-b-isbcod7e7j 4s infinite linear;
 }
 
-.profile-section[b-isbcod7e7j] {
+@keyframes scan-b-isbcod7e7j {
+    0% {
+        top: 0%;
+    }
+
+    100% {
+        top: 100%;
+    }
+}
+
+/*.profile-section {
     display: flex;
     flex-direction: column;
-    align-items: center; /* This keeps the avatar-box centered */
-    gap: 20px;
+    align-items: center;*/ /* This keeps the avatar-box centered */
+    /*gap: 20px;
     padding: 20px;
-    overflow-y: auto; /* Adds a scrollbar if the profile gets too long */
-}
+    overflow-y: auto;*/ /* Adds a scrollbar if the profile gets too long */
+/*}*/
 
 .section-divider[b-isbcod7e7j] {
     display: flex;
@@ -793,7 +810,31 @@ body[b-t1r3hyusy4] {
         text-transform: uppercase;
     }
 
-.extract-btn[b-isbcod7e7j] {
+.sidebar-extract-btn[b-isbcod7e7j] {
+    margin-top: 30px;
+    padding: 8px 15px;
+    border: 1px solid var(--accent-glow);
+    color: var(--accent-glow);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-family: 'Fira Code', monospace;
+}
+
+@media (max-width: 900px) {
+    .identity-horizontal-wrapper[b-isbcod7e7j] {
+        flex-direction: column; /* Stacks them on top of each other */
+        overflow-y: auto;
+    }
+
+    .profile-sidebar-section[b-isbcod7e7j] {
+        flex: 0 0 auto;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(var(--accent-rgb), 0.2);
+    }
+}
+
+/*.extract-btn {
     width: 100%;
     margin-top: 20px;
     background: transparent;
@@ -806,23 +847,23 @@ body[b-t1r3hyusy4] {
     position: relative;
     text-transform: uppercase;
     letter-spacing: 2px;
-    transition: all 0.2s ease;
+    transition: all 0.2s ease;*/
     /* Creating a notched corner look */
-    clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
+    /*clip-path: polygon(0 0, 90% 0, 100% 30%, 100% 100%, 10% 100%, 0 70%);
 }
 
-    .extract-btn:hover[b-isbcod7e7j] {
+    .extract-btn:hover {
         background: rgba(var(--accent-rgb), 0.1);
         box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);
         transform: scale(1.02);
-        color: #FFF; /* Text turns white on hover for maximum contrast */
-    }
+        color: #FFF;*/ /* Text turns white on hover for maximum contrast */
+    /*}
 
-    .extract-btn:active[b-isbcod7e7j] {
+    .extract-btn:active {
         transform: scale(0.98);
         background: var(--accent-glow);
         color: #000;
-    }
+    }*/
 
 .btn-icon[b-isbcod7e7j] {
     margin-right: 10px;
