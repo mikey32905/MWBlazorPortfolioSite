@@ -7,7 +7,11 @@
     <div class="sidebar-header">EXPLORER</div>
 
     <div class="file-tree">
-        @if (ProjectState.ProjectFiles != null)
+        @if (ProjectState.ProjectFiles == null)
+        {
+            <div class="sidebar-loading">INITIALIZING_FILESYSTEM...</div>
+        }
+        else
         {
             @foreach (var categoryGroup in ProjectState.ProjectFiles.GroupBy(f => f.Category))
             {
@@ -39,22 +43,7 @@
             }
         }
     </div>
-    @*   @foreach (var group in Manifest.GetGroupedProjects())
-    {
-
-       <div class="category-folder">
-            <span class="folder-label">@group.Key</span>
-
-            @foreach (var file in group)
-            {
-                <div class="file-item @(IsSelected(file) ? "active" : "")"
-                     @onclick="() => HandleFileClick(file)">
-                    <span class="file-icon">@file.Icon</span>
-                    <span class="file-name">@file.FileName@file.Extension</span>
-                </div>
-            }
-        </div> 
-    }*@
+   
 </div>
 
 
@@ -84,7 +73,19 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        expandedCategories.Add(ProjectState.SelectedFile.Category);
+        // If the data hasn't arrived yet, exit gracefully
+        if (ProjectState.ProjectFiles == null || !ProjectState.ProjectFiles.Any())
+        {
+            return;
+        }
+
+        foreach (var cat in ProjectState.ProjectFiles.Select(f => f.Category).Distinct())
+        {
+            if (!expandedCategories.Contains(cat))
+            {
+                expandedCategories.Add(cat);
+            }
+        }
     }
 
     private void ToggleFolder(string category)

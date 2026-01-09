@@ -1,6 +1,7 @@
 ﻿@inject ProjectStateService ProjectState
 @inject TerminalService TerminalSvc
 @inject IJSRuntime JS
+@inject NavigationManager Nav
 
 @if (ProjectState.SelectedFile != null)
 {
@@ -23,11 +24,11 @@
             <div class="avatar-box">
                 <div class="avatar-flipper @(isFlipped ? "is-flipped" : "")">
                     <div class="avatar-face avatar-front">
-                        <img src="img/portfolioImages/MyPortfolioAvatar.png" alt="AI Profile" />
+                        <img src="@($"{Nav.BaseUri}img/portfolioImages/MyPortfolioAvatar.png")" alt="AI Profile" />
                     </div>
 
                     <div class="avatar-face avatar-back">
-                        <img src="img/portfolioImages/portfolo-pic1(a).jpg" alt="Real Profile" />
+                        <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" alt="Real Profile" />
                     </div>
                 </div>
 

@@ -54,29 +54,28 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        // Use whichever one isn't null
-        var activeFile = SelectedFile;
-
-        if (activeFile == null && UnmatchedParameters != null && UnmatchedParameters.ContainsKey("Project"))
-        {
-            activeFile = UnmatchedParameters["Project"] as ProjectFile;
-        }
+        if (SelectedFile == null) return;
 
         try
         {
-            FileContent = await Http.GetStringAsync(activeFile.PhysicalPath);
+            // Clear old content so the user knows a switch is happening
+            FileContent = "FETCHING_SOURCE_CODE...";
             StateHasChanged();
-            await Task.Delay(100);
+
+            // Fetch the new file
+            FileContent = await Http.GetStringAsync(SelectedFile.PhysicalPath);
+
+            // Let the UI render the text
+            StateHasChanged();
+
+            // Wait a tiny bit for the DOM to update, then highlight
+            await Task.Delay(50);
             await JS.InvokeVoidAsync("applyHighlighting", "highlight-target");
         }
         catch (Exception ex)
         {
-            FileContent = $"ERR: Could not resolve {activeFile.PhysicalPath}";
-            StateHasChanged();
+            FileContent = $"SYSTEM_ERROR: Could not load {SelectedFile.PhysicalPath}. Check GitHub case-sensitivity.";
         }
-        // Reset and trigger the "Streaming" effect
-        // HighlightedCode = "";
-        // await LoadSourceCode();
     }
 
     // private async Task LoadSourceCode()
