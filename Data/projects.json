@@ -2,16 +2,17 @@
   {
     "FileName": "Identity",
     "Extension": ".cs",
-    "Category": "SYSTEM",
+    "Category": "SYSTEM_CORE",
     "PhysicalPath": "Developer/Identity.cs",
-    "AccentColor": "#FFFFFF",
+    "Language": "csharp",
+    "AccentColor": "#39FF14",
     "Icon": "👤",
-    "Description": "CORE_IDENTITY_PROTOCOL"
+    "Description": "USER_IDENTITY_MODEL"
   },
   {
     "FileName": "System_Diagnostic",
     "Extension": ".diag",
-    "Category": "SYSTEM",
+    "Category": "SYSTEM_CORE",
     "AccentColor": "#00FF41",
     "Icon": "📊",
     "Description": "RUNTIME_INTEGRITY_CHECK"
@@ -28,16 +29,17 @@
   {
     "FileName": "TipTop",
     "Extension": ".razor",
-    "Category": "BLAZOR_WASM",
-    "PhysicalPath": "Projects/TipTopApp/TipCalculator.razor",
+    "Category": "BLAZOR_WASM_CODE",
+    "PhysicalPath": "Projects/TipTopApp/TipCalculator.razor.txt",
+    "Language": "html",
     "AccentColor": "#BC13FE",
     "Icon": "🧠",
-    "Description": "WEB_ASSEMBLY_TIPCALCULATOR"
+    "Description": "WEB_ASSEMBLY_CODE_TIPCALCULATOR"
   },
   {
     "FileName": "Uplink",
     "Extension": ".link",
-    "Category": "SYSTEM",
+    "Category": "SYSTEM_CORE",
     "AccentColor": "#FFD700",
     "Icon": "📡",
     "Description": "SOCIAL_LINKS"
@@ -49,5 +51,25 @@
     "AccentColor": "#00F3FF",
     "Icon": "📊",
     "Description": "WPF_CORE_APP"
+  },
+  {
+    "FileName": "NowShowing",
+    "Extension": ".razor",
+    "Category": "LIVE_APPS",
+    "LiveUrl": "https://mwnowshowing.netlify.app/",
+    "PhysicalPath": "Projects/NowShowing/Placeholder.txt",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": "WEB_ASSEMBLY_USING_API"
+  },
+  {
+    "FileName": "NowShowing",
+    "Extension": ".razor",
+    "Category": "BLAZOR_WASM_CODE",
+    "PhysicalPath": "Projects/NowShowing/NowPlayingPage.razor.txt",
+    "Language": "html",
+    "AccentColor": "#BC13FE",
+    "Icon": "🧠",
+    "Description": "WEB_ASSEMBLY_CODE_MOVIE_SHOWTIME_VIEWER"
   }
 ]
