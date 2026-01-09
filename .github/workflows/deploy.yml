@@ -1,9 +1,11 @@
 name: Deploy to GitHub Pages
-
 on:
   push:
     branches: [ master ] # Runs every time you push to the main branch
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6f0c1f72b1376ae38ae8c4a95fdc2de62e55d210
 jobs:
   deploy-to-github-pages:
     runs-on: ubuntu-latest
