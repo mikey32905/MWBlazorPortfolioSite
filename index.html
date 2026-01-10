@@ -5,8 +5,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MWBlazorPortfolioSite</title>
-     <!--<base href="/" />-->
-   <base href="/MWBlazorPortfolioSite/" />
+    <!--<base href="/" />-->
+    <base href="/MWBlazorPortfolioSite/" />
     <!-- BootStrap Css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
 
@@ -31,6 +31,30 @@
 
     <!--Favicon-->
     <link rel="icon" type="image/png" href="favicon(3)-40x40.png" />
+
+    <style>
+        /* Kill the white scrollbar on the far right */
+        .main-stage::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .main-stage {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+            overflow-y: auto !important;
+        }
+
+        /* Target the Identity View specifically */
+        .data-pane, .transparent-editor {
+            overflow: hidden !important;
+        }
+
+        /* Ensure ONLY the internal code area scrolls */
+        /* This targets the generated code window classes */
+        .code-editor-container, .monaco-scrollable-element {
+            overflow-y: auto !important;
+        }
+    </style>
 
 </head>
 
@@ -89,6 +113,27 @@
             const element = document.getElementById(elementId);
             if (element) element.focus();
         };
+
+        window.killDoubleScrollbars = () => {
+            // Targets the specific containers that usually cause the double bar
+            const targets = ['.main-stage', '.data-pane', '.transparent-editor'];
+
+            targets.forEach(selector => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    el.style.overflow = 'hidden';
+                    // This ensures the element is exactly as tall as it needs to be
+                    // without triggering a scroll event.
+                }
+            });
+        };
+
+        // Run this whenever the location changes
+        window.onload = () => {
+            const observer = new MutationObserver(() => window.killDoubleScrollbars());
+            observer.observe(document.body, { childList: true, subtree: true });
+        };
+
     </script>
 
     <script src="_framework/blazor.webassembly.js"></script>

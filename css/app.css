@@ -17,10 +17,20 @@
 }
 
 html, body {
-    font-family: var(--mw-body-font);
-    font-size: var(--mw-font-size);
-    height: 100%;
-    min-height: 100vh;
+    background-color: #000 !important;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+/* This is likely where the white background is coming from */
+.page {
+    background: #000 !important;
+}
+
+.content {
+    background: #000 !important;
+    padding: 0 !important;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -99,10 +109,41 @@ h1:focus {
     box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
 }
 
+/* Ensure the Identity view doesn't get the massive WPF scroll heights */
+.identity-dossier .code-viewport {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
 * {
     /* This ensures all colors transition smoothly when the service updates */
     transition: color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, background-color 0.5s ease;
 }
+
+/* 1. Hide scrollbars globally across the entire app */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+    *::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Brave */
+    }
+
+/* 2. EXCEPTION: Allow ONLY the code editor to show its scrollbar */
+/* Replace '.code-editor-viewport' with whatever class your editor uses */
+.code-editor-viewport,
+.monaco-scrollable-element,
+pre code {
+    scrollbar-width: thin !important;
+    -ms-overflow-style: auto !important;
+}
+
+    .code-editor-viewport::-webkit-scrollbar,
+    .monaco-scrollable-element::-webkit-scrollbar {
+        display: block !important;
+        width: 6px !important;
+    }
 
 /* #region Blazor default CSS */
 
