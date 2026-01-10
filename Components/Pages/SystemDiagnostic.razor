@@ -1,0 +1,165 @@
+﻿@page "/system-diagnostic"
+
+@layout PortfolioLayout
+@implements IDisposable
+@inject ProjectStateService ProjectState
+
+<div class="diag-container">
+    <div class="diag-header">
+        <div class="header-main">
+            <h1 class="glitch-title">SYSTEM_DIAGNOSTICS_V4.0</h1>
+            <div class="uptime-counter">UPTIME: <span class="glow-text">@UptimeString</span></div>
+        </div>
+        
+        <div class="header-telemetry">
+            <div class="core-load-group">
+                <div class="core-item">
+                    <label>CORE_01</label>
+                    <div class="mini-bar"><div class="fill" style="width: @(CpuLoad)%"></div></div>
+                </div>
+                <div class="core-item">
+                    <label>CORE_02</label>
+                    <div class="mini-bar"><div class="fill" style="width: @(Math.Clamp(CpuLoad + 5, 0, 100))%"></div></div>
+                </div>
+                <div class="core-item">
+                    <label>CORE_03</label>
+                    <div class="mini-bar"><div class="fill" style="width: @(Math.Clamp(CpuLoad - 12, 0, 100))%"></div></div>
+                </div>
+            </div>
+            <div class="load-percentage">@CpuLoad% AVG_LOAD</div>
+        </div>
+    </div>
+
+    <div class="diag-grid">
+        <div class="diag-card wide">
+            <h3 class="pane-title">> NEURAL_SKILL_FREQUENCIES</h3>
+            <div class="skill-telemetry">
+                <div class="skill-row">
+                    <label>C_SHARP / .NET</label>
+                    <div class="wave-container">
+                        <svg class="wave" viewBox="0 0 100 20"><path d="M0 10 Q 5 0, 10 10 T 20 10 T 30 10 T 40 10 T 50 10 T 60 10 T 70 10 T 80 10 T 90 10 T 100 10" stroke="#FFD700" fill="transparent" /></svg>
+                    </div>
+                    <span class="percentage">95%</span>
+                </div>
+                <div class="skill-row">
+                    <label>BLAZOR_WASM</label>
+                    <div class="wave-container">
+                        <svg class="wave fast" viewBox="0 0 100 20"><path d="M0 10 Q 5 0, 10 10 T 20 10 T 30 10 T 40 10 T 50 10 T 60 10 T 70 10 T 80 10 T 90 10 T 100 10" stroke="#00F3FF" fill="transparent" /></svg>
+                    </div>
+                    <span class="percentage">90%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="diag-card">
+            <h3 class="pane-title">> CORE_UTILIZATION</h3>
+            <div class="radial-stats">
+                <div class="ring-container">
+                    <div class="ring" style="--p:85;--c:#00F3FF;">85% WEB</div>
+                    <div class="ring" style="--p:60;--c:#FFD700;">60% WPF</div>
+                </div>
+            </div>
+        </div>
+ 
+        <div class="diag-card spec-list">
+            <h3 class="pane-title">> HARDWARE_MANIFEST</h3>
+            <div class="spec-table">
+                <div class="spec-item"><span class="label">OS_KERNEL:</span> <span class="val">BLAZOR_WASM_9.0</span></div>
+                <div class="spec-item"><span class="label">CORES:</span> <span class="val">C#_14_UNLOCKED</span></div>
+                <div class="spec-item"><span class="label">RENDER_ENGINE:</span> <span class="val">CSS3_NEON_GRID</span></div>
+                <div class="spec-item"><span class="label">STATE_SYNC:</span> <span class="val">ACTIVE_BROADCAST</span></div>
+                <div class="spec-item"><span class="label">ENCRYPTION:</span> <span class="val">AES_256_NEURAL</span></div>
+            </div>
+        </div>
+
+        <div class="diag-card system-log">
+            <h3 class="pane-title">> LIVE_SYSTEM_LOG</h3>
+
+            <div class="cpu-monitor">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path class="circle" stroke-dasharray="@($"{CpuLoad}, 100")" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.35" class="percentage">@CpuLoad%</text>
+                    <text x="18" y="28" class="label">NEURAL_LOAD</text>
+                </svg>
+            </div>
+
+            <div class="log-stream">
+                @foreach (var log in _logs)
+                {
+                    <div class="log-entry">
+                        <span class="timestamp">[@DateTime.Now.ToString("HH:mm:ss")]</span>
+                        <span class="message">@log</span>
+                    </div>
+                }
+            </div>
+        </div>
+    
+    </div>
+
+</div>
+
+@code {
+    private string UptimeString = "00:00:00";
+    private int CpuLoad = 42;
+    private Timer? _timer;
+    private Timer? logTimer;
+    private Timer? cpuTimer;
+
+    private List<string> _logs = new() { "System initialized.", "Neural link established." };
+    private string[] _randomMsgs = {
+        "Scanning network ports...", "Optimizing WASM memory...",
+        "Uplink heartbeat stable.", "Syncing project data cores...",
+        "Bypassing security protocols...", "Resource allocation optimized."
+    };
+
+
+    protected override void OnInitialized()
+    {
+        // Simple uptime logic starting from a fixed date (your career start)
+        var startDate = new DateTime(2018, 1, 1);
+        _timer = new Timer(_ =>
+        {
+            var diff = DateTime.Now - startDate;
+            UptimeString = $"{(int)diff.TotalDays}d:{diff.Hours}h:{diff.Minutes}m:{diff.Seconds}s";
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
+
+        // Timer for log updates
+        logTimer = new Timer(_ =>
+        {
+            var msg = _randomMsgs[new Random().Next(_randomMsgs.Length)];
+            _logs.Insert(0, msg); // Newest on top
+            if (_logs.Count > 8) _logs.RemoveAt(8); // Keep it tidy
+            InvokeAsync(StateHasChanged);
+        }, null, 1000, 3000);
+
+        // Timer to fluctuate CPU load
+        cpuTimer = new Timer(_ =>
+        {
+            // Randomly swing load between 40% and 85%
+            CpuLoad = new Random().Next(40, 86);
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 2000);
+
+        // Subscribe to state changes
+        ProjectState.OnChange += HandleStateChange;
+    }
+
+    private void HandleStateChange()
+    {
+        // If the user closed the session, the service event fires.
+        // We call StateHasChanged to ensure the UI stays in sync.
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        // Essential: Unsubscribe so the timer doesn't run in the background
+        _timer?.Dispose();
+        // Make sure to dispose of the new log and cpu timers too!
+        logTimer?.Dispose();
+        cpuTimer?.Dispose(); 
+        ProjectState.OnChange -= HandleStateChange;
+    }
+}

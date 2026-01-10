@@ -1,0 +1,99 @@
+﻿@page "/live-app"
+
+@layout PortfolioLayout
+@inject ProjectStateService ProjectState
+@inject TerminalService TerminalSvc
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="live-app-container">
+    <div class="app-toolbar">
+        <div class="status-light"></div>
+        <div class="address-bar">
+            <span class="protocol">HTTPS://</span> @ProjectUrl
+        </div>
+        @* <button class="external-btn" @onclick="OpenTab">OUTBOUND_LINK</button> *@
+    </div>
+
+    @if (ProjectState.SelectedFile != null)
+    {
+        <div class="app-header">
+            <div class="header-left">
+                <span class="pulse-dot"></span>
+                DECRYPTING_HOST: @ProjectState.SelectedFile.FileName
+            </div>
+            <div class="header-right">
+                <a href="@ProjectState.SelectedFile.LiveUrl" target="_blank" class="outbound-link">
+                    [BREAKOUT_LINK] ↗
+                </a>
+            </div>
+        </div>
+
+        @* The @key here ensures the iframe reloads when the URL changes *@
+        <div class="viewport-wrapper">
+            @if (_isLoading)
+            {
+                <div class="loading-overlay">
+                    <div class="glitch-text" data-text="ESTABLISHING_UPLINK...">ESTABLISHING_UPLINK...</div>
+                    <div class="loading-bar"><div class="progress"></div></div>
+                </div>
+            }
+
+            <iframe src="@ProjectState.SelectedFile.LiveUrl"
+                    @key="@ProjectState.SelectedFile.LiveUrl"
+                    @onload="OnFrameLoad"
+                    class="app-viewport @(_isLoading ? "hidden" : "visible")">
+            </iframe>
+            @* @if (ProjectState.SelectedFile != null)
+            {
+                <iframe src="@ProjectState.SelectedFile.LiveUrl"
+                        @key="ProjectState.SelectedFile.LiveUrl"
+                        class="app-viewport"></iframe>
+            } *@
+            @* <iframe src="@ProjectState.SelectedFile.LiveUrl"
+                    @key="@ProjectState.SelectedFile.LiveUrl"
+                    class="app-viewport">
+            </iframe> *@
+        </div>
+    }
+    
+</div>
+
+@code {
+    [Parameter] public string ProjectUrl { get; set; } = "";
+    private bool _isLoading = true;
+
+    protected override void OnInitialized()
+    {
+        ProjectState.OnChange += HandleRefresh;
+        ProjectState.OnSelectedFileChanged += HandleRefresh;
+    }
+
+    private void OnFrameLoad()
+    {
+        _isLoading = false; // Hide loader when iframe finishes
+        StateHasChanged();
+    }
+
+    private void HandleRefresh()
+    {
+        // InvokeAsync is critical! It ensures the UI thread handles the update.
+        InvokeAsync(StateHasChanged);
+    }
+
+    // This method runs every time the Sidebar calls SelectFile
+    private void HandleStateChanged()
+    {
+        // This forces THIS component to refresh its HTML
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OpenTab() => await JS.InvokeVoidAsync("open", ProjectUrl, "_blank");
+
+    public void Dispose()
+    {
+        // Unsubscribe from both
+        ProjectState.OnChange -= HandleRefresh;
+        ProjectState.OnSelectedFileChanged -= HandleRefresh;
+    }
+}

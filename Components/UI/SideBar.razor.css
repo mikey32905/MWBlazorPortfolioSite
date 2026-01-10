@@ -1,6 +1,20 @@
 ﻿﻿.sidebar-explorer {
-    user-select: none;
-    font-size: 0.9rem;
+    background: #050505; /* Deep black */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--accent-glow);
+    font-family: 'Fira Code', monospace;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-header {
+    padding: 20px;
+    font-size: 0.8rem;
+    color: var(--accent-glow);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .sidebar-content {
@@ -61,23 +75,31 @@
 
 /* Individual File Items */
 .file-item {
+    padding: 12px 20px;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 6px 10px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    border-radius: 4px;
-    margin: 2px 0;
+    gap: 10px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
     .file-item:hover {
         background: rgba(var(--accent-rgb), 0.1);
+        border-left: 3px solid var(--accent-glow);
     }
 
-    /* The Active/Selected State */
     .file-item.active {
-        background: rgba(var(--accent-rgb), 0.2);
-        color: var(--accent-glow);
+        border-left: 3px solid var(--accent-color);
+        background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.1) 0%, transparent 100%);
+        color: var(--accent-color);
+        text-shadow: 0 0 10px var(--accent-color);
+    }
+
+    /* Specific styling for the Gold Identity file if you chose that */
+    .file-item[data-identity="true"].active {
+        border-left: 3px solid #FFD700;
+        color: #FFD700;
     }
 
 .file-icon {

@@ -30,5 +30,16 @@ namespace MWBlazorPortfolioSite.Models
 
         [JsonPropertyName("Description")]
         public string Description { get; set; } = "";
+        // The relative path to the screenshot (e.g., "images/blueprints/TitanVault.png")
+ 
+        [JsonPropertyName("BlueprintUrl")]
+        public string? BlueprintUrl { get; set; }
+
+        // The path to the raw XAML text file
+        [JsonPropertyName("SourceUrl")]
+        public string? SourceUrl { get; set; }
+
+        // This allows the JSON: "Metadata": { "KEY": "VALUE" } to be mapped automatically
+        public Dictionary<string, string> Metadata { get; set; } = new();
     }
 }

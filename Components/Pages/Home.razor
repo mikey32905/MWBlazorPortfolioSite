@@ -1,39 +1,52 @@
 ﻿@page "/"
 
-@layout HomeLayout
+@layout PortfolioLayout
+@inject ProjectStateService ProjectState
 
 <PageTitle>Home</PageTitle>
 
-<!--Page Background-->
-<div class="pageStyle h-100 d-flex justify-content-center">
-    <div class="row row-cols-1 row-cols-xl-2 container-xxl h-100">
-        <div class="col d-flex flex-column justify-content-xl-center order-last order-xl-first">
-            <div class="title">My Portfolio Page</div>
-            <div class="subTitle">A tiny glimpse into projects I have worked on.</div>
-            <div class="mt-3">
-                <div class="hstack gap-2">
-                    <a href="portfolio" class="btn btn-home">View Portfolio</a>
-                    @* <a href="popular" class="btn btn-home">Popular</a>
-                    <a href="favorites" class="btn btn-home">Favorites</a> *@
-                </div>
-            </div>
-            <div class="mt-3">
-                Built with pride using:
-                <div class="hstack">
-                    <div><i class="devicons devicon-csharp-plain colored me-1"></i></div>
-                    <div><i class="devicons devicon-blazor-original colored me-1"></i></div>
-                    <div><i class="devicons devicon-bootstrap-plain colored me-1"></i></div>
-                    <div><i class="devicons devicon-javascript-plain colored me-1"></i></div>
-                    <div><i class="devicons devicon-html5-plain colored me-1"></i></div>
-                    <div><i class="devicons devicon-css3-plain colored me-1"></i></div>
+<div class="stage-wrapper">
+  @if (ProjectState.SelectedFile == null)
+    {
+        <div class="welcome-container">
+            <div class="scan-grid"></div>
 
+            <div class="boot-content">
+                <h1 class="glitch-title" data-text="NEURAL_LINK_ESTABLISHED">NEURAL_LINK_ESTABLISHED</h1>
+
+                <div class="terminal-loader">
+                    <p class="typing-text">> ACCESSING_PROTECTED_DATA_CORES...</p>
+                    <p class="typing-text">> DECRYPTING_BIOMETRIC_SIGNATURES... <span class="status-ok">DONE</span></p>
+                    <p class="typing-text">> LOADING_PORTFOLIO_OS_V4.2.0...</p>
+                </div>
+
+                <div class="action-prompt">
+                    <span class="pulse-icon">▲</span> SELECT_FILE_FROM_SIDEBAR_TO_INITIALIZE
                 </div>
             </div>
+
+            <div class="corner-top-right">V.88-01</div>
+            <div class="corner-bottom-left">SECURE_CONNECTION_ENCRYPTED</div>
         </div>
-        <div class="col d-flex flex-column justify-content-center">
-            <img src="/img/MWPortfolioLandingPageLogo.png" class="img-fluid" />
+    }
+    else
+    {
+        @* The @key="ProjectState.SelectedFile.FileName" is the magic fix here *@
+        <div class="editor-container" @key="ProjectState.SelectedFile.FileName">
+            <CodeEditorView SelectedFile="ProjectState.SelectedFile" />
         </div>
-    </div>
-    
+
+    }
 </div>
+
+@code {
+
+    // This method runs every time the Sidebar calls SelectFile
+    private void HandleStateChanged()
+    {
+        // This forces THIS component to refresh its HTML
+        InvokeAsync(StateHasChanged);
+    }
+
+}
 

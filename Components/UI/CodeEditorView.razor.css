@@ -17,6 +17,12 @@ code {
     line-height: 1.5;
 }
 
+pre code {
+    display: block;
+    width: max-content; /* This forces the container to expand to the longest line */
+    color: #00F3FF; /* Cyan glow for the text */
+}
+
 .editor-container {
     display: flex;
     flex-direction: column;

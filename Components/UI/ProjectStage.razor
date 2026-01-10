@@ -1,63 +1,80 @@
 ﻿@inject ProjectStateService ProjectState
+@inject NavigationManager Nav
 
 
 <div class="stage-container">
-    @if (ProjectState.SelectedFile == null)
+  
+    @if (ProjectState.SelectedFile?.FileName == "Identity")
     {
-        <EmptyState />
+        @ChildContent @* This renders the IdentityView.razor page *@
+    }
+    else if (ProjectState.SelectedFile != null)
+    {
+        var file = ProjectState.SelectedFile;
+
+        @if (file.Category == "LIVE_APPS")
+        {
+            <LiveAppView Project="file" />
+        }
+        else if (file.FileName == "System_Diagnostic")
+        {
+            <SystemDiagnosticView />
+        }
+        else if (file.FileName == "Uplink")
+        {
+            <UplinkView />
+        }
+        else if (file.Extension == ".xaml")
+        {
+            <WPFView SelectedFile="file" />
+        }
+        else 
+        {
+            @* Default to the Code Editor for everything else *@
+            <CodeEditorView SelectedFile="file" />
+        }
+      
     }
     else
     {
-        <div class="stage-header">
-            <span class="breadcrumb">SYSTEM / @ProjectState.SelectedFile.Category.ToUpper() / @ProjectState.SelectedFile.FileName@ProjectState.SelectedFile.Extension</span>
+        @* Default Welcome Screen *@
+        <div class="welcome-screen">
+            <h3> > SYSTEM_READY </h3>
+            <p>SELECT_A_FILE_FROM_SIDEBAR</p>
         </div>
-
-        <div class="stage-viewport">
-            @if (ProjectState.SelectedFile?.FileName == "Identity")
-            {
-                @* This is the specialized view that contains BOTH the code and the HUD *@
-                <IdentityView />
-            }
-            else
-            {
-                @* Standard logic for all other files *@
-                @switch (ProjectState.SelectedFile?.Extension?.ToLower())
-                {
-                    case ".razor" when !string.IsNullOrEmpty(ProjectState.SelectedFile.LiveUrl):
-                        <LiveAppViewer ProjectUrl="@ProjectState.SelectedFile.LiveUrl" />
-                        break;
-                    case ".diag":
-                        <SystemDiagnostic />
-                        break;
-                    case ".xaml":
-                        <WPFWindow Project="ProjectState.SelectedFile" />
-                        break;
-                    case ".link":
-                        <UplinkView />
-                        break;
-                    default:
-                        <CodeEditorView @key="ProjectState.SelectedFile?.PhysicalPath"
-                                        SelectedFile="ProjectState.SelectedFile" />
-                        break;
-                }
-            }
-        </div>
-
-        <style>
-            .wpf-active {
-                /* This creates a soft halo behind the WPF window */
-                background: radial-gradient(circle, rgba(var(--accent-rgb), 0.1) 0%, transparent 70%);
-            }
-        </style>
     }
+   
 </div>
 
 @code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
     protected override void OnInitialized()
     {
         ProjectState.OnChange += StateHasChanged;
     }
 
+    protected override void OnParametersSet()
+    {
+        // If they click Identity, force the URL to change
+        if (ProjectState.SelectedFile?.FileName == "Identity" && !Nav.Uri.Contains("identity"))
+        {
+            Nav.NavigateTo("identity");
+        }
+        // If they click a code file while on the Identity page, go back to home
+        else if (ProjectState.SelectedFile?.FileName != "Identity" && Nav.Uri.Contains("identity"))
+        {
+            Nav.NavigateTo("/");
+        }
+        // Any additional logic when parameters are set can go here
+        // This is the "Smart Redirect"
+        // if (ProjectState.SelectedFile?.FileName == "Identity")
+        // {
+        //     Nav.NavigateTo("identity");
+        // }
+    }
+
+ 
     public void Dispose()
     {
         ProjectState.OnChange -= StateHasChanged;

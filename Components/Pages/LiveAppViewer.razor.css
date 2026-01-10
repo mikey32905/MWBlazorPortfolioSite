@@ -1,0 +1,155 @@
+﻿.live-app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Important: Takes full height of main-stage */
+    width: 100%;
+    background: #000;
+}
+
+.app-toolbar {
+    height: 40px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    border-bottom: 1px solid #333;
+    gap: 15px;
+}
+
+.status-light {
+    width: 8px;
+    height: 8px;
+    background: #00FF41;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #00FF41;
+}
+
+.address-bar {
+    flex-grow: 1;
+    background: #000;
+    color: #888;
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    border: 1px solid #222;
+    font-family: 'Fira Code', monospace;
+}
+
+/*.iframe-wrapper {
+    width: 100%;
+    height: calc(100vh - 250px);*/ /* Leave room for terminal and header */
+    /*overflow: hidden;
+    position: relative;
+    background: #000;
+    border: 1px solid var(--accent-glow);
+}
+
+.app-frame {*/
+    /* Scale the content to 80% if it feels too big */
+    /*width: 125%;*/ /* Increase width to 125% then scale back to 100% (125 * 0.8 = 100) */
+    /*height: 125%;
+    transform: scale(0.8);
+    transform-origin: 0 0;
+    border: none;
+}
+
+.app-viewer-frame {
+    background-color: #ffffff;*/ /* Some sites expect a white background to render colors correctly */
+    /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) inset;
+    filter: contrast(1.1);*/ /* Optional: Sharpen the colors slightly */
+/*}*/
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #111;
+    padding: 10px 20px;
+    border-bottom: 1px solid #333;
+    font-family: 'Fira Code', monospace;
+}
+
+.outbound-link {
+    color: var(--accent-glow);
+    text-decoration: none;
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    transition: 0.3s;
+}
+
+    .outbound-link:hover {
+        background: rgba(var(--accent-rgb), 0.1);
+        border-color: var(--accent-glow);
+        box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+.viewport-wrapper {
+    flex-grow: 1;
+    position: relative;
+    background: #000;
+}
+
+/*.app-viewport {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+*/
+.status-blip {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #00ff00;
+    border-radius: 50%;
+    margin-right: 10px;
+    box-shadow: 0 0 5px #00ff00;
+}
+
+.loading-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 5;
+}
+
+.loading-bar {
+    width: 200px;
+    height: 2px;
+    background: #222;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 100%;
+    height: 100%;
+    background: var(--accent-glow);
+    animation: loading-scan 1.5s infinite;
+}
+
+@keyframes loading-scan {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.app-viewport {
+    width: 100%;
+    height: 100%;
+    border: none;
+    transition: opacity 0.5s ease;
+}
+
+    .app-viewport.hidden {
+        opacity: 0;
+    }
+
+    .app-viewport.visible {
+        opacity: 1;
+    }

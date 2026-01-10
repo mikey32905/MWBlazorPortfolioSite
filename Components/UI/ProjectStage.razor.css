@@ -21,6 +21,8 @@
     animation: viewport-flash 0.3s ease-out;
 }
 
+
+
 @keyframes viewport-flash {
     0% {
         opacity: 0;

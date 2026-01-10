@@ -1,0 +1,123 @@
+﻿@page "/wpf-viewer"
+
+@layout PortfolioLayout
+@inject ThemeService ThemeSvc
+@inject TerminalService TerminalSvc
+@inject ProjectStateService ProjectState
+@implements IDisposable
+
+<div class="wpf-container">
+    <div class="wpf-layout">
+        <div class="blueprint-pane">
+            <h3 class="pane-title">> UI_SCHEMATIC_PREVIEW</h3>
+            <div class="blueprint-frame">
+
+                @if (!string.IsNullOrEmpty(ProjectState.SelectedFile?.BlueprintUrl))
+                {
+                    <img src="@ProjectState.SelectedFile.BlueprintUrl" class="blueprint-img" alt="WPF Preview" />
+                }
+                else
+                {
+                    <div class="no-asset-warning">MISSING_VISUAL_ASSET</div>
+                }
+                
+                <div class="scan-overlay"></div>
+
+                <div class="overlay-grid"></div>
+            </div>
+
+            <div class="blueprint-metadata">
+                @if (ProjectState.SelectedFile?.Metadata != null)
+                {
+                    @foreach (var entry in ProjectState.SelectedFile.Metadata)
+                    {
+                        <div class="meta-box">
+                            <label>@entry.Key.Replace("_", " ")</label>
+                            <span class="glow-text">@entry.Value</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="meta-box">
+                        <label>STATUS</label>
+                        <span>NO_METADATA_AVAILABLE</span>
+                    </div>
+                }
+                @* <div class="meta-box">
+                    <label>ASSET_ID</label>
+                    <span>@(ProjectState.SelectedFile?.FileName.ToUpper())_UI</span>
+                </div>
+                <div class="meta-box">
+                    <label>COMPILER</label>
+                    <span>MS_XAML_PARSER_v4.8</span>
+                </div>
+                <div class="meta-box highlight">
+                    <label>INTEGRITY</label>
+                    <span>STABLE</span>
+                </div> *@
+            </div>
+        </div>
+
+        <div class="xaml-pane">
+            <h3 class="pane-title">> XAML_SOURCE</h3>
+            <div class="editor-wrapper">
+                <CodeEditorView @key="ProjectState.SelectedFile?.FileName" SelectedFile="ProjectState.SelectedFile" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? xamlContent;
+
+    [Parameter] public ProjectFile Project { get; set; } = new();
+    
+    protected override void OnInitialized()
+    {
+        // Listen for when the HttpClient finishes loading the text
+        ProjectState.OnChange += HandleStateChange; ;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProjectState.OnChange += async () => await LoadProjectData();
+        await LoadProjectData();
+    }
+
+    private void HandleStateChange()
+    {
+        Console.WriteLine($">>> WPF_VIEWER: State changed. Content length: {ProjectState.SelectedFileContent?.Length ?? 0}");
+        // This forces the page to re-render the moment
+        // the HttpClient finishes downloading the XAML.
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadProjectData()
+    {
+        if (ProjectState.SelectedFile != null && ProjectState.SelectedFile.Extension == ".xaml")
+        {
+            // Reset content while loading
+            xamlContent = "LOADING_SCHEMATIC...";
+            StateHasChanged();
+
+            // Fetch the raw XAML text from your wwwroot/data folder
+            try
+            {
+                // Assuming your ProjectStateService or a separate Service handles the HttpClient
+                // xamlContent = await Http.GetStringAsync(ProjectState.SelectedFile.SourceUrl);
+            }
+            catch
+            {
+                xamlContent = "ERROR: SOURCE_NOT_FOUND";
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        ProjectState.OnChange -= StateHasChanged;
+    }
+}

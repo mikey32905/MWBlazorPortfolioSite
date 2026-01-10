@@ -16,6 +16,12 @@
     <Content Update="wwwroot\Data\projects.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\Data\source\Identity.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Data\source\SimpleImageViewer\SimpleImageViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
     <Content Update="wwwroot\Developer\Identity.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -3,10 +3,11 @@
     "FileName": "Identity",
     "Extension": ".cs",
     "Category": "SYSTEM_CORE",
-    "PhysicalPath": "Developer/Identity.cs",
+    "PhysicalPath": "Data/source/Identity.cs",
     "Language": "csharp",
-    "AccentColor": "#39FF14",
+    "AccentColor": "#FFD700",
     "Icon": "👤",
+    "SourceUrl": "Data/source/Identity.cs",
     "Description": "USER_IDENTITY_MODEL"
   },
   {
@@ -71,5 +72,40 @@
     "AccentColor": "#BC13FE",
     "Icon": "🧠",
     "Description": "WEB_ASSEMBLY_CODE_MOVIE_SHOWTIME_VIEWER"
+  },
+  {
+    "FileName": "MediaMosaic",
+    "Extension": ".razor",
+    "Category": "LIVE_APPS",
+    "LiveUrl": "https://moviemosaic-live-production.up.railway.app/",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": "WEB_SERVER_APP_USING_API"
+  },
+  {
+    "FileName": "MediaMosaic",
+    "Extension": ".razor",
+    "Category": "BLAZOR_WASM_CODE",
+    "PhysicalPath": "Projects/MediaMosaic/MovieMosaicGame.razor.txt",
+    "Language": "html",
+    "AccentColor": "#BC13FE",
+    "Icon": "🧠",
+    "Description": "WEB_SERVER_CODE_MOVIE_GUESSING_GAME"
+  },
+  {
+    "FileName": "SimpleImageViewer",
+    "Extension": ".xaml",
+    "Category": "WPF_CORE",
+    "AccentColor": "#00F3FF",
+    "Icon": "󱂛",
+    "BlueprintUrl": "img/blueprints/SimpleImageViewer/SimpleImageViewer.png",
+    "SourceUrl": "data/source/SimpleImageViewer/SimpleImageViewer.xaml",
+    "Metadata": {
+      "TargetPlatform": ".NET 10-windows",
+      "Compiler": "MS_XAML_PARSER_v4.8",
+      "Integrity": "STABLE",
+      "ProjectClass": "Desktop Security Suite"
+    }
   }
+
 ]

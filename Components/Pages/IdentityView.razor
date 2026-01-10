@@ -1,0 +1,169 @@
+﻿@page "/identity"
+
+@layout PortfolioLayout
+
+@inject ProjectStateService ProjectState
+@inject TerminalService TerminalSvc
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+@inject HttpClient Http
+
+
+@if (ProjectState.SelectedFile == null)
+{
+    <p>Loading System Profile...</p>
+}
+else
+{
+    <div class="identity-dossier">
+        <div class="dossier-header">
+            <div class="glitch-title">SUBJECT_PROFILE: @ProjectState.SelectedFile?.FileName</div>
+            <div class="status-badge">RECOGNIZED_USER</div>
+        </div>
+
+        <div class="dossier-grid">
+            <div class="biometric-pane">
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="avatar-frame">
+                                <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" alt="Neural Signature" />
+                                <div class="scan-line"></div>
+                            </div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="clearance-badge">LEVEL_05_ACCESS</div>
+                            <div class="data-readout">
+                                <p>UUID: 88-ALPHA-01</p>
+                                <p>CLASS: FULL_STACK</p>
+                                <p>STATUS: ACTIVE</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-bars">
+                    <div class="stat"><span>LOGIC</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
+                    <div class="stat"><span>CREATIVITY</span><div class="bar"><div class="fill" style="width:88%"></div></div></div>
+                    <div class="stat"><span>STAMINA</span><div class="bar"><div class="fill" style="width:92%"></div></div></div>
+                </div>
+            </div>
+
+            <div class="data-pane">
+                <h3 class="pane-title">> RAW_SOURCE_DATA</h3>
+                <div class="code-overlay-container">
+                    @if (ProjectState.SelectedFile != null)
+                    {
+                        <div class="transparent-editor">
+                            <div style="height: 98%; width: 100%; overflow: hidden;">
+                                <CodeEditorView SelectedFile="ProjectState.SelectedFile" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="spec-pane">
+                <div class="spec-box">
+                    <label>CURRENT_LOCATION</label>
+                    <p>[REDACTED] / EARTH</p>
+                </div>
+                <div class="spec-box">
+                    <label>PRIMARY_LANGUAGE</label>
+                    <p>C# / TYPESCRIPT / ENGLISH</p>
+                </div>
+                <div class="spec-box highlight">
+                    <label>CORE_DIRECTIVE</label>
+                    <p>BUILD_BETTER_SYSTEMS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+}
+
+
+@code {
+    [Parameter] public ProjectFile Project { get; set; } = new();
+    private ProjectFile? identityFile;
+    private bool isFlipped = false;
+    private System.Timers.Timer? flipTimer;
+
+
+    private async Task HandleResumeDownload()
+    {
+        // 1. Play the "Hacker" role in the terminal
+        TerminalSvc.AddLog("INITIATING_SECURE_EXTRACT...", LogType.System);
+        await Task.Delay(800);
+
+        TerminalSvc.AddLog("BYPASSING_ENCRYPTION_LAYERS...", LogType.Warning);
+        await Task.Delay(600);
+
+        // 2. Trigger the actual browser download
+        // Ensure your resume is at wwwroot/data/resume.pdf
+        await JS.InvokeVoidAsync("open", "data/resume.pdf", "_blank");
+
+        TerminalSvc.AddLog("EXTRACT_SUCCESSFUL: Local copy generated.", LogType.Success);
+    }
+
+    // Ensure this component re-renders if the state changes
+    protected override void OnInitialized()
+    {
+        // Option A: Find it in your loaded manifest
+        // identityFile = ProjectState.ProjectFiles
+        //     .FirstOrDefault(f => f.FileName == "Identity");
+        // Find the identity file in the service
+        var identityFile = ProjectState.ProjectFiles
+            .FirstOrDefault(f => f.FileName.Equals("Identity", StringComparison.OrdinalIgnoreCase));
+
+
+        // Option B: Manual fallback if manifest isn't loaded yet
+        if (identityFile == null)
+        {
+            Console.WriteLine("DEBUG: Identity file not found in ProjectState list.");
+        }
+        else
+        {
+            // Highlight this file in the sidebar even if we arrived here via URL
+            ProjectState.SelectFile(identityFile);
+        }
+
+        ProjectState.OnChange += StateHasChanged;
+
+        // Flip every 4 seconds (matching the scan-move animation duration)
+        flipTimer = new System.Timers.Timer(4000);
+        flipTimer.Elapsed += (s, e) =>
+        {
+            isFlipped = !isFlipped;
+            InvokeAsync(StateHasChanged);
+        };
+        flipTimer.AutoReset = true;
+        flipTimer.Enabled = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Ensure the service actually has the files loaded
+        if (ProjectState.ProjectFiles == null)
+        {
+            await ProjectState.InitializeAsync(Http);
+        }
+
+        // 2. Find the file
+        identityFile = ProjectState.ProjectFiles?
+            .FirstOrDefault(f => f.FileName.Equals("Identity", StringComparison.OrdinalIgnoreCase));
+
+        // 3. IMPORTANT: Tell the service this is the active file
+        // This is what makes the CLOSE_SESSION button appear in the Layout!
+        if (identityFile != null)
+        {
+            ProjectState.SelectFile(identityFile);
+        }
+    }
+
+
+    public void Dispose()
+    {
+        ProjectState.OnChange -= StateHasChanged;
+    }
+}

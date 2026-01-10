@@ -1,42 +1,42 @@
 ﻿@using System.Text
 @inject TerminalService TerminalSvc
+@inject ProjectStateService ProjectState
 @inject HttpClient Http
 @inject IJSRuntime JS
 @implements IDisposable
 
 <div class="editor-wrapper">
-    @if (string.IsNullOrEmpty(FileContent))
+    @if (ProjectState.SelectedFileContent != null)
     {
-        @* This prevents the "Invisible" state *@
-        <div class="loading-overlay">
-            <span class="glitch-text">FETCHING_SOURCE_DATA...</span>
-        </div>
+        <pre><code class="language-xaml">@ProjectState.SelectedFileContent</code></pre>
     }
     else
     {
-        <pre><code id="highlight-target" class="language-@SelectedFile.Language">@FileContent</code></pre>
+        <div class="loading-overlay">
+            <span class="pulse">LOADING_ENCRYPTED_SOURCE...</span>
+        </div>
     }
 </div>
 
 <div class="editor-container">
-    <div class="editor-tabs">
-        <div class="tab active">
-            <span class="file-icon">@SelectedFile.Icon</span>
-            @SelectedFile.FileName@SelectedFile.Extension
-            <span class="tab-close">×</span>
+    @if (ProjectState.SelectedFileContent != null)
+    {
+        @* Wrap the code in a dedicated scroll-box *@
+        <div class="code-viewport">
+            <pre><code>@ProjectState.SelectedFileContent</code></pre>
         </div>
-    </div>
-
-    <div class="code-viewport">
-        <div class="line-numbers">
-            @for (int i = 1; i <= LineCount; i++)
-            {
-                <div class="line-num">@i</div>
-            }
-        </div>
-        <pre class="code-content"><code>@((MarkupString)HighlightedCode)</code></pre>
-    </div>
+    }
+    else if (ProjectState.SelectedFile != null)
+    {
+        @* Show a tiny loading indicator instead of large text to avoid layout shifts *@
+        <div class="loading-bar-mini"></div>
+    }
+    else
+    {
+        <div class="no-file-ghost">NO_FILE_SELECTED</div>
+    }
 </div>
+
 
 @code {
     [Parameter] public ProjectFile SelectedFile { get; set; }

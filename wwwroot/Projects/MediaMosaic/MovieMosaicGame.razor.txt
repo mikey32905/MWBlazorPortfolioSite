@@ -1,0 +1,489 @@
+﻿@page "/movieMosaic"
+
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+
+@inject ITMDBService tmdbService
+@inject IGameSettingsService gameSettingsService
+
+<PageTitle>Movie Mosaic</PageTitle>
+
+
+<div class="container-xxl text-center mt-3">
+    <div>
+        <img src="/img/mwMovieMosaicLogo.png" class="title-img" />
+        <h5 class="subTitle">Guess the Movie, One Tile at a Time.</h5>
+    </div>
+</div>
+<div class="container-xxl game-container">
+    <div class="gameBoard-container">
+        <div class="poster-container">
+            <img src="@randomMovie.PosterPath" class="poster-img" />
+            <div class="poster-overlay row row-cols-3 g-0">
+                @foreach (var square in squareList)
+                {
+                    <div class="col overlay-block @(square.Show ? "fade-out" : "")">
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="controls-container rounded" data-bs-theme="dark">
+        <div>
+            <div class="mt-4">
+                <EditForm Model="formModel" OnValidSubmit="HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <div class="hstack gap-2">
+                        <InputText class="form-control" placeholder="Enter a movie title"
+                                   @bind-value="formModel.MovieTitle"
+                                   autocomplete="off"
+                                   autocorrect="off"
+                                   spellcheck="false"
+                                   @oninput="OnInputChanged" />
+                        <button class="btn btn-primary" type="submit">Guess</button>
+                    </div>
+                    <input type="hidden" @bind-value="formModel.ReleaseDate" />
+                    <ValidationMessage For="() => formModel.MovieTitle" />
+                        <!--Show the typeahead results-->
+                        @if (movies?.Any() == true)
+                        {
+                            <div class="suggestions-wrapper">
+                                <ul class="suggestions">
+                                    @foreach(var movie in movies)
+                                    {
+                                      <li @onclick="()=> SelectMovie(movie)">@movie.Title (@(DateTime.TryParse(movie.ReleaseDate, out var date)? date.Year : "Unknown"))</li>
+                                    }
+                            </ul>
+                            </div>
+                        }
+                </EditForm>
+            </div>
+            <nav class="mt-3">
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-hint-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#nav-hint"
+                            type="button"
+                            role="tab"
+                            aria-selected="true">
+                        Hints
+                    </button>
+                    <button class="nav-link" id="nav-guess-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#nav-guess"
+                            type="button"
+                            role="tab"
+                            aria-selected="false">
+                        Guesses
+                    </button>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane border-0 fade show active" id="nav-hint"
+                     role="tabpanel" aria-label="nav-hint-tab" tabindex="0">
+                    <ul class="list-group mb-3" id="Hints">
+                        @foreach(var hint in hints.OrderBy(h => h.Order))
+                        {
+                            if (guesses.Count + 1 >= hint.Order || hint.Show)
+                            {
+                                <li class="list-group-item">
+                                    <i class="bi bi-@hint.Order-square-fill me-1"></i>@hint.HintText
+                                </li>
+                            }
+                        }
+                     </ul>
+                </div>
+                <div class="tab-pane border-0 fade" id="nav-guess"
+                     role="tabpanel" aria-label="nav-guess-tab" tabindex="0">
+                    <ul class="list-group mb-3" id="Guesses">
+                        @for (int i = 0; i < guesses.Count; i++)
+                        {
+                            var guess = guesses[i];
+
+                            if (guess.Correct)
+                            {
+                                <li class="list-group-item list-group-item-success">
+                                    <i class="bi bi-@(i+1)-square-fill me-1"></i>
+                                    <span>@guess.Title (@guess.ReleaseYear)</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="list-group-item list-group-item-danger">
+                                    <i class="bi bi-@(i + 1)-square-fill me-1">
+                                        <span>@guess.Title (@guess.ReleaseYear)</span>
+                                    </i>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="hstack gap-2 justify-content-end">
+                <button class="btn btn-info controls-btn" @onclick="PlayItAgain">Play Again</button>
+                <button class="btn controls-btn" data-bs-toggle="modal" data-bs-target="#instructionsModal">
+                    <i class="bi bi-question-circle text-secondary"></i>
+                </button>
+                <button class="btn controls-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSettings" aria-controls="offcanvasRight">
+                    <i class="bi bi-gear text-secondary"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<WinLossOverlay IsVisible="@showOverlay" IsWin="@win"
+                Guesses="@guesses.Count"
+                OnClose="CloseOverlay"
+                movie="@randomMovie"/>
+
+<InstructionsModal />
+
+<GameSettings Genres="genres" MovieGameSettings="movieMosaicGameSettings" OnSubmit="ApplyGameSettings"/>
+
+@code {
+
+    #region State Variables
+
+    FormModel formModel = new();
+
+    private MovieMosaicGameSettings movieMosaicGameSettings = new MovieMosaicGameSettings();
+
+    private Movie randomMovie = new Movie();
+
+    private int squareCount = 12;
+    private int yearStart = 1970;
+    private int yearEnd = 2030;
+    private string selectedGenres = "";
+
+    List<Square> squareList = [];
+    private List<Movie> movies = [];
+    private List<Guess> guesses = [];
+    private List<Hint> hints = new();
+    private List<Genre> genres = [];
+
+    //timers
+    private Timer? debounceTimer;
+    private Timer? inactivityTimer;
+
+    private int debounceDelay = 500; //milliseconds
+
+    //game state variables
+    private int maxGuesses = 5;
+    //  private int currentGuesses = 0;
+    private bool gameOver = false;
+    private bool win = false;
+    private bool showOverlay = false;
+
+    #endregion State Variables
+
+    #region Game Flow
+
+    private async Task PlayItAgain()
+    {
+        //reset the game state
+        await ResetGameState();
+        //start a new game
+        await NewGame();
+
+        Task.Delay(2000).Wait(); //wait for a second to let the UI update
+
+        //show a random square
+        await showRandomSquare();
+    }
+
+    private async Task NewGame()
+    {
+        randomMovie = new();
+        win = false;
+        randomMovie = await tmdbService.GetRandomMovieAsync(yearStart, yearEnd, selectedGenres);
+
+        await GetHints(randomMovie.Id);
+    }
+
+    private void CloseOverlay()
+    {
+        showOverlay = false;
+    }
+
+    private async Task ResetGameState()
+    {
+        squareList = new();
+
+        for (int i = 1; i <= squareCount; i++)
+        {
+            Square newSquare = new();
+            newSquare.Show = false;
+            squareList.Add(newSquare);
+        }
+
+        formModel = new();
+        guesses = new();
+        hints = new();
+        win = false;
+        gameOver = false;
+        showOverlay = false;
+    }
+
+    private async Task ApplyGameSettings(MovieMosaicGameSettings gameSettings)
+    {
+        yearStart = gameSettings.YearStart;
+        yearEnd = gameSettings.YearEnd;
+
+        if (gameSettings.SelectedGenre == 0)
+        {
+            selectedGenres = "";
+        }
+        else
+        {
+            selectedGenres = gameSettings.SelectedGenre.ToString();
+        }
+
+        await gameSettingsService.SaveMovieMosaicGameSettingsAsync(gameSettings);
+
+        //Reset Game
+        await PlayItAgain();
+    }
+
+    private async Task HandleSubmit()
+    {
+        //check if the guess is correct
+        if (formModel.MovieTitle?.ToLower() == randomMovie.Title?.ToLower() &&
+            formModel.ReleaseDate == randomMovie.ReleaseDate)
+        {
+            //show the movie poster
+            StateHasChanged();
+
+            //Reveal the poster
+            RevealPoster();
+
+            //show all the hints
+            showAllHints();
+
+            win = true;
+            gameOver = true;
+        }
+        else
+        {
+            //shows a new random square
+            await showRandomSquare();
+
+            win = false;
+            gameOver = false;
+        }
+
+        guesses.Add(new Guess
+        {
+            Title = formModel.MovieTitle,
+            ReleaseYear = DateTime.TryParse(formModel.ReleaseDate, out var date) ? date.Year.ToString() : "Unknown",
+            Correct = win
+        });
+
+        //check if the max guesses have been reached
+        if (guesses.Count >= maxGuesses)
+        {
+            gameOver = true;
+            win = false;
+            RevealPoster();
+        }
+
+        if (gameOver)
+        {
+            showOverlay = true;
+        }
+
+    }
+
+    private async Task showRandomSquare()
+    {
+        Random random = new Random();
+
+        List<Square> hiddenSquares = squareList.Where(s => s.Show == false).ToList();
+
+        if (hiddenSquares.Count > 0)
+        {
+            //pick a random square from the hidden squares
+            int randomIndex = random.Next(hiddenSquares.Count());
+            hiddenSquares[randomIndex].Show = true;
+        }
+    }
+
+    private void showAllHints()
+    {
+        foreach (var hint in hints)
+        {
+            hint.Show = true;
+        }
+    }
+
+    private void RevealPoster()
+    {
+        foreach(var square in squareList)
+        {
+            square.Show = true;
+        };
+    }
+
+    #endregion Game Flow
+
+    #region Lifecycle Events
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize the game state
+        genres = await tmdbService.GetMovieGenresAsync();
+
+        movieMosaicGameSettings = await gameSettingsService.GetMovieMosaicGameSettings();
+        await ApplyGameSettings(movieMosaicGameSettings);        
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // await PlayItAgain();
+            // StateHasChanged();
+        }
+    }
+
+    #endregion Lifecycle Events
+
+    #region Search Type Ahead
+
+    private async Task SearchMovies()
+    {
+        //if search is empty and clear results.
+        if (string.IsNullOrWhiteSpace(formModel.MovieTitle))
+        {
+            movies.Clear();
+        }
+        else
+        {
+            try
+            {
+                var response = await tmdbService.SearchMoviesAsync(formModel.MovieTitle);
+
+                movies = response ?? new List<Movie>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error searching movies: {ex.Message}");
+                movies.Clear();
+            }
+        }
+
+        //trigger a re-render to refresh UI.
+        StateHasChanged();
+    }
+
+    private void OnInputChanged(ChangeEventArgs e)
+    {
+        formModel.MovieTitle = e.Value?.ToString() ?? "";
+
+        //dispose any existing search timers
+        debounceTimer?.Dispose();
+
+        //create a new timer that calls search movies after a debounce delay
+        debounceTimer = new Timer(async _ =>
+         {
+
+             await InvokeAsync(async () =>
+         {
+             await SearchMovies();
+             ResetInactivityTimer();
+         });
+         }, null, debounceDelay, Timeout.Infinite);
+
+    }
+
+    private void ResetInactivityTimer()
+    {
+        inactivityTimer?.Dispose();
+
+        inactivityTimer = new Timer(_ =>
+        {
+            // Handle inactivity (e.g., show a message, log out, etc.)
+            InvokeAsync(() =>
+        {
+            movies.Clear();
+            StateHasChanged();
+
+        });
+        }, null, 10000, Timeout.Infinite); // 30 seconds of inactivity
+    }
+
+    private void SelectMovie(Movie movie)
+    {
+        formModel.MovieTitle = movie.Title;
+        formModel.ReleaseDate = movie.ReleaseDate;
+        //clear search results
+        movies.Clear();
+    }
+
+    #endregion Search Type Ahead
+
+    #region UI Helpers
+
+    public async Task GetHints(int movieId)
+    {
+        var movieDetails = await tmdbService.GetMovieDetailsAsync(movieId);
+
+        if (movieDetails is not null)
+        {
+            var releaseYear = DateTime.TryParse(movieDetails.ReleaseDate, out var date) ? date.Year.ToString() : "";
+            string genreName = movieDetails.Genres?.FirstOrDefault()?.Name ?? "Unknown";
+            string tagline = movieDetails.Tagline ?? "";
+            string leadActor = movieDetails.Credits?.Cast?.FirstOrDefault()?.Name ?? "Unknown";
+            string director = movieDetails.Credits?.Crew?.FirstOrDefault(c => c.Job == "Director")?.Name ?? "Unknown";
+            string overview = movieDetails.Overview ?? "No Overview Available";
+            
+            //build hint1
+            string taglineHint = string.IsNullOrEmpty(tagline) 
+                                 ? "No tagline for this movie - the mystery deepens"
+                                 : $"Here's the movie tagline: \"{tagline}\"";
+            string actorHint = string.IsNullOrEmpty(leadActor) 
+                               ? "The lead actor's is a bit of a mystery.. fitting right?"
+                                 : $"{leadActor} takes the spotlight in this one";
+            string directorHint = string.IsNullOrEmpty(director)
+                                ? "Directed by... Well, that part's classified."
+                                : $"{director} is the mastermind behind this one";
+
+            string genreHint = string.IsNullOrEmpty(genreName)
+                                ? "Genre? It's a mystery wrapped in an enigma."
+                                : $"This {genreName.ToLower()} flick dropped in {releaseYear}.";
+
+
+            string overviewHint = string.IsNullOrEmpty(overview)
+                ? "Overview? More like over-guessing!"
+                : $"Here's a sneak peek: \"{overview}\"";
+
+            hints = new List<Hint>
+            {
+                BuildHint(taglineHint, 1),
+                BuildHint(actorHint, 2),
+                BuildHint(directorHint, 3),
+                BuildHint(genreHint, 4),
+                BuildHint(overviewHint, 5)
+            };
+
+        }
+
+
+    }
+
+    public Hint BuildHint(string hintText, int order)
+    {
+        // This method can be used to return hints for the movie
+        // For now, it returns a placeholder object
+        return new Hint
+        {
+            HintText = hintText,
+            Show = false,
+            Order = order
+        };
+    }
+
+    #endregion Ui Helpers
+
+}

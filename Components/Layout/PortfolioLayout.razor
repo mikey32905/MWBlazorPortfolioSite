@@ -3,6 +3,8 @@
 @inject ProjectStateService ProjectState
 @inject ProjectManifestService Manifest
 @inject HttpClient Http
+@inject NavigationManager Nav
+
 @implements IDisposable
 
 <BootScreen />
@@ -16,10 +18,12 @@
     }
 </style>
 
+
+
 <div class="app-shell" style="--accent-glow: @ThemeSvc.CurrentColor;">
    
- 
     <header class="system-header">
+      
         <div class="logo">PORTFOLIO_OS // @(ThemeSvc.CurrentColor == "#39FF14" ? "WPF_MODE" : "WASM_MODE")</div>
         <nav class="system-controls">
             <span>RUN</span>
@@ -28,29 +32,40 @@
         </nav>
     </header>
 
-    <aside class="sidebar">
-        <SideBar OnFileSelected="UpdateSelection"/>
-    </aside>
-    @* The Sidebar with dynamic classes *@
-   @*  <div class="sidebar @(isMenuOpen ? "mobile-open" : "mobile-collapsed")">
-        <SideBar OnFileSelected="UpdateSelection"/>
-    </div> *@
+    <div class="sidebar-wrapper">
+        <SideBar />
+    </div>
+   
+    <div class="right-side-container">
+        <main class="main-stage">
 
-    <main class="content-area">
-        <ProjectStage />
-        @* @if (SelectedFile == null)
-        {
-            <EmptyState />
-        }
-        else
-        {
+            @* TEMPORARY DEBUG TEXT - Delete this once button works *@
+           @*  <div style="color:white; font-size: 10px; position: fixed; top: 45px; left: 270px; z-index: 9999;">
+                DEBUG: FileSelected = @(ProjectState.SelectedFile?.FileName ?? "NULL")
+            </div> *@
+
+            @if (ProjectState.SelectedFile != null)
+            {
+                <div class="global-action-bar">
+                    <button class="exit-btn" @onclick="CloseFile">[ESC] CLOSE_SESSION</button>
+                    <span class="file-path">SYS://@ProjectState.SelectedFile.FileName</span>
+                </div>
+            }
+
             @Body
-        } *@
-    </main>
 
-    <footer class="terminal-area">
-        <TerminalComponent />
-    </footer>
+        </main>
+
+        <div class="terminal-container">
+            <TerminalComponent />
+        </div>
+    </div>
+
+    
+
+   @*  <footer class="terminal-area">
+       
+    </footer> *@
 
 </div>
 
@@ -63,18 +78,29 @@
 
     public ProjectFile? SelectedFile { get; set; } // The variable you saw in Line 20
 
+    protected override void OnInitialized()
+    {
+        // Subscribe to changes so the button appears/disappears instantly
+        ProjectState.OnChange += StateHasChanged;
+        ProjectState.OnSelectedFileChanged += HandleFileSelection;
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        // Force the load at the start of the application lifecycle
+        await ProjectState.InitializeAsync(Http);
+
+        await ProjectState.LoadProjects();
         // Only load if the list is currently empty
-        if (ProjectState.ProjectFiles == null || !ProjectState.ProjectFiles.Any())
-        {
-            var rawData = await Http.GetFromJsonAsync<List<ProjectFile>>("Data/projects.json");
-            if (rawData != null)
-            {
-                ProjectState.LoadProjects(rawData);
-                StateHasChanged(); // Tell the sidebar to wake up and show the files
-            }
-        }
+        // if (ProjectState.ProjectFiles == null || !ProjectState.ProjectFiles.Any())
+        // {
+        //     var rawData = await Http.GetFromJsonAsync<List<ProjectFile>>("Data/projects.json");
+        //     if (rawData != null)
+        //     {
+        //         ProjectState.LoadProjects(rawData);//
+        //         StateHasChanged(); // Tell the sidebar to wake up and show the files
+        //     }
+        // }
        // await Manifest.InitializeAsync();
         // Subscribe to selection changes
         ProjectState.OnSelectedFileChanged += HandleFileSelection;
@@ -89,6 +115,19 @@
     private void UpdateSelection(ProjectFile file)
     {
         SelectedFile = file; // The variable is "Set" here!
+    }
+
+    private void CloseFile()
+    {
+        // 1. Reset the global state so the Sidebar highlights go away
+        ProjectState.SelectFile(null);
+
+        // Use ForceLoad: false to allow Blazor to handle the route internally
+        Nav.NavigateTo("/");
+
+        // 3. Log it to your terminal for that extra immersion
+        // (Assuming you have a method to push to terminal)
+        Console.WriteLine(">>> SESSION_TERMINATED: Returning to Root...");
     }
 
     public void Dispose()

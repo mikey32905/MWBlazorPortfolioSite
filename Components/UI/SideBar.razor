@@ -2,50 +2,62 @@
 @inject TerminalService TerminalSvc
 @inject ProjectStateService ProjectState
 @inject ProjectManifestService Manifest
-@* @inject NavigationManager Nav
- *@
+@inject NavigationManager Nav
+@inject HttpClient Http
+@implements IDisposable
 
-<div class="sidebar-explorer">
-    <div class="sidebar-header">EXPLORER</div>
 
-    <div class="file-tree">
-        @if (ProjectState.ProjectFiles == null)
-        {
-            <div class="sidebar-loading">INITIALIZING_FILESYSTEM...</div>
-        }
-        else
-        {
-            @foreach (var categoryGroup in ProjectState.ProjectFiles.GroupBy(f => f.Category))
+<div style="background-color: red; width: 260px; height: 100vh;">
+    <div class="sidebar-explorer">
+        <div class="sidebar-header">
+            <h3>PROJECTS_EXE</h3>
+        </div>
+
+        @* DEBUG PIXELS: If this is Red, the list is null. If Green, the list is ready. *@
+        <div style="height: 2px; width: 100%; background: @(ProjectState.ProjectFiles == null ? "red" : "green")"></div>
+
+        <div class="file-tree">
+            @if (ProjectState.ProjectFiles == null)
             {
-                var category = categoryGroup.Key;
-                bool isOpen = expandedCategories.Contains(category);
-
-                <div class="folder-section">
-                    @* Toggle folder state on click *@
-                    <div class="folder-header" @onclick="() => ToggleFolder(category)" style="cursor: pointer;">
-                        <span class="folder-arrow">@(isOpen ? "▼" : "▶")</span>
-                        <span class="folder-icon">@(isOpen ? "📂" : "📁")</span>
-                        <span class="folder-name">@category</span>
-                    </div>
-
-                    @if (isOpen)
-                    {
-                        <div class="folder-content">
-                            @foreach (var file in categoryGroup)
-                            {
-                                <div class="file-item @(ProjectState.SelectedFile == file ? "active" : "")"
-                                     @onclick="() => ProjectState.SelectFile(file)">
-                                    <span class="file-icon" style="color: @file.AccentColor">@file.Icon</span>
-                                    <span class="file-name">@file.FileName@file.Extension</span>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
+                @*  <p>Loading Files...</p> *@
+                <div class="sidebar-loading">INITIALIZING_FILESYSTEM...</div>
             }
-        }
+            else
+            {
+                @foreach (var categoryGroup in ProjectState.ProjectFiles.GroupBy(f => f.Category))
+                {
+                    var category = categoryGroup.Key;
+                    bool isOpen = expandedCategories.Contains(category);
+
+                    <div class="folder-section">
+                        @* Toggle folder state on click *@
+                        <div class="folder-header" @onclick="() => ToggleFolder(category)" style="cursor: pointer;">
+                            <span class="folder-arrow">@(isOpen ? "▼" : "▶")</span>
+                            <span class="folder-icon">@(isOpen ? "📂" : "📁")</span>
+                            <span class="folder-name">@category</span>
+                        </div>
+
+                        @if (isOpen)
+                        {
+                            <div class="folder-content">
+                                @foreach (var file in categoryGroup)
+                                {
+                                    <div class="file-item @(ProjectState.SelectedFile == file ? "active" : "")"
+                                         style="--accent-color: @file.AccentColor"
+                                         @onclick="() => HandleFileClick(file)">
+                                        <span class="icon">@file.Icon</span>
+                                        <span class="text">@file.FileName</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
     </div>
-   
+
 </div>
 
 
@@ -61,6 +73,16 @@
         ProjectState.SelectedFile?.FileName == file.FileName;
    
 
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to the event
+        ProjectState.OnChange += StateHasChanged;
+
+        // Fetch data
+        await ProjectState.InitializeAsync(Http);
+  
+    }
+
     protected override void OnInitialized()
     {
         // Optional: Start with all folders expanded
@@ -71,6 +93,8 @@
                 expandedCategories.Add(cat);
             }
         }
+
+        ProjectState.OnChange += StateHasChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -104,7 +128,35 @@
 
     private async Task HandleFileClick(ProjectFile file)
     {
+        var previousFile = ProjectState.SelectedFile;
+        
+        // 1. Update the global state so the editor knows what's selected
         ProjectState.SelectFile(file);
+
+        // Get the destination route
+        string destination = file.Category switch
+        {
+            "LIVE_APPS" => "live-app",
+            "SYSTEM_CORE" when file.FileName == "Identity" => "identity", // The Unique Dossier
+            "SYSTEM_CORE" when file.FileName == "System_Diagnostic" => "system-diagnostic",
+            "SYSTEM_CORE" when file.FileName == "Uplink" => "uplink",
+            _ => file.Extension == ".xaml" ? "wpf-viewer" : "source-viewer" // The IDE Viewer
+        };
+
+         // 3. Smart Navigation
+        if (Nav.Uri.EndsWith(destination, StringComparison.OrdinalIgnoreCase) || 
+           (destination == "/" && Nav.Uri == Nav.BaseUri))
+        {
+            // We are already on the page! 
+            // Just let the Service event handle the UI update.
+        }
+        else
+        {
+            // We are on a different page, so move there.
+            Nav.NavigateTo(destination);
+        }
+       
+
         // 1. Update the global site glow
         ThemeSvc.UpdateTheme(file.AccentColor);
         TerminalSvc.AddLog($"MOUNTING_MODULE: {file.FileName.ToUpper()}", LogType.System);
@@ -113,26 +165,14 @@
         TerminalSvc.AddLog($"Loading module: {file.FileName}{file.Extension}...", LogType.System);
         TerminalSvc.AddLog($"Setting environment accent to {file.AccentColor}.", LogType.Success);
 
-        // 3. (Optional) Navigate or Update Main Stage
-        ProjectState.SelectFile(file); // This is where the variable is "Set"
-
-        if (file.Extension == ".link")
-        {
-            TerminalSvc.AddLog("WARNING: Establishing unencrypted bridge to external nodes...", LogType.Warning);
-            TerminalSvc.AddLog("UPLINK_PROTOCOL: Active.", LogType.Success);
-        }
-        else
-        {
-            TerminalSvc.AddLog($"Accessing {file.FileName}...", LogType.System);
-        }
-
-        // Auto-close menu on mobile after selecting a file
-      //  isCollapsed = true;
-
         await OnFileSelected.InvokeAsync(file); // This triggers the parent's method
     }
 
     
-    
+    // Unsubscribe when the sidebar is destroyed to prevent memory leaks
+    public void Dispose()
+    {
+        ProjectState.OnChange -= StateHasChanged;
+    }
    
 }

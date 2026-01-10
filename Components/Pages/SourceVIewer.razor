@@ -1,0 +1,46 @@
+﻿@page "/source-viewer"
+
+@layout PortfolioLayout
+@implements IDisposable
+@inject ProjectStateService ProjectState
+@inject IJSRuntime JS
+
+<div class="source-container">
+    @if (ProjectState.SelectedFile != null)
+    {
+        <div class="source-header">
+            <div class="header-info">
+                <span class="path-text">SYS/PROJECTS/@ProjectState.SelectedFile.FileName@ProjectState.SelectedFile.Extension</span>
+                <div class="header-actions">
+                    <span class="stat-tag">LANG: @ProjectState.SelectedFile.Extension.ToUpper()</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <button class="action-btn" @onclick="CopyCode">[COPY_BUFFER]</button>
+                <span class="stat-tag">ENC: UTF-8</span>
+                <span class="stat-tag">LANG: @ProjectState.SelectedFile.Extension.Replace(".", "").ToUpper()</span>
+            </div>
+        </div>
+
+        <div class="editor-frame">
+            <CodeEditorView @key="ProjectState.SelectedFile.FileName" SelectedFile="ProjectState.SelectedFile" />
+        </div>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        ProjectState.OnChange += StateHasChanged;
+    }
+
+    private async Task CopyCode()
+    {
+        // Add a JS helper to copy text if you have one,
+        // or I can provide the script!
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", "Code content here...");
+    }
+
+    public void Dispose() => ProjectState.OnChange -= StateHasChanged;
+}
