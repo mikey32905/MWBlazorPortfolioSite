@@ -25,13 +25,9 @@
     <Content Update="wwwroot\Developer\Identity.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\Projects\TipTopApp\TipCalculator.razor">
+    <Content Update="wwwroot\Projects\TipTopApp\TipTop.razor">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\Projects\NowShowing\" />
   </ItemGroup>
 
 </Project>
