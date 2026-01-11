@@ -128,7 +128,7 @@
       "Integrated a custom-styled Window chrome to maintain a seamlessly simple to use across the OS."
     ],
     "BlueprintUrl": "img/blueprints/CloneHunter/CloneHunter.png",
-    "SourceUrl": "data/source/CloneHunter/CloneHunter.xaml",
+    "SourceUrl": "Data/source/CloneHunter/CloneHunter.xaml",
     "SupportingFiles": {
       "XAML": "Data/source/CloneHunter/CloneHunter.xaml",
       "C#": "Data/source/CloneHunter/CloneHunter.xaml.cs",
