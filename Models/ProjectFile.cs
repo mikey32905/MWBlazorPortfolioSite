@@ -29,9 +29,9 @@ namespace MWBlazorPortfolioSite.Models
         public string Icon { get; set; } = "📄";
 
         [JsonPropertyName("Description")]
-        public string Description { get; set; } = "";
+        public List<string> Description { get; set; } = new List<string>();
         // The relative path to the screenshot (e.g., "images/blueprints/TitanVault.png")
- 
+
         [JsonPropertyName("BlueprintUrl")]
         public string? BlueprintUrl { get; set; }
 

@@ -8,7 +8,7 @@
     "AccentColor": "#FFD700",
     "Icon": "👤",
     "SourceUrl": "Data/source/Identity.cs",
-    "Description": "USER_IDENTITY_MODEL"
+    "Description": [ "USER_IDENTITY_MODEL" ]
   },
   {
     "FileName": "System_Diagnostic",
@@ -16,7 +16,7 @@
     "Category": "SYSTEM_CORE",
     "AccentColor": "#00FF41",
     "Icon": "📊",
-    "Description": "RUNTIME_INTEGRITY_CHECK"
+    "Description": [ "RUNTIME_INTEGRITY_CHECK" ]
   },
   {
     "FileName": "TipTop",
@@ -25,7 +25,7 @@
     "LiveUrl": "https://tiptopcalculator.netlify.app/",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
-    "Description": "WEB_ASSEMBLY_TIPCALCULATOR"
+    "Description": [ "WEB_ASSEMBLY_TIPCALCULATOR" ]
   },
   {
     "FileName": "TipTop",
@@ -36,7 +36,7 @@
     "Language": "html",
     "AccentColor": "#BC13FE",
     "Icon": "🧠",
-    "Description": "WEB_ASSEMBLY_CODE_TIPCALCULATOR"
+    "Description": [ "WEB_ASSEMBLY_CODE_TIPCALCULATOR" ]
   },
   {
     "FileName": "Uplink",
@@ -44,7 +44,7 @@
     "Category": "SYSTEM_CORE",
     "AccentColor": "#FFD700",
     "Icon": "📡",
-    "Description": "SOCIAL_LINKS"
+    "Description": [ "SOCIAL_LINKS" ]
   },
   {
     "FileName": "NowShowing",
@@ -54,7 +54,7 @@
     "PhysicalPath": "Projects/NowShowing/Placeholder.txt",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
-    "Description": "WEB_ASSEMBLY_USING_API"
+    "Description": [ "WEB_ASSEMBLY_USING_API" ]
   },
   {
     "FileName": "NowShowing",
@@ -65,7 +65,7 @@
     "Language": "html",
     "AccentColor": "#BC13FE",
     "Icon": "🧠",
-    "Description": "WEB_ASSEMBLY_CODE_MOVIE_SHOWTIME_VIEWER"
+    "Description": [ "WEB_ASSEMBLY_CODE_MOVIE_SHOWTIME_VIEWER" ]
   },
   {
     "FileName": "MediaMosaic",
@@ -74,7 +74,7 @@
     "LiveUrl": "https://moviemosaic-live-production.up.railway.app/",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
-    "Description": "WEB_SERVER_APP_USING_API"
+    "Description": [ "WEB_SERVER_APP_USING_API" ]
   },
   {
     "FileName": "MediaMosaic",
@@ -85,7 +85,7 @@
     "Language": "html",
     "AccentColor": "#BC13FE",
     "Icon": "🧠",
-    "Description": "WEB_SERVER_CODE_MOVIE_GUESSING_GAME"
+    "Description": [ "WEB_SERVER_CODE_MOVIE_GUESSING_GAME" ]
   },
   {
     "FileName": "SimpleImageViewer",
@@ -95,6 +95,11 @@
     "Category": "WPF_CORE",
     "AccentColor": "#00F3FF",
     "Icon": "󱂛",
+    "Description": [
+      "High-performance WPF image gallery utilizing asynchronous file loading to prevent UI thread blocking.",
+      "Features a custom MVVM architecture with specialized ValueConverters for dynamic visibility logic.",
+      "Integrated a custom-styled Window chrome to maintain a seamless dark-mode aesthetic across the OS."
+    ],
     "BlueprintUrl": "img/blueprints/SimpleImageViewer/SimpleImageViewer.png",
     "SourceUrl": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml",
     "SupportingFiles": {
@@ -108,6 +113,54 @@
       "Last_Deployed": "2026-01-11",
       "Security_Level": "ENCRYPTED"
     }
+  },
+  {
+    "FileName": "CloneHunter",
+    "DownloadUrl": "https://www.dropbox.com/scl/fi/l28tz7tkws3pe82xovl3w/CloneHunter.zip?rlkey=cj638bb5e7a8cxkjio1gw7p3b&dl=1",
+    "Version": "v1.0.0-STABLE",
+    "Extension": ".xaml",
+    "Category": "WPF_CORE",
+    "AccentColor": "#00F3FF",
+    "Icon": "󱂛",
+    "Description": [
+      "High-performance WPF intuitive file duplicate search and removal tool.",
+      "Features a custom MVVM architecture with specialized ValueConverters for searching logic.",
+      "Integrated a custom-styled Window chrome to maintain a seamlessly simple to use across the OS."
+    ],
+    "BlueprintUrl": "img/blueprints/CloneHunter/CloneHunter.png",
+    "SourceUrl": "data/source/CloneHunter/CloneHunter.xaml",
+    "SupportingFiles": {
+      "XAML": "Data/source/CloneHunter/CloneHunter.xaml",
+      "C#": "Data/source/CloneHunter/CloneHunter.xaml.cs",
+      "ViewModel": "Data/source/CloneHunter/CloneHunter.cs"
+    },
+    "Metadata": {
+      "TargetPlatform": ".NET 100-windows",
+      "Compiler": "MS_XAML_PARSER_v4.8",
+      "Integrity": "STABLE",
+      "ProjectClass": "Desktop Security Suite"
+    }
+  },
+  {
+    "FileName": "TitanVault",
+    "Extension": ".xaml",
+    "BlueprintUrl": "img/restricted.svg",
+    "Category": "WPF_CORE",
+    "AccentColor": "#FF3131",
+    "Description": [
+      "PROTOCOL: BLACK_SITE_DEPLOIMENT",
+      "STATUS: DATA_ENCRYPTED",
+      "REASON: Intellectual property protection in effect until v2.0 stable release."
+    ],
+    "Metadata": {
+      "Security": "LEVEL_05",
+      "Status": "REDACTED",
+      "Uplink": "OFFLINE"
+    },
+    "SupportingFiles": {
+      "XAML": "data/source/TitanVault.xaml"
+    }
   }
+
 
 ]

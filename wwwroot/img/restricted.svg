@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#050505"/>
+  <path d="M0 0L800 600M800 0L0 600" stroke="#1a1a1a" stroke-width="1"/>
+  <circle cx="400" cy="280" r="80" fill="none" stroke="#FF3131" stroke-width="2" stroke-dasharray="10 5"/>
+  <path d="M400 230V300M400 320V330" stroke="#FF3131" stroke-width="8" stroke-linecap="round"/>
+  <text x="400" y="420" text-anchor="middle" fill="#FF3131" font-family="monospace" font-size="24" font-weight="bold">ACCESS_RESTRICTED</text>
+  <text x="400" y="450" text-anchor="middle" fill="#666" font-family="monospace" font-size="14">ENCRYPTION_KEY_REQUIRED // LEVEL_05_CLEARANCE</text>
+  <rect x="200" y="480" width="400" height="2" fill="#FF3131" opacity="0.3"/>
+</svg>

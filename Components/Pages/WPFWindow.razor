@@ -9,12 +9,40 @@
 <div class="wpf-container">
     <div class="wpf-layout">
         <div class="blueprint-pane">
-            <h3 class="pane-title">> UI_SCHEMATIC_PREVIEW</h3>
+            <div class="briefing-header">
+                <span class="pulse-dot"></span>
+                <h4 class="briefing-title">> PROJECT_LOG_SUMMARY</h4>
+                @* <h3 class="pane-title">> UI_SCHEMATIC_PREVIEW</h3> *@
+            </div>
+
+            <div class="briefing-body">
+                @if (ProjectState.SelectedFile?.Description != null && ProjectState.SelectedFile.Description.Any())
+                {
+                    <div class="glitch-container" @key="ProjectState.SelectedFile.FileName">
+                        @foreach (var logEntry in ProjectState.SelectedFile.Description)
+                        {
+                            <div class="log-row @(isGlitched ? "glitch-text" : "")">
+                                <span class="line-prefix">[LOG]:</span>
+                                <p class="briefing-text">@logEntry</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="briefing-text opacity-50">NO_DESCRIPTION_DATA_RECOVERED...</p>
+                }
+            </div>
+            
             <div class="blueprint-frame">
 
                 @if (!string.IsNullOrEmpty(ProjectState.SelectedFile?.BlueprintUrl))
                 {
-                    <img src="@ProjectState.SelectedFile.BlueprintUrl" class="blueprint-img" alt="WPF Preview" />
+                    <div class="image-container @(isGlitched ? "glitch-image" : "")">
+                        <img src="@ProjectState.SelectedFile.BlueprintUrl" class="blueprint-img" 
+                             style="width: 100%; height: auto; display: block;"
+                             alt="System Blueprint" />
+                    </div>
                 }
                 else
                 {
@@ -96,6 +124,7 @@
 
     [Parameter] public ProjectFile Project { get; set; } = new();
     private string activeTab = "XAML";
+    private bool isGlitched = true;
 
     protected override void OnInitialized()
     {
@@ -107,6 +136,17 @@
     {
         ProjectState.OnChange += async () => await LoadProjectData();
         await LoadProjectData();
+    }
+
+    private async void TriggerGlitch()
+    {
+        isGlitched = false; // Turn off animation
+        StateHasChanged();
+
+        await Task.Delay(50); // Micro-delay to let the DOM breathe
+
+        isGlitched = true; // Turn animation back on
+        await InvokeAsync(StateHasChanged);
     }
 
     private void HandleStateChange()
