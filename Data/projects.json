@@ -89,17 +89,24 @@
   },
   {
     "FileName": "SimpleImageViewer",
+    "DownloadUrl": "https://www.dropbox.com/scl/fi/mxp9sjtp2dy5rr49tt5it/Simple-Image-Viewer.zip?rlkey=eiq6mz2g1aidjkvyqtkncpvmw&dl=1",
+    "Version": "v1.0.0-STABLE",
     "Extension": ".xaml",
     "Category": "WPF_CORE",
     "AccentColor": "#00F3FF",
     "Icon": "󱂛",
     "BlueprintUrl": "img/blueprints/SimpleImageViewer/SimpleImageViewer.png",
     "SourceUrl": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml",
+    "SupportingFiles": {
+      "XAML": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml",
+      "C#": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml.cs",
+      "ViewModel": "Data/source/SimpleImageViewer/SimpleImageViewer.cs"
+    },
     "Metadata": {
       "TargetPlatform": ".NET 10-windows",
-      "Compiler": "MS_XAML_PARSER_v4.8",
-      "Integrity": "STABLE",
-      "ProjectClass": "Desktop Security Suite"
+      "Build_Status": "STABLE",
+      "Last_Deployed": "2026-01-11",
+      "Security_Level": "ENCRYPTED"
     }
   }
 
