@@ -82,20 +82,6 @@ namespace MWBlazorPortfolioSite.Services
             SelectedFile = file;
             SelectedFileContent = null; // Clear old content immediately
 
-            //if (file != null && !string.IsNullOrEmpty(file.SourceUrl))
-            //{
-            //    Console.WriteLine($">>> SYSTEM: Attempting to fetch source from {file.SourceUrl}");
-            //    try
-            //    {
-            //        SelectedFileContent = await _http.GetStringAsync(file.SourceUrl);
-            //        Console.WriteLine(">>> SYSTEM: Source code successfully cached.");
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        SelectedFileContent = $"// ERROR: Could not load {file.SourceUrl}. {ex.Message}";
-            //        Console.WriteLine($">>> ERROR: {ex.Message}");
-            //    }
-            //}
             if (file != null)
             {
                 CurrentAccentColor = file.AccentColor;
@@ -113,19 +99,33 @@ namespace MWBlazorPortfolioSite.Services
                     }
                 }
             }
-            //else
-            //{
-            //    CurrentAccentColor = "#00FF41";
-            //}
+           
 
             NotifyStateChanged();
         }
 
-        // Call this after fetching the JSON in your initialization logic
-        //public void LoadProjects(List<ProjectFile> files)
-        //{
-        //    ProjectFiles = files;
-        //}
+        public async Task UpdateActiveContent(string url)
+        {
+            SelectedFileContent = null; // Clear old text
+            NotifyStateChanged();
+
+            try
+            {
+                // Use a slight delay to test if it's a race condition locally
+                // await Task.Delay(100); 
+
+                var content = await _http.GetStringAsync(url);
+                SelectedFileContent = content; // Step 2: Set new code
+                Console.WriteLine($">>> FETCH_SUCCESS: {url} | Length: {content.Length}");
+            }
+            catch (Exception ex)
+            {
+                SelectedFileContent = $"// ERROR: Target not found at {url}";
+                Console.WriteLine($">>> FETCH_ERROR: {ex.Message}");
+            }
+
+            NotifyStateChanged();
+        }
 
         public async Task LoadProjects()
         {

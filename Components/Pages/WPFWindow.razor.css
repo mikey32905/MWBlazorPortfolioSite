@@ -33,6 +33,49 @@
     height: 100%;
     background-image: linear-gradient(rgba(0, 85, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 85, 255, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
+    pointer-events: none !important; /* THE CRITICAL FIX */
+    z-index: 5;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.download-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border: 1px solid #39FF14; /* Neon Green */
+    background: rgba(57, 255, 20, 0.05);
+    padding: 2px 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.7rem;
+    color: #39FF14;
+    transition: all 0.3s ease;
+}
+
+    .download-link:hover {
+        background: #39FF14;
+        color: #000;
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+    }
+
+.version-tag {
+    opacity: 0.6;
+    margin-right: 8px;
+    border-right: 1px solid #39FF14;
+    padding-right: 8px;
+}
+
+.pane-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 20; /* Higher than the scan-overlay and grid */
 }
 
 .pane-title {
@@ -43,6 +86,35 @@
     border-left: 3px solid var(--accent-glow);
     line-height: 1;
 }
+
+.mini-tabs {
+    display: flex;
+    gap: 8px;
+    pointer-events: auto !important; /* Force clicks to be active here */
+}
+
+.tab-btn {
+    background: transparent;
+    border: 1px solid #333;
+    color: #666;
+    padding: 4px 12px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .tab-btn.active {
+        border-color: #00F3FF;
+        color: #00F3FF;
+        background: rgba(0, 243, 255, 0.1);
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+    }
+
+    .tab-btn:hover:not(.active) {
+        border-color: #555;
+        color: #fff;
+    }
 
 .xaml-pane {
     height: 100%;
@@ -109,6 +181,8 @@
     box-shadow: 0 0 15px #0055ff, 0 0 30px #0055ff;
     z-index: 5;
     animation: scan-move 3s linear infinite;
+    pointer-events: none !important; /* THE CRITICAL FIX */
+    z-index: 10; /* Keep it visually on top, but non-interactable */
 }
 
 /* A subtle "reconstruction" flicker on the image */

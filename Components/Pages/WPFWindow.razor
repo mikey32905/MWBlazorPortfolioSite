@@ -44,25 +44,48 @@
                         <span>NO_METADATA_AVAILABLE</span>
                     </div>
                 }
-                @* <div class="meta-box">
-                    <label>ASSET_ID</label>
-                    <span>@(ProjectState.SelectedFile?.FileName.ToUpper())_UI</span>
-                </div>
-                <div class="meta-box">
-                    <label>COMPILER</label>
-                    <span>MS_XAML_PARSER_v4.8</span>
-                </div>
-                <div class="meta-box highlight">
-                    <label>INTEGRITY</label>
-                    <span>STABLE</span>
-                </div> *@
             </div>
         </div>
 
         <div class="xaml-pane">
-            <h3 class="pane-title">> XAML_SOURCE</h3>
+            <div class="pane-header">
+                
+                <h3 class="pane-title">> SOURCE_FILES</h3>
+
+                <div class="header-actions">
+                    @if (ProjectState.SelectedFile?.SupportingFiles?.Any() == true)
+                    {
+                        @if (!string.IsNullOrEmpty(ProjectState.SelectedFile?.DownloadUrl))
+                        {
+                            <a href="@ProjectState.SelectedFile.DownloadUrl"
+                               @onclick="LogDownload"
+                               target="_blank"
+                               class="download-link">
+                                <span class="version-tag">@ProjectState.SelectedFile.Version</span>
+                                <span class="btn-text">[ GET_EXECUTABLE.EXE ]</span>
+                            </a>
+                        }
+
+                        <div class="mini-tabs">
+                            @foreach (var file in ProjectState.SelectedFile.SupportingFiles)
+                            {
+                                @* Ensure you are capturing the current 'file' variables correctly *@
+                                var tabLabel = file.Key;
+                                var tabUrl = file.Value;
+
+                                <button class="tab-btn @(activeTab == tabLabel ? "active" : "")"
+                                        @onclick="() => LoadTab(tabLabel, tabUrl)">
+                                    @tabLabel
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            
             <div class="editor-wrapper">
-                <CodeEditorView @key="ProjectState.SelectedFile?.FileName" SelectedFile="ProjectState.SelectedFile" />
+                <CodeEditorView @key="@(ProjectState.SelectedFile?.FileName + activeTab)" />
             </div>
         </div>
     </div>
@@ -72,7 +95,8 @@
     private string? xamlContent;
 
     [Parameter] public ProjectFile Project { get; set; } = new();
-    
+    private string activeTab = "XAML";
+
     protected override void OnInitialized()
     {
         // Listen for when the HttpClient finishes loading the text
@@ -91,6 +115,17 @@
         // This forces the page to re-render the moment
         // the HttpClient finishes downloading the XAML.
         InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadTab(string label, string url)
+    {
+        Console.WriteLine($">>> UI_ACTION: Switching to tab [{label}] - Target: {url}");
+        activeTab = label;
+
+        // We call a new helper method in your service to just swap the text
+        await ProjectState.UpdateActiveContent(url);
+
+        StateHasChanged();
     }
 
     private async Task LoadProjectData()
@@ -114,6 +149,13 @@
 
             StateHasChanged();
         }
+    }
+
+    private void LogDownload()
+    {
+        var fileName = ProjectState.SelectedFile?.FileName ?? "UNKNOWN";
+        // Assuming your terminal logic is tied to a method in a service or parent
+        Console.WriteLine($">>> INITIATING_SECURE_TRANSFER: {fileName}.zip from remote uplink.");
     }
 
     public void Dispose()

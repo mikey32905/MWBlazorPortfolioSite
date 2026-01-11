@@ -28,8 +28,10 @@
     }
     else if (ProjectState.SelectedFile != null)
     {
-        @* Show a tiny loading indicator instead of large text to avoid layout shifts *@
-        <div class="loading-bar-mini"></div>
+        @* Show ONLY the loading message while fetching *@
+        <div class="loading-overlay">
+            <span class="pulse">LOADING_ENCRYPTED_SOURCE...</span>
+        </div>
     }
     else
     {
@@ -51,6 +53,12 @@
 
     private string HighlightedCode = "";
     private int LineCount = 1;
+
+    protected override void OnInitialized()
+    {
+        // Subscribe so this component re-renders whenever the service updates
+        ProjectState.OnChange += StateHasChanged;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -86,5 +94,8 @@
         }
     }
 
-     public void Dispose() { }
+    public void Dispose()
+    {
+        ProjectState.OnChange -= StateHasChanged;
+    }
 }

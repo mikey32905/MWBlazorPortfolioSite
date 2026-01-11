@@ -39,7 +39,13 @@ namespace MWBlazorPortfolioSite.Models
         [JsonPropertyName("SourceUrl")]
         public string? SourceUrl { get; set; }
 
+        public string? DownloadUrl { get; set; }
+        public string? Version { get; set; } = "v1.0.0";
+
         // This allows the JSON: "Metadata": { "KEY": "VALUE" } to be mapped automatically
         public Dictionary<string, string> Metadata { get; set; } = new();
+
+        // Key = Tab Name (e.g., "XAML", "C#"), Value = SourceUrl
+        public Dictionary<string, string> SupportingFiles { get; set; } = new();
     }
 }
