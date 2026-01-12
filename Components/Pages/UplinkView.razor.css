@@ -1,4 +1,14 @@
-﻿.uplink-grid {
+﻿.uplink-view {
+    /* Adding padding ensures glows and borders aren't clipped by the screen edges */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Ensure nothing inside forces a scrollbar prematurely */
+    overflow-x: hidden;
+}
+
+.uplink-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 25px;
@@ -16,68 +26,260 @@
     transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* The hidden glow that appears on hover */
-.card-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+.uplink-page {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 20px;
     height: 100%;
-    background: radial-gradient(circle at center, rgba(var(--accent-rgb), 0.3) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
 }
 
-.uplink-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    border-color: var(--accent-glow);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(var(--accent-rgb), 0.2);
+.external-nodes-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-    .uplink-card:hover .card-glow {
-        opacity: 1;
-    }
-
-/* Icon Hexagon Style */
-.icon-hex {
-    width: 60px;
-    height: 60px;
-    background: rgba(var(--accent-rgb), 0.1);
+.separator {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    border: 1px solid var(--accent-glow);
-    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    gap: 15px;
+    color: var(--accent-glow);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.7rem;
+    opacity: 0.6;
 }
 
-.bar {
-    width: 4px;
-    height: 12px;
-    background: #333;
-    animation: signal-pulse 1.5s infinite ease-in-out;
-}
-
-    .bar.active {
-        background: var(--accent-glow);
+    .separator .line {
+        flex-grow: 1;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
     }
 
-@keyframes signal-pulse {
-    0%, 100% {
+.contact-terminal {
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    /* Small margin to keep the top-row borders from hitting the header */
+    margin-top: 10px;
+    /* Important: allow the 'glow' to extend beyond the box slightly */
+    padding: 5px;
+}
+
+.node-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    min-height: 120px; /* Reduce from 160px */
+    padding: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+    /* Ensure the card doesn't hide its own glowing borders */
+    overflow: visible;
+    /* If you use 'box-shadow', this helps it not get clipped */
+    backface-visibility: hidden;
+}
+
+/* Specific Accent Colors */
+.gold-node {
+    border-color: #FFD700;
+}
+
+    .gold-node .node-title {
+        color: #FFD700;
+    }
+
+.purple-node {
+    border-color: #A855F7;
+}
+
+    .purple-node .node-title {
+        color: #A855F7;
+    }
+
+.orange-node {
+    border-color: #F48024;
+}
+
+    .orange-node .node-title {
+        color: #F48024;
+    }
+
+.node-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 15px var(--accent-glow);
+    transform: translateY(-2px);
+}
+
+.node-path {
+    font-size: 0.65rem;
+    opacity: 0.5;
+    margin: 10px 0;
+    font-family: 'Fira Code', monospace;
+}
+
+.node-desc {
+    display: none; /* Hide description on desktop to save massive space */
+}
+
+.node-card:hover .node-desc {
+    display: block; /* Optional: show it only on hover */
+}
+
+.uplink-separator {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 40px 0;
+}
+
+.line-left, .line-right {
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-glow));
+}
+
+.line-right {
+    background: linear-gradient(270deg, transparent, var(--accent-glow));
+}
+
+.separator-center {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.separator-text {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: var(--accent-glow);
+    letter-spacing: 3px;
+}
+
+.pulse-icon {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-glow);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-glow);
+    animation: separator-pulse 2s infinite;
+}
+
+@keyframes separator-pulse {
+    0% {
         opacity: 1;
     }
 
     50% {
-        opacity: 0.4;
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
 
-/* Stagger the bars */
-.bar:nth-child(2) {
-    animation-delay: 0.2s;
+/* Responsive adjustment for tablets/phones */
+@media (max-width: 1200px) {
+    .nodes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.bar:nth-child(3) {
-    animation-delay: 0.4s;
+@media (max-width: 600px) {
+    .nodes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.terminal-interface {
+    max-width: 1100px; /* Increased to prevent wrapping */
+    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 184, 0, 0.1);
+    padding: 30px;
+    font-family: 'Fira Code', monospace;
+}
+
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 184, 0, 0.1);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 0.7rem;
+    color: #ffb800;
+}
+
+.terminal-progress {
+    color: #ffb800; /* Amber to match your Uplink theme */
+    text-shadow: 0 0 8px rgba(255, 184, 0, 0.6);
+    letter-spacing: 2px;
+}
+
+.input-line {
+    display: flex; /* Change from column to flex row */
+    align-items: center;
+    margin-bottom: 10px; /* Tighter spacing */
+}
+
+.prompt {
+    font-size: 0.8rem;
+    color: #ffb800; /* Matching your amber theme */
+    margin-bottom: 0;
+    margin-right: 15px;
+    white-space: nowrap;
+    /* Adjust this value until the vertical line clears the longest text */
+    min-width: 320px;
+    display: inline-block;
+}
+
+.cmd-input {
+    background: transparent;
+    border: none;
+    /* This creates the vertical line you see in your screenshot */
+    border-left: 2px solid #ffb800;
+    padding: 2px 15px;
+    color: #fff;
+    font-family: 'Fira Code', monospace;
+    width: 100%;
+    outline: none;
+}
+
+    .cmd-input:focus {
+        background: rgba(255, 184, 0, 0.05);
+    }
+
+.transmit-btn {
+    background: transparent;
+    border: 1px solid #ffb800;
+    color: #ffb800;
+    padding: 10px 30px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+    .transmit-btn:hover {
+        background: #ffb800;
+        color: #000;
+        box-shadow: 0 0 15px rgba(255, 184, 0, 0.4);
+    }
+
+.message-line {
+    align-items: flex-start; /* Keeps the prompt at the top of the large box */
+}
+
+.cmd-textarea {
+    min-height: 150px;
+    resize: none;
 }

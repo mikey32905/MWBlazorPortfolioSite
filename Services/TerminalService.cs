@@ -5,6 +5,8 @@ namespace MWBlazorPortfolioSite.Services
     public record TerminalEntry(string Message, LogType Type, DateTime Timestamp);
     public class TerminalService
     {
+        // Define the event so 'OnChange?.Invoke()' has a target
+        public event Action? OnChange;
         public List<TerminalEntry> Logs { get; } = new();
 
         // This event notifies the UI to refresh when a new log arrives
@@ -23,6 +25,24 @@ namespace MWBlazorPortfolioSite.Services
             // OnLogAdded?.Invoke();
             // This triggers the "Routine" if anyone is listening
             OnNewLog?.Invoke();
+        }
+
+        public void AddToTerminal(string message)
+        {
+            // Create the object the list is looking for
+            var entry = new TerminalEntry(message, LogType.System, DateTime.Now);
+            //{
+            //    Timestamp = DateTime.Now,
+            //    Type = LogType.System,
+            //    Message = message
+            //};
+
+            Logs.Add(entry);
+
+            // Keep only the last 50 logs to prevent memory lag
+            if (Logs.Count > 50) Logs.RemoveAt(0);
+
+            NotifyStateChanged();
         }
 
         public void LogRequest(string path)
@@ -62,5 +82,7 @@ namespace MWBlazorPortfolioSite.Services
                     break;
             }
         }
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

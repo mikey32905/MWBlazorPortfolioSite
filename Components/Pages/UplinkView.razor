@@ -3,49 +3,154 @@
 @layout PortfolioLayout
 @inject TerminalService TerminalSvc
 @inject ThemeService ThemeSvc
+@inject IJSRuntime JS
+@inject NavigationManager Nav
 
-<div class="uplink-container">
-    <div class="uplink-grid">
-        @foreach (var link in SocialLinks)
-        {
-            <a href="@link.Url" target="_blank" class="uplink-card">
-                <div class="card-glow"></div>
-                <div class="card-content">
-                    <div class="card-top">
-                        <span class="node-status">● LIVE_SIGNAL</span>
-                        <div class="signal-bars">
-                            <div class="bar active"></div>
-                            <div class="bar active"></div>
-                            <div class="bar active"></div>
-                            <div class="bar"></div>
-                        </div>
+<div class="uplink-view">
+         <div class="nodes-grid">
+            @foreach (var link in SocialLinks)
+            {
+                <div class="node-card @GetNodeClass(link.Name)" @key="link.Name">
+                    <div class="node-header">
+                        <span class="node-icon">@link.Icon</span>
+                        <span class="node-title">> @link.Name</span>
                     </div>
-
-                    <div class="card-body">
-                        <div class="icon-hex">@link.Icon</div>
-                        <div class="text-group">
-                            <h3 class="node-title">@link.Name.ToUpper()</h3>
-                            <p class="node-path">https://ext.node/@link.Name.ToLower()</p>
-                        </div>
+                    <div class="node-body">
+                        <p class="node-desc">@link.Description</p>
+                        <p class="node-path">https://ext.node/@link.Name.ToLower()</p>
                     </div>
-
-                    <div class="card-footer">
-                        <span class="access-text">ESTABLISH_CONNECTION</span>
-                        <span class="arrow">→</span>
-                    </div>
+                    <a href="@link.Url" target="_blank" class="node-action">
+                        ESTABLISH_CONNECTION →
+                    </a>
                 </div>
-            </a>
-        }
+            }
+        </div>
+
+    <div class="uplink-separator">
+        <div class="line-left"></div>
+        <div class="separator-center">
+            <span class="pulse-icon"></span>
+            <span class="separator-text">INITIATING_DIRECT_COMMS_CHANNEL</span>
+        </div>
+        <div class="line-right"></div>
     </div>
+
+    <div class="terminal-interface">
+        <div class="terminal-header">
+            <span class="header-tag">[ COMMS_INPUT ]</span>
+            <div class="status-group">
+                <span class="terminal-status">ENCRYPTION: AES-256</span>
+                <span class="terminal-status">SIGNAL: STABLE</span>
+            </div>
+        </div>
+
+        <div class="terminal-body">
+            <div class="input-line">
+                <span class="prompt">GUEST@PORTFOLIO:~$ IDENT_SOURCE --input</span>
+                <input type="text" @bind="contactName" class="cmd-input" placeholder="ENTER_NAME_OR_EMAIL..." />
+            </div>
+
+            <div class="input-line">
+                <span class="prompt">GUEST@PORTFOLIO:~$ SUBJECT_LINE --set</span>
+                <input type="text" @bind="contactSubject" class="cmd-input" placeholder="REASON_FOR_CONTACT..." />
+            </div>
+
+            <div class="input-line message-line">
+                <span class="prompt">GUEST@PORTFOLIO:~$ MESSAGE_BODY --write</span>
+                <textarea @bind="contactMessage" class="cmd-input cmd-textarea" rows="6" placeholder="TYPE_MESSAGE_DATA_HERE..."></textarea>
+            </div>
+
+            <div class="action-line">
+                <button @onclick="HandleTransmission" class="transmit-btn">
+                    [ EXECUTE_TRANSMISSION ]
+                </button>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 @code {
+
+    private string contactName = "";
+    private string contactSubject = "";
+    private string contactMessage = "";
+    private bool isTransmitting = false;
+    private string progressDisplay = "";
+
     private List<SocialLink> SocialLinks = new()
     {
-        new SocialLink { Name = "GitHub", Url = "https://github.com/mikey32905", Icon = "📂", Description = "Source repositories & open-source contributions." },
-        new SocialLink { Name = "LinkedIn", Url = "https://www.linkedin.com/in/mike-williams-0511835/", Icon = "🔗", Description = "Professional network & career history." },
-        new SocialLink { Name = "Twitter/X", Url = "https://x.com/mikey32905", Icon = "🐦", Description = "Tech insights & community engagement." }
+        new SocialLink { Name = "GITHUB", Url = "https://github.com/mikey32905", Icon = "📂", Description = "Source repositories & open-source contributions." },
+        new SocialLink { Name = "LINKEDIN", Url = "https://www.linkedin.com/in/mike-williams-0511835/", Icon = "🔗", Description = "Professional network & career history." },
+        new SocialLink { Name = "TWITTER/X", Url = "https://x.com/mikey32905", Icon = "🐦", Description = "Tech insights & community engagement." },
+        new SocialLink { Name = "STACK OVERFLOW", Url = "https://stackoverflow.com/users/608583/mike", Icon = "󰓌", Description = "Problem-solving history & community reputation." },
+        new SocialLink { Name = "DISCORD", Url = "https://discordapp.com/users/mikey32905_8675309", Icon = "󰙯", Description = "Real-time technical collaboration & networking." },
+        new SocialLink { Name = "DEV_INTEL", Url = "https://mwdevstudio.net/", Icon = "󰖟", Description = "Technical articles, tutorials, and system logs." },
+        new SocialLink { Name = "PERSONNEL_DOSSIER", Url = "YOUR_RESUME_URL", Icon = "󰦪", Description = "High-priority technical CV & certification manifest." },
+        new SocialLink { Name = "COFFEE_UPLINK", Url = "https://buymeacoffee.com/mikey32935", Icon = "󰄬", Description = "Professional endorsements and peer validations." }
     };
+
+    // Helper to assign specific colors to special cards
+    private string GetNodeClass(string name) => name switch
+    {
+        "PERSONNEL_DOSSIER" => "gold-node",
+        "INTEL_FEED" => "purple-node",
+        "STACK_OVERFLOW" => "orange-node",
+        _ => "cyan-node"
+    };
+
+    private async Task HandleTransmission()
+    {
+        // Prevent multiple clicks while transmission is in progress
+        if (isTransmitting) return;
+        isTransmitting = true;
+
+        // 1. Initial System Handshake
+        TerminalSvc.AddToTerminal(">>> INITIATING_SECURE_UPLINK...");
+        TerminalSvc.AddToTerminal(">>> ENCRYPTING_DATA_PACKETS (AES-256)...");
+        await Task.Delay(400); // Brief pause for realism
+
+        // 2. Pure C# Progress Bar Logic
+        int totalBlocks = 20;
+        for (int i = 1; i <= totalBlocks; i++)
+        {
+            // Creates the filling bar: [■■■■      ]
+            string blocks = new string('■', i).PadRight(totalBlocks, ' ');
+            int percent = (int)((i / (float)totalBlocks) * 100);
+
+            // Update the terminal with the current progress
+            TerminalSvc.AddToTerminal($"[TRANSMISSION]: [{blocks}] {percent}%");
+
+            // Force the UI to refresh so we see the bar move
+            StateHasChanged();
+
+            // Control the speed of the "upload"
+            await Task.Delay(80);
+        }
+
+        // 3. Finalization
+        TerminalSvc.AddToTerminal(">>> UPLINK_COMPLETE. HANDSHAKE_SUCCESSFUL.");
+        TerminalSvc.AddToTerminal(">>> OPENING_EXTERNAL_MAIL_CLIENT...");
+
+        await Task.Delay(600); // Final dramatic pause
+
+        // 4. Trigger the Email
+        // Using your specific email and the bound fields from your terminal form
+        var mailto = $"mailto:mikey32905@1791.com?subject={Uri.EscapeDataString(contactSubject)}&body={Uri.EscapeDataString(contactMessage)}";
+        Nav.NavigateTo(mailto);
+
+        // Reset state for future messages
+        isTransmitting = false;
+    }
+
+    // This method is called by the JavaScript to update the live terminal
+    [JSInvokable]
+    public static void UpdateTerminalProgress(string progress)
+    {
+        // You'll need a way to update your terminal service here
+        // e.g., TerminalService.CurrentLine = $"PROGRESS: [{progress}]";
+    }
 
     private void LogHover(string target)
     {
