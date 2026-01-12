@@ -27,4 +27,7 @@ builder.Services.AddScoped(sp =>
     return new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
 });
 
+// This is the simplest way to force Blazor to interpret the hash as a route
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
 await builder.Build().RunAsync();
