@@ -669,6 +669,41 @@ SideBar[b-qtrtjoljry] {
     overflow: hidden;
 }
 
+.activity-log[b-jkck17v7e6] {
+    margin-top: 15px;
+    background: rgba(0, 243, 255, 0.03);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    padding: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.65rem;
+}
+
+.log-header[b-jkck17v7e6] {
+    color: #00F3FF;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.log-line[b-jkck17v7e6] {
+    color: #aaa;
+    margin: 2px 0;
+}
+
+.pulse-text[b-jkck17v7e6] {
+    color: #00F3FF;
+    animation: log-flicker-b-jkck17v7e6 1.5s infinite;
+}
+
+@keyframes log-flicker-b-jkck17v7e6 {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
 /* Flip Card Container */
 .flip-card[b-jkck17v7e6] {
     background-color: transparent;
