@@ -122,6 +122,41 @@
     overflow: hidden;
 }
 
+.activity-log {
+    margin-top: 15px;
+    background: rgba(0, 243, 255, 0.03);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    padding: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.65rem;
+}
+
+.log-header {
+    color: #00F3FF;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.log-line {
+    color: #aaa;
+    margin: 2px 0;
+}
+
+.pulse-text {
+    color: #00F3FF;
+    animation: log-flicker 1.5s infinite;
+}
+
+@keyframes log-flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
 /* Flip Card Container */
 .flip-card {
     background-color: transparent;
