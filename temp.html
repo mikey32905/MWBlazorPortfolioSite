@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>System_Redirect</title>
+    <script type="text/javascript">
+        var segmentCount = 1; // 1 for /MWBlazorPortfolioSite/
+        var l = window.location;
+        l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
+            l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash);
+    </script>
+</head>
+<body style="background: #000; color: #FFD700; font-family: monospace;">
+    [REDIRECTING_TO_SYSTEM_CORE...]
+</body>
+</html>
