@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "MWBlazorPortfolioSite",
   "resources": {
-    "hash": "sha256-9yBpxIJrCkyutKIQizB4n22CSGfCbfA8vwB4GvDJE2c=",
+    "hash": "sha256-7PRJWP/uFxDe1DEgqd3h2mbJocUGrtdCIVa7ajK5B84=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-vtotCeXt2UD6oc459laJT32vBgigZ+eLoUmdeFkvYDk="
     },
@@ -56,7 +56,7 @@
       "System.Threading.wasm": "sha256-A/T6ZqAEwCt9MvkCwK489A59CsjMeamN1y3W4hz59h4=",
       "System.wasm": "sha256-I4hhyMuUoHdrzDopL9tlnkL/Skg+0OO+gmkOXNT3dcg=",
       "System.Private.CoreLib.wasm": "sha256-eHsALXs9qTw5EJ2sG1Sql1gGfNzqNxGHqZkEsZAErK0=",
-      "MWBlazorPortfolioSite.wasm": "sha256-YQl2dTo0urlrgDTpJCF3sDp5mKXGsiBkhDLUYbM3oFY="
+      "MWBlazorPortfolioSite.wasm": "sha256-i696BWu0BThQEPrIshAtnx4jiRwj0+eGeS9PYeNzKkI="
     }
   },
   "debugLevel": 0,
