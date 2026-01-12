@@ -1,15 +1,11 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>System Redirect</title>
+    <meta charset="utf-8">
+    <title>System_Redirect</title>
     <script type="text/javascript">
-        // Set segmentCount to 0 for 'mikey32905.github.io/'
-        // Set segmentCount to 1 for 'mikey32905.github.io/RepositoryName/'
+        // SegmentCount 0 for root domains (mikey32905.github.io)
         var segmentCount = 0;
-
         var l = window.location;
         l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
             l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
@@ -17,11 +13,8 @@
             (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
             l.hash);
     </script>
-
 </head>
-
-<body>
-    REDIRECTING_TO_SYSTEM_CORE...
+<body style="background: #000; color: #FFD700; font-family: monospace; padding: 20px;">
+    [REDIRECTING_TO_CORE_MODULE...]
 </body>
-
 </html>
