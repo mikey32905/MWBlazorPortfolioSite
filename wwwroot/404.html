@@ -4,94 +4,24 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MWBlazorPortfolioSite</title>
-    <!--<base href="/" />-->
-    <base href="/MWBlazorPortfolioSite/" />
-    <!-- BootStrap Css -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <title>System Redirect</title>
+    <script type="text/javascript">
+        // Set segmentCount to 0 for 'mikey32905.github.io/'
+        // Set segmentCount to 1 for 'mikey32905.github.io/RepositoryName/'
+        var segmentCount = 0;
 
-    <!-- Bootstrap Icons-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!--Dev Icons-->
-    <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
-
-    <!--Google Fonts Bebaus for headlines Montserrat 300 or 400 for Body-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-
-    <!--custom CSS-->
-    <link rel="stylesheet" href="css/themes.css" />
-    <link rel="stylesheet" href="css/app.css" />
-    <link href="MWBlazorPortfolioSite.styles.css" rel="stylesheet" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
-
-    <!--Favicon-->
-    <link rel="icon" type="image/png" href="favicon(3)-40x40.png" />
+        var l = window.location;
+        l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
+            l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash);
+    </script>
 
 </head>
 
-<body data-cf-theme="teal">
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
-
-    <!--<script src="_framework/blazor.webassembly.js"></script>-->
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
-
-    <script>
-        window.setTheme = (theme) => {
-            document.querySelector('[data-cf-theme]').setAttribute('data-cf-theme', theme);
-        };
-
-        window.applyHighlighting = (elementId, language) => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                // If you are using Prism.js:
-                Prism.highlightElement(element);
-
-                // If you are using Highlight.js:
-                // hljs.highlightElement(element);
-            }
-        };
-    </script>
-
-    <!--<script src="_framework/blazor.webassembly.js"></script>-->
-
-    <script>
-        // Place your helper functions here
-        window.scrollToBottom = (elementId) => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.scrollTop = element.scrollHeight;
-            }
-        };
-
-        window.focusElement = (elementId) => {
-            const element = document.getElementById(elementId);
-            if (element) element.focus();
-        };
-    </script>
-
-    <script src="_framework/blazor.webassembly.js"></script>
+<body>
+    REDIRECTING_TO_SYSTEM_CORE...
 </body>
 
 </html>
