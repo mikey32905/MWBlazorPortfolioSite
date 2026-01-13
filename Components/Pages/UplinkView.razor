@@ -6,8 +6,15 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 
-<div class="uplink-view">
-         <div class="nodes-grid">
+<div class="uplink-container">
+    <div class="identity-header">
+        <span class="root-path">SYS://COMM/</span>
+        <span class="file-name">SIGNAL_INTERCEPT.io</span>
+        <div class="security-clearance">ENCRYPTION: RSA_4096</div>
+    </div>
+
+    <div class="uplink-view">
+        <div class="nodes-grid">
             @foreach (var link in SocialLinks)
             {
                 <div class="node-card @GetNodeClass(link.Name)" @key="link.Name">
@@ -26,50 +33,77 @@
             }
         </div>
 
-    <div class="uplink-separator">
-        <div class="line-left"></div>
-        <div class="separator-center">
-            <span class="pulse-icon"></span>
-            <span class="separator-text">INITIATING_DIRECT_COMMS_CHANNEL</span>
+        <div class="uplink-separator">
+            <div class="line-left"></div>
+            <div class="separator-center">
+                <span class="pulse-icon"></span>
+                <span class="separator-text">INITIATING_DIRECT_COMMS_CHANNEL</span>
+            </div>
+            <div class="line-right"></div>
         </div>
-        <div class="line-right"></div>
+
+        <div class="terminal-interface">
+            <div class="terminal-header">
+                <span class="header-tag">[ COMMS_INPUT ]</span>
+                <div class="status-group">
+                    <span class="terminal-status">ENCRYPTION: AES-256</span>
+                    <span class="terminal-status">SIGNAL: STABLE</span>
+                </div>
+            </div>
+
+            <div class="terminal-body">
+                <div class="input-line">
+                    <span class="prompt">GUEST@PORTFOLIO:~$ IDENT_SOURCE --input</span>
+                    <input type="text" @bind="contactName" class="cmd-input" placeholder="ENTER_NAME_OR_EMAIL..." />
+                </div>
+
+                <div class="input-line">
+                    <span class="prompt">GUEST@PORTFOLIO:~$ SUBJECT_LINE --set</span>
+                    <input type="text" @bind="contactSubject" class="cmd-input" placeholder="REASON_FOR_CONTACT..." />
+                </div>
+
+                <div class="input-line message-line">
+                    <span class="prompt">GUEST@PORTFOLIO:~$ MESSAGE_BODY --write</span>
+                    <textarea @bind="contactMessage" class="cmd-input cmd-textarea" rows="6" placeholder="TYPE_MESSAGE_DATA_HERE..."></textarea>
+                </div>
+
+                <div class="action-line">
+                    <button @onclick="HandleTransmission" class="transmit-btn">
+                        [ EXECUTE_TRANSMISSION ]
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
+    @if (isTransmitting)
+    {
+        <div class="transmission-overlay">
+            <div class="overlay-content">
+                <div class="glitch-text" data-text="ENCRYPTING_PACKET...">ENCRYPTING_PACKET...</div>
+                <div class="progress-container">
+                    <div class="progress-fill" style="width: @(transmissionProgress)%"></div>
+                </div>
+                <div class="status-text">
+                    @if (transmissionProgress < 40)
+                    {
+                        <span>STAGING_DORSAL_BUFFER...</span>
+                    }
+                    else if (transmissionProgress < 80)
+                    {
 
-    <div class="terminal-interface">
-        <div class="terminal-header">
-            <span class="header-tag">[ COMMS_INPUT ]</span>
-            <div class="status-group">
-                <span class="terminal-status">ENCRYPTION: AES-256</span>
-                <span class="terminal-status">SIGNAL: STABLE</span>
+                        <span>BYPASSING_FIREWALL...</span>
+                    }
+                    else
+                    {
+
+                        <span>SIGNAL_STABILIZED_SENDING...</span>
+                    }
+                </div>
             </div>
         </div>
-
-        <div class="terminal-body">
-            <div class="input-line">
-                <span class="prompt">GUEST@PORTFOLIO:~$ IDENT_SOURCE --input</span>
-                <input type="text" @bind="contactName" class="cmd-input" placeholder="ENTER_NAME_OR_EMAIL..." />
-            </div>
-
-            <div class="input-line">
-                <span class="prompt">GUEST@PORTFOLIO:~$ SUBJECT_LINE --set</span>
-                <input type="text" @bind="contactSubject" class="cmd-input" placeholder="REASON_FOR_CONTACT..." />
-            </div>
-
-            <div class="input-line message-line">
-                <span class="prompt">GUEST@PORTFOLIO:~$ MESSAGE_BODY --write</span>
-                <textarea @bind="contactMessage" class="cmd-input cmd-textarea" rows="6" placeholder="TYPE_MESSAGE_DATA_HERE..."></textarea>
-            </div>
-
-            <div class="action-line">
-                <button @onclick="HandleTransmission" class="transmit-btn">
-                    [ EXECUTE_TRANSMISSION ]
-                </button>
-            </div>
-        </div>
-    </div>
-
-
+    }
 </div>
+
 
 @code {
 
@@ -78,6 +112,7 @@
     private string contactMessage = "";
     private bool isTransmitting = false;
     private string progressDisplay = "";
+    private int transmissionProgress = 0;
 
     private List<SocialLink> SocialLinks = new()
     {
@@ -102,46 +137,71 @@
 
     private async Task HandleTransmission()
     {
-        // Prevent multiple clicks while transmission is in progress
-        if (isTransmitting) return;
+        if (string.IsNullOrWhiteSpace(contactName) || string.IsNullOrWhiteSpace(contactMessage)) return;
+
         isTransmitting = true;
+        transmissionProgress = 0;
 
-        // 1. Initial System Handshake
-        TerminalSvc.AddToTerminal(">>> INITIATING_SECURE_UPLINK...");
-        TerminalSvc.AddToTerminal(">>> ENCRYPTING_DATA_PACKETS (AES-256)...");
-        await Task.Delay(400); // Brief pause for realism
+        TerminalSvc.AddLog(">>> INITIATING_UPLINK_PROTOCOL...", LogType.System);
 
-        // 2. Pure C# Progress Bar Logic
-        int totalBlocks = 20;
-        for (int i = 1; i <= totalBlocks; i++)
+        // Simulate a multi-stage transmission process
+        while (transmissionProgress < 100)
         {
-            // Creates the filling bar: [■■■■      ]
-            string blocks = new string('■', i).PadRight(totalBlocks, ' ');
-            int percent = (int)((i / (float)totalBlocks) * 100);
+            transmissionProgress += new Random().Next(5, 15);
+            if (transmissionProgress > 100) transmissionProgress = 100;
 
-            // Update the terminal with the current progress
-            TerminalSvc.AddToTerminal($"[TRANSMISSION]: [{blocks}] {percent}%");
-
-            // Force the UI to refresh so we see the bar move
             StateHasChanged();
-
-            // Control the speed of the "upload"
-            await Task.Delay(80);
+            await Task.Delay(200); // Give it that "crunchy" data feel
         }
 
-        // 3. Finalization
-        TerminalSvc.AddToTerminal(">>> UPLINK_COMPLETE. HANDSHAKE_SUCCESSFUL.");
-        TerminalSvc.AddToTerminal(">>> OPENING_EXTERNAL_MAIL_CLIENT...");
+        TerminalSvc.AddLog($">>> PACKET_SENT: FROM_{contactName.ToUpper().Replace(" ", "_")}", LogType.Success);
 
-        await Task.Delay(600); // Final dramatic pause
+        // Hold the success screen for a moment
+        await Task.Delay(1000);
 
-        // 4. Trigger the Email
-        // Using your specific email and the bound fields from your terminal form
-        var mailto = $"mailto:mikey32905@1791.com?subject={Uri.EscapeDataString(contactSubject)}&body={Uri.EscapeDataString(contactMessage)}";
-        Nav.NavigateTo(mailto);
-
-        // Reset state for future messages
         isTransmitting = false;
+        contactName = ""; contactSubject = ""; contactMessage = "";
+        StateHasChanged();
+        // // Prevent multiple clicks while transmission is in progress
+        // if (isTransmitting) return;
+        // isTransmitting = true;
+
+        // // 1. Initial System Handshake
+        // TerminalSvc.AddToTerminal(">>> INITIATING_SECURE_UPLINK...");
+        // TerminalSvc.AddToTerminal(">>> ENCRYPTING_DATA_PACKETS (AES-256)...");
+        // await Task.Delay(400); // Brief pause for realism
+
+        // // 2. Pure C# Progress Bar Logic
+        // int totalBlocks = 20;
+        // for (int i = 1; i <= totalBlocks; i++)
+        // {
+        //     // Creates the filling bar: [■■■■      ]
+        //     string blocks = new string('■', i).PadRight(totalBlocks, ' ');
+        //     int percent = (int)((i / (float)totalBlocks) * 100);
+
+        //     // Update the terminal with the current progress
+        //     TerminalSvc.AddToTerminal($"[TRANSMISSION]: [{blocks}] {percent}%");
+
+        //     // Force the UI to refresh so we see the bar move
+        //     StateHasChanged();
+
+        //     // Control the speed of the "upload"
+        //     await Task.Delay(80);
+        // }
+
+        // // 3. Finalization
+        // TerminalSvc.AddToTerminal(">>> UPLINK_COMPLETE. HANDSHAKE_SUCCESSFUL.");
+        // TerminalSvc.AddToTerminal(">>> OPENING_EXTERNAL_MAIL_CLIENT...");
+
+        // await Task.Delay(600); // Final dramatic pause
+
+        // // 4. Trigger the Email
+        // // Using your specific email and the bound fields from your terminal form
+        // var mailto = $"mailto:mikey32905@1791.com?subject={Uri.EscapeDataString(contactSubject)}&body={Uri.EscapeDataString(contactMessage)}";
+        // Nav.NavigateTo(mailto);
+
+        // // Reset state for future messages
+        // isTransmitting = false;
     }
 
     // This method is called by the JavaScript to update the live terminal

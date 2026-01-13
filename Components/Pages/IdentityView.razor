@@ -15,64 +15,41 @@
 }
 else
 {
-    <div class="identity-dossier">
-        <div class="dossier-header">
-            <div class="glitch-title">SUBJECT_PROFILE: @ProjectState.SelectedFile?.FileName</div>
-            <div class="status-badge">RECOGNIZED_USER</div>
-        </div>
-
-        <div class="dossier-grid">
-            <div class="biometric-pane">
-                <div class="flip-card">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <div class="avatar-frame">
-                                <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" alt="Neural Signature" />
-                                <div class="scan-line"></div>
-                            </div>
-                        </div>
-                        <div class="flip-card-back">
-                            <div class="clearance-badge">LEVEL_05_ACCESS</div>
-                            <div class="data-readout">
-                                <p>UUID: 88-ALPHA-01</p>
-                                <p>CLASS: FULL_STACK</p>
-                                <p>STATUS: ACTIVE</p>
-                            </div>
-                        </div>
+    <div class="identity-dossier" style="display: flex; flex-direction: column; height: 100vh; padding-top: 60px;">
+        <div class="identity-header"> ... </div>
+        
+        <div class="identity-grid">
+            <div class="system-stats-col">
+                <div class="photo-module">
+                    <div class="photo-frame">
+                        <div class="scan-line"></div>
+                        <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" alt="Neural Signature" />
+                    </div>
+                    <div class="stat-indicators">
+                        <p>LOGIC_PROCESSING <span class="force-blink" style="color: #FFD700;">[ACTIVE]</span></p>
+                        <p>CREATIVE_ENGINE <span class="blink-slow">[STABLE]</span></p>
+                        <p>SYSTEM_STAMINA <span class="blink-fast">[98%]</span></p>
                     </div>
                 </div>
 
-                <div class="neural-monitor">
-                    <div class="skill-row">
-                        <span class="skill-label">LOGIC_PROCESSING</span>
-                        <div class="meter-container"><div class="meter-fill logic" style="width: 95%;"></div></div>
-                    </div>
-                    <div class="skill-row">
-                        <span class="skill-label">CREATIVE_ENGINE</span>
-                        <div class="meter-container"><div class="meter-fill creative" style="width: 85%;"></div></div>
-                    </div>
-                    <div class="skill-row">
-                        <span class="skill-label">SYSTEM_STAMINA</span>
-                        <div class="meter-container"><div class="meter-fill stamina" style="width: 90%;"></div></div>
+                <div class="trace-module">
+                    <div class="trace-header">LIVE_SYSTEM_TRACE</div>
+                    <div class="trace-body">
+                        @foreach (var log in displayedLogs)
+                        {
+                            <p class="trace-line">
+                                <span class="timestamp">[@DateTime.Now.ToString("HH:mm:ss")]</span> @log
+                            </p>
+                        }
                     </div>
                 </div>
-               @*  <div class="stat-bars">
-                    <div class="stat"><span>LOGIC</span><div class="bar"><div class="fill" style="width:95%"></div></div></div>
-                    <div class="stat"><span>CREATIVITY</span><div class="bar"><div class="fill" style="width:88%"></div></div></div>
-                    <div class="stat"><span>STAMINA</span><div class="bar"><div class="fill" style="width:92%"></div></div></div>
-                </div> *@
- 
-            </div>
-
-            <div class="data-pane">
+            </div> <div class="data-pane">
                 <h3 class="pane-title">> RAW_SOURCE_DATA</h3>
                 <div class="code-overlay-container">
                     @if (ProjectState.SelectedFile != null)
                     {
                         <div class="transparent-editor">
-                            <div style="height: 98%; width: 100%; overflow: hidden;">
-                                <CodeEditorView SelectedFile="ProjectState.SelectedFile" />
-                            </div>
+                            <CodeEditorView SelectedFile="ProjectState.SelectedFile" />
                         </div>
                     }
                 </div>
@@ -92,20 +69,12 @@ else
                     <p>BUILD_BETTER_SYSTEMS</p>
                 </div>
             </div>
-
-            <div class="activity-log">
-                <div class="log-header">LIVE_SYSTEM_TRACE</div>
-                <div class="log-content">
-                    <div class="log-line">> [INIT] CORE_DRIVERS_LOADED... OK</div>
-                    <div class="log-line">> [SCAN] MEMORY_INTEGRITY... 100%</div>
-                    <div class="log-line">> [AUTH] USER_RECOGNIZED: MICHAEL_W</div>
-                    <div class="log-line pulse-text">> [STATUS] AWAITING_COMMAND...</div>
-                </div>
-            </div>
         </div>
+
     </div>
 
-    
+
+
 }
 
 
@@ -115,6 +84,14 @@ else
     private bool isFlipped = false;
     private System.Timers.Timer? flipTimer;
 
+    private List<string> displayedLogs = new();
+    private string[] fullLogs = {
+    "> [INIT] CORE_DRIVERS_LOADED... OK",
+    "> [SCAN] MEMORY_INTEGRITY... 100%",
+    "> [AUTH] USER_RECOGNIZED: MICHAEL_W",
+    "> [STATUS] IDENTITY_PROXIMITY_SENSORS_ACTIVE",
+    "> [READY] AWAITING_COMMAND..."
+};
 
     private async Task HandleResumeDownload()
     {
@@ -135,9 +112,9 @@ else
     // Ensure this component re-renders if the state changes
     protected override void OnInitialized()
     {
-        // Option A: Find it in your loaded manifest
-        // identityFile = ProjectState.ProjectFiles
-        //     .FirstOrDefault(f => f.FileName == "Identity");
+        // Log the re-entry into the system logs
+        TerminalSvc.AddToTerminal(">>> RECOGNIZED_USER: MICHAEL_W // IDENTITY_MODULE_MOUNTED");
+
         // Find the identity file in the service
         var identityFile = ProjectState.ProjectFiles
             .FirstOrDefault(f => f.FileName.Equals("Identity", StringComparison.OrdinalIgnoreCase));
@@ -169,6 +146,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        displayedLogs.Clear();
+        foreach (var line in fullLogs)
+        {
+            displayedLogs.Add(line);
+            StateHasChanged();
+            await Task.Delay(200); // Faster typing feels more "system-like"
+        }
+
         // 1. Ensure the service actually has the files loaded
         if (ProjectState.ProjectFiles == null)
         {
@@ -184,6 +169,22 @@ else
         if (identityFile != null)
         {
             ProjectState.SelectFile(identityFile);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Clear any existing logs to prevent duplication
+            displayedLogs.Clear();
+
+            foreach (var line in fullLogs)
+            {
+                displayedLogs.Add(line);
+                StateHasChanged(); // Force re-render
+                await Task.Delay(400);
+            }
         }
     }
 

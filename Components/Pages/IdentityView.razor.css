@@ -1,17 +1,56 @@
-﻿﻿.identity-dossier {
-    display: block; /* Change from flex to block to allow natural flow */
-    width: 100%;
-    min-height: 100%;
-    background: #000; /* Kills the white background */
-    padding: 80px 40px 40px 40px; /* Massive top padding to clear the back button */
+﻿
+.identity-dossier {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 40px 20px 20px 20px; /* Increased top padding significantly */
     box-sizing: border-box;
+    overflow: hidden; /* Prevent the container itself from scrolling */
 }
 
-.dossier-header {
-    width: 100%;
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--accent-glow);
-    padding-bottom: 10px;
+.identity-grid {
+    flex: 1 1 auto; /* Let the grid take up remaining space */
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    gap: 25px;
+    align-items: start; /* Vital: Aligns items to the top of the grid rows */
+    overflow: hidden;
+}
+
+::deep .identity-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    gap: 20px;
+    align-items: start;
+    margin-top: 20px; /* Fixes the clipping at the top */
+}
+
+/* Fix the 'Residue' by giving the editor a solid, non-transparent background */
+::deep .data-pane {
+    background-color: #0a0a0a !important;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    z-index: 5;
+    position: relative;
+    overflow: hidden;
+}
+
+.identity-header {
+    display: flex;
+    gap: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.65rem;
+    color: #444;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.file-name {
+    color: var(--accent-gold);
+}
+
+.security-clearance {
+    margin-left: auto;
+    color: #ff3b3b;
 }
 
 .dossier-grid {
@@ -83,159 +122,294 @@
 }
 
 .data-pane {
-    min-width: 0; /* Prevents internal code editor from stretching the grid */
-    overflow: hidden !important;
+    background: #000; /* Solid black background to hide anything behind it */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden; /* This is the primary 'shredder' for ghost text */
 }
 
 /* Make the code editor look like a holographic projection */
-.transparent-editor {
-    height: 540px; /* Try a slightly smaller value than 550 or 600 */
-    width: 100%;
-    display: flex;
-    overflow: hidden !important;
-}
-
-    /* Target the CodeEditorView inside to ensure it handles the scroll */
-    .transparent-editor ::deep .code-editor-container {
-        overflow-y: auto;
+    .transparent-editor {
         height: 100%;
+        width: 100%;
+        display: flex;
+        overflow: hidden !important;
+    }
+        /* Target the CodeEditorView inside to ensure it handles the scroll */
+        .transparent-editor ::deep .code-editor-container {
+            overflow-y: auto;
+            height: 100%;
+        }
+
+    /* Optional: Make the remaining scrollbar look Cyberpunk */
+    ::-webkit-scrollbar {
+        width: 6px;
     }
 
-/* Optional: Make the remaining scrollbar look Cyberpunk */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: #050505;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--accent-glow);
-    border-radius: 10px;
-}
-
-.avatar-frame {
-    position: relative;
-    border: 2px solid var(--accent-glow);
-    padding: 5px;
-    overflow: hidden;
-}
-
-.activity-log {
-    margin-top: 15px;
-    background: rgba(0, 243, 255, 0.03);
-    border: 1px solid rgba(0, 243, 255, 0.1);
-    padding: 10px;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.65rem;
-}
-
-.log-header {
-    color: #00F3FF;
-    margin-bottom: 8px;
-    border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-}
-
-.log-line {
-    color: #aaa;
-    margin: 2px 0;
-}
-
-.pulse-text {
-    color: #00F3FF;
-    animation: log-flicker 1.5s infinite;
-}
-
-@keyframes log-flicker {
-    0%, 100% {
-        opacity: 1;
+    ::-webkit-scrollbar-track {
+        background: #050505;
     }
 
-    50% {
-        opacity: 0.4;
+    ::-webkit-scrollbar-thumb {
+        background: var(--accent-glow);
+        border-radius: 10px;
     }
-}
 
-/* Flip Card Container */
-.flip-card {
-    background-color: transparent;
-    width: 280px;
-    height: 280px;
-    perspective: 1000px; /* Required for 3D effect */
-    margin-bottom: 20px;
-}
+    .system-stats-col {
+        display: flex;
+        flex-direction: column;
+        gap: 12px; /* Pulls the log up close to the stats */
+        justify-content: flex-start;
+    }
 
-.flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    transition: transform 0.8s;
-    transform-style: preserve-3d;
-}
+    .photo-frame {
+        border: 2px solid #FFD700;
+        padding: 8px; /* Space between photo and border */
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+    }
 
-.flip-card:hover .flip-card-inner {
-    transform: rotateY(180deg);
-}
+        .photo-frame img {
+            border: 1px solid rgba(255, 215, 0, 0.3); /* Thin inner border */
+            max-height: 180px;
+            width: auto;
+        }
+        /* Let's add that scanning line back in properly */
+        .photo-frame::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #FFD700;
+            box-shadow: 0 0 8px #FFD700;
+            animation: scanning 4s linear infinite;
+            z-index: 5;
+        }
 
-.flip-card-front, .flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden; /* Safari */
-    backface-visibility: hidden;
-    border: 2px solid var(--accent-glow);
-}
+    @keyframes scanning {
+        0% {
+            top: 0%;
+        }
 
-.flip-card-back {
-    background: rgba(var(--accent-rgb), 0.1);
-    color: var(--accent-glow);
-    transform: rotateY(180deg);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(5px);
-}
-
-.clearance-badge {
-    font-size: 1.2rem;
-    font-weight: bold;
-    border: 2px solid #FFD700;
-    color: #FFD700;
-    padding: 10px;
-    margin-bottom: 15px;
-}
-
-.scan-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--accent-glow);
-    box-shadow: 0 0 15px var(--accent-glow);
-    animation: scan 3s linear infinite;
-}
-
-@keyframes scan {
-    0% {
+        100% {
+            top: 100%;
+        }
+    }
+    /* The moving scan line */
+    .scan-line {
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 215, 0, 0.6);
+        box-shadow: 0 0 15px #FFD700;
         top: 0;
+        z-index: 10;
+        animation: scan-move 4s linear infinite;
+    }
+    /* The faint "Grid" overlay on the photo */
+    .photo-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
     }
 
-    100% {
-        top: 100%;
+    @keyframes scan-move {
+        0% {
+            top: -5%;
+        }
+
+        100% {
+            top: 105%;
+        }
     }
-}
+    /* Ensure the code editor stays contained and doesn't push the page down */
+    .code-overlay-container {
+        background: #0d0d0d; /* Slightly different shade to define the editor area */
+        padding-left: 10px; /* Moves the editor slightly right, away from the edge */
+        height: 100%;
+        overflow: hidden;
+    }
+    /* Force the internal editor to stay within its box */
+    ::deep .transparent-editor pre,
+    ::deep .transparent-editor code {
+        margin: 0;
+        padding: 0;
+        overflow: hidden !important;
+    }
 
-.spec-box {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 15px;
-    margin-bottom: 15px;
-    border-right: 3px solid #334155;
-}
+    .trace-module {
+        margin-top: 15px;
+        background: rgba(0, 243, 255, 0.03);
+        border: 1px solid rgba(0, 243, 255, 0.1);
+        padding: 10px;
+        font-family: 'Fira Code', monospace;
+        font-size: 0.65rem;
+    }
 
-    .spec-box.highlight {
-        border-right: 3px solid #FFD700; /* Gold for the core identity */
+    .log-header {
+        color: #00F3FF;
+        margin-bottom: 8px;
+        border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+    }
+
+    .log-line {
+        color: #aaa;
+        margin: 2px 0;
+    }
+
+    .pulse-text {
+        color: #00F3FF;
+        animation: log-flicker 1.5s infinite;
+    }
+
+    @keyframes log-flicker {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    .trace-body {
+        background: rgba(0, 243, 255, 0.05);
+        border-left: 2px solid #00F3FF;
+        padding: 6px;
+        height: 110px; /* Fixed height ensures it fits on most screens without scrolling */
+        font-size: 0.7rem;
+        overflow: hidden;
+        font-family: 'Fira Code', monospace;
+    }
+
+    .trace-line {
+        color: #00F3FF;
+        margin-bottom: 2px;
+        white-space: nowrap;
+    }
+
+    .timestamp {
+        color: #555;
+        margin-right: 8px;
+    }
+    /* Flip Card Container */
+    .flip-card {
+        background-color: transparent;
+        width: 280px;
+        height: 280px;
+        perspective: 1000px; /* Required for 3D effect */
+        margin-bottom: 20px;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+    }
+
+    .flip-card:hover .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        -webkit-backface-visibility: hidden; /* Safari */
+        backface-visibility: hidden;
+        border: 2px solid var(--accent-glow);
+    }
+
+    .flip-card-back {
+        background: rgba(var(--accent-rgb), 0.1);
+        color: var(--accent-glow);
+        transform: rotateY(180deg);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+    }
+
+    .clearance-badge {
+        font-size: 1.2rem;
+        font-weight: bold;
+        border: 2px solid #FFD700;
+        color: #FFD700;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .scan-line {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--accent-glow);
+        box-shadow: 0 0 15px var(--accent-glow);
+        animation: scan 3s linear infinite;
+    }
+
+    @keyframes scan {
+        0% {
+            top: 0;
+        }
+
+        100% {
+            top: 100%;
+        }
+    }
+
+    .spec-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        margin-bottom: 15px;
+        border-right: 3px solid #334155;
+    }
+
+        .spec-box.highlight {
+            border-right: 3px solid #FFD700; /* Gold for the core identity */
+        }
+    /* If in Identity.razor.css, use ::deep to force it onto the generated HTML */
+    ::deep .blink-fast {
+        animation: simple-blink 0.8s step-end infinite;
+        color: #FFD700;
+    }
+
+    ::deep .blink-slow {
+        animation: simple-blink 2s step-end infinite;
+        color: #00F3FF;
+    }
+
+    @keyframes simple-blink {
+        0%, 100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0;
+        }
+    }
+    /* Global blinker to ensure it bypasses isolation */
+    ::deep .force-blink {
+        animation: system-blink 1s step-end infinite;
+        color: #00F3FF;
+        font-weight: bold;
+    }
+
+    @keyframes system-blink {
+        50% {
+            opacity: 0;
+        }
     }

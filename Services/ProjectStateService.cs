@@ -53,31 +53,7 @@ namespace MWBlazorPortfolioSite.Services
             }
         }
 
-        //public void SelectFile(ProjectFile file)
-        //{
-        //    SelectedFile = file;
-
-        //    if (file != null)
-        //    {
-        //        CurrentAccentColor = file.AccentColor;
-        //        // ... any other logic that requires a file ...
-        //        Console.WriteLine($">>> STATE_SERVICE: Selected {file.FileName}");
-        //    }
-        //    else
-        //    {
-        //        // Reset to default "Welcome" state values
-        //        CurrentAccentColor = "#00FF41";
-        //        Console.WriteLine(">>> STATE_SERVICE: Session Closed / File Cleared");
-        //    }
-
-        //    // Fire EVERY messenger to ensure all components hear the update
-        //    NotifyStateChanged(); // Fires OnChange
-        //                          // OnSelectedFileChanged?.Invoke();
-
-        //    Console.WriteLine(">>> STATE_SERVICE: Session Closed / File Cleared");
-        //}
-
-        public async Task SelectFile(ProjectFile? file)
+              public async Task SelectFile(ProjectFile? file)
         {
             SelectedFile = file;
             SelectedFileContent = null; // Clear old content immediately
@@ -152,13 +128,7 @@ namespace MWBlazorPortfolioSite.Services
             {
                 Console.WriteLine($">>> ERROR: Failed to load manifest. {ex.Message}");
             }
-            //var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-            //// Fetch and deserialize the manifest
-            //var projects = await _http.GetFromJsonAsync<List<ProjectFile>>("data/projects.json", options);
-
-            //// Store them in your service...
-            //ProjectFiles = projects;
+            
         }
 
         public void NotifyStateChanged() => OnChange?.Invoke();

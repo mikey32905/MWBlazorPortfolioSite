@@ -1,8 +1,12 @@
 ﻿@page "/system-diagnostic"
 
 @layout PortfolioLayout
+@inject TerminalService TerminalSvc
+@inject ThemeService ThemeSvc
 @implements IDisposable
 @inject ProjectStateService ProjectState
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Nav
 
 <div class="diag-container">
     <div class="diag-header">
@@ -27,6 +31,28 @@
                 </div>
             </div>
             <div class="load-percentage">@CpuLoad% AVG_LOAD</div>
+        </div>
+    </div>
+
+    <div class="circuit-view">
+        <h3 class="pane-title">> NEURAL_DEPENDENCY_MAP</h3>
+        <div class="circuit-board">
+            <svg class="circuit-svg">
+                <path d="M 450 150 L 150 80" class="trace-line" />
+                <path d="M 450 150 L 750 80" class="trace-line" />
+                <path d="M 450 150 L 150 220" class="trace-line" />
+                <path d="M 450 150 L 750 220" class="trace-line" />
+            </svg>
+
+            <div class="node core-hub">
+                <div class="hub-text">C# / .NET 9/10</div>
+                <div class="sub-label">CORE_PROCESSOR</div>
+            </div>
+
+            <div class="node satellite" style="top: 40px; left: 20px;">BLAZOR_WASM</div>
+            <div class="node satellite" style="top: 40px; right: 20px;">WPF_XAML</div>
+            <div class="node satellite" style="bottom: 40px; left: 20px;">SQL_SERVER</div>
+            <div class="node satellite" style="bottom: 40px; right: 20px;">AZURE_CLOUD</div>
         </div>
     </div>
 
@@ -70,6 +96,12 @@
                 <div class="spec-item"><span class="label">STATE_SYNC:</span> <span class="val">ACTIVE_BROADCAST</span></div>
                 <div class="spec-item"><span class="label">ENCRYPTION:</span> <span class="val">AES_256_NEURAL</span></div>
             </div>
+
+            <div class="action-zone">
+                <button class="broadcast-btn" @onclick="NavigateToUplink">
+                    <span class="btn-glitch">INITIATE_REMOTE_UPLINK</span>
+                </button>
+            </div>
         </div>
 
         <div class="diag-card system-log">
@@ -84,7 +116,7 @@
                 </svg>
             </div>
 
-            <div class="log-stream">
+            <div class="log-stream" @ref="_logContainer">
                 @foreach (var log in _logs)
                 {
                     <div class="log-entry">
@@ -100,11 +132,14 @@
 </div>
 
 @code {
+   // [Inject] private IJSRuntime JSRuntime { get; set; }
     private string UptimeString = "00:00:00";
     private int CpuLoad = 42;
     private Timer? _timer;
     private Timer? logTimer;
     private Timer? cpuTimer;
+    private ElementReference _logContainer;
+    private int _previousLogCount = 0;
 
     private List<string> _logs = new() { "System initialized.", "Neural link established." };
     private string[] _randomMsgs = {
@@ -113,6 +148,32 @@
         "Bypassing security protocols...", "Resource allocation optimized."
     };
 
+    private void NavigateToUplink()
+    {
+        // Verification log
+        Console.WriteLine("Navigating to Uplink...");
+
+        // Add to your terminal service
+        TerminalSvc.AddToTerminal(">>> SECURE_LINE_REQUESTED...");
+        TerminalSvc.AddToTerminal(">>> REDIRECTING_TO_UPLINK_MODULE...");
+
+        // 1. Find the Uplink file in your ProjectState
+        // (Assuming your files are stored in a list in ProjectState)
+        var uplinkFile = ProjectState.ProjectFiles.FirstOrDefault(f => f.FileName == "Uplink");
+
+        if (uplinkFile != null)
+        {
+            // 2. This tells the ProjectState to update, which the Sidebar is likely listening to
+            ProjectState.SelectFile(uplinkFile);
+
+            // 3. Update the theme color to match Uplink's accent
+            ThemeSvc.UpdateTheme(uplinkFile.AccentColor);
+        }
+
+        // 4. Perform the actual navigation
+        TerminalSvc.AddLog(">>> SECURE_LINE_REQUESTED...", LogType.System);
+        Nav.NavigateTo("uplink");
+    }
 
     protected override void OnInitialized()
     {
@@ -146,11 +207,39 @@
         ProjectState.OnChange += HandleStateChange;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Every time the component re-renders with a new log,
+        // we jump the scroll to the bottom. 
+        try
+        {
+            _previousLogCount = _logs.Count;
+            await ScrollToBottom();
+        }
+        catch
+        {
+            
+        }
+    }
+
     private void HandleStateChange()
     {
         // If the user closed the session, the service event fires.
         // We call StateHasChanged to ensure the UI stays in sync.
         InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ScrollToBottom()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("scrollToBottom", _logContainer);
+        }
+        catch (Exception ex)
+        {
+            // Silent catch for pre-rendering or JS isolation edge cases
+            Console.WriteLine($"Scroll Error: {ex.Message}");
+        }
     }
 
     public void Dispose()

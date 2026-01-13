@@ -145,6 +145,20 @@ pre code {
         width: 6px !important;
     }
 
+@keyframes system-blink {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+.force-blink {
+    animation: system-blink 1s step-end infinite !important;
+}
+
 /* #region Blazor default CSS */
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

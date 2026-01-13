@@ -147,6 +147,12 @@
             observer.observe(document.body, { childList: true, subtree: true });
         };
 
+        window.scrollToBottom = (element) => {
+            if (element) {
+                element.scrollTop = element.scrollHeight;
+            }
+        };
+
     </script>
 
 

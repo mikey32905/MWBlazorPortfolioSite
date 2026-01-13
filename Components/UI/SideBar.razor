@@ -95,6 +95,8 @@
         }
 
         ProjectState.OnChange += StateHasChanged;
+        // Subscribe to navigation events
+        Nav.LocationChanged += HandleLocationChanged;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -112,6 +114,12 @@
                 expandedCategories.Add(cat);
             }
         }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        // Force the sidebar to re-render when the URL changes
+        StateHasChanged();
     }
 
     private void ToggleFolder(string category)
@@ -173,6 +181,7 @@
     public void Dispose()
     {
         ProjectState.OnChange -= StateHasChanged;
+        Nav.LocationChanged -= HandleLocationChanged;
     }
    
 }
