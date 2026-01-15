@@ -35,3 +35,16 @@
         background: var(--accent-glow);
         color: #000;
     }
+
+.code-container, .workspace-pane {
+    /* 1. Force a solid, opaque background */
+    background-color: #080808 !important;
+    /* 2. Isolation: Creates a new stacking context */
+    isolation: isolate;
+    /* 3. Disable transparency artifacts */
+    backface-visibility: hidden;
+    /* 4. Hardware Acceleration: Move the pane to the GPU */
+    transform: translateZ(0);
+    /* 5. Fix for Chromium ghosting on GitHub */
+    contain: content;
+}

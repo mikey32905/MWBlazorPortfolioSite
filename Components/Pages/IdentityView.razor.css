@@ -1,20 +1,19 @@
 ﻿
-.identity-dossier {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 40px 20px 20px 20px; /* Increased top padding significantly */
+.identity-wrapper {
+    padding: 30px;
+    margin-left: 20px; /* Adjust this to match your sidebar width */
+    height: calc(100vh - 120px); /* Adjust to match your header height */
+    overflow-y: auto;
     box-sizing: border-box;
-    overflow: hidden; /* Prevent the container itself from scrolling */
 }
 
 .identity-grid {
-    flex: 1 1 auto; /* Let the grid take up remaining space */
     display: grid;
-    grid-template-columns: 260px 1fr 260px;
-    gap: 25px;
-    align-items: start; /* Vital: Aligns items to the top of the grid rows */
-    overflow: hidden;
+    /* This creates two columns: 60% for Bio/Skills and 40% for the Contact Form */
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+    align-items: start;
+    width: 100%;
 }
 
 ::deep .identity-grid {
@@ -25,6 +24,12 @@
     margin-top: 20px; /* Fixes the clipping at the top */
 }
 
+.identity-main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between Bio and Skills */
+}
+
 /* Fix the 'Residue' by giving the editor a solid, non-transparent background */
 ::deep .data-pane {
     background-color: #0a0a0a !important;
@@ -32,6 +37,22 @@
     z-index: 5;
     position: relative;
     overflow: hidden;
+}
+
+.identity-layout {
+    /* Ensure the content starts below the header and away from the sidebar */
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: 100%;
+    overflow-y: auto; /* Allows scrolling if you add more skills later */
+}
+
+/* If you are using the workspace-grid, ensure it has a margin-left */
+.workspace-grid {
+    margin-top: 10px;
 }
 
 .identity-header {
@@ -121,6 +142,36 @@
     }
 }
 
+.progress-container {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    transition: width 1.5s ease-in-out;
+}
+
+.skill-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.profile-frame {
+    width: 150px;
+    border: 2px solid var(--accent-color);
+    padding: 5px;
+    filter: grayscale(1) contrast(1.2);
+    margin-bottom: 20px;
+}
+
 .data-pane {
     background: #000; /* Solid black background to hide anything behind it */
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -161,6 +212,37 @@
         gap: 12px; /* Pulls the log up close to the stats */
         justify-content: flex-start;
     }
+
+.profile-frame {
+    width: 140px;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+    margin-bottom: 10px;
+}
+
+.pane-content {
+    padding: 20px;
+}
+
+.bio-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* Fix for the clipping at the top */
+.workspace-pane {
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+}
+
+.bio-text h3 {
+    font-family: 'OCR A Extended', monospace;
+    color: var(--accent-color);
+    letter-spacing: 3px;
+    margin-top: 0;
+}
 
     .photo-frame {
         border: 2px solid #FFD700;
@@ -295,6 +377,16 @@
         white-space: nowrap;
     }
 
+.diagnostic-list {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.skill-row {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
     .timestamp {
         color: #555;
         margin-right: 8px;
@@ -413,3 +505,139 @@
             opacity: 0;
         }
     }
+
+.data-pane, .code-viewport, .code-overlay-container {
+    /* 1. Ensure absolute opacity */
+    background-color: #0b0b0b !important;
+    /* 2. Force a new stacking context */
+    z-index: 10;
+    position: relative;
+    /* 3. Hardware acceleration - forces the browser to 
+       render this on the GPU, preventing 'trail' artifacts */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* 4. Kill the scroll bleed */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.terminal-form {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.prompt {
+    color: var(--accent-color);
+    font-size: 0.8rem;
+}
+
+.term-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-family: monospace;
+    width: 100%;
+    outline: none;
+}
+
+    .term-input:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 1px 0 var(--accent-color);
+    }
+
+.transmit-btn {
+    margin-top: 10px;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px;
+    cursor: pointer;
+}
+
+.typewriter-text {
+    display: inline-block;
+    overflow: hidden; /* Ensures the content is not revealed until the animation */
+    border-right: .5em solid var(--accent-color); /* The typewriter cursor */
+    white-space: nowrap; /* Keeps the content on a single line */
+    margin: 0 auto;
+    letter-spacing: .1em;
+    animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+/* The typing effect */
+@keyframes typing {
+    from {
+        width: 0
+    }
+
+    to {
+        width: 100%
+    }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+    from, to {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: var(--accent-color);
+    }
+}
+
+/* For longer paragraphs that need to wrap, we use a fade-in instead */
+.decode-fade {
+    animation: decode-glitch 2s ease-out forwards;
+}
+
+@keyframes decode-glitch {
+    0% {
+        opacity: 0;
+        filter: blur(10px);
+    }
+
+    100% {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.progress-glow {
+    animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 0.8;
+        box-shadow: 0 0 15px var(--accent-color);
+    }
+}
+
+.decode-fade {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(5px);
+    animation: reveal-text 1.5s ease-out forwards;
+}
+
+@keyframes reveal-text {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}

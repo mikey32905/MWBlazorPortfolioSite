@@ -223,6 +223,38 @@
     text-overflow: ellipsis; /* Add ... if text is too long */
 }
 
+.github-repo-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid rgba(var(--accent-rgb), 0.5);
+    color: var(--accent-color) !important;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .github-repo-btn:hover {
+        background: rgba(var(--accent-rgb), 0.2);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+    }
+
+.github-icon {
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+.github-repo-btn:hover .github-icon {
+    color: #000;
+    filter: none; /* Icon turns black when button fills on hover */
+}
+
 /* This is the actual scrolling box */
 .code-viewport {
     flex: 1;

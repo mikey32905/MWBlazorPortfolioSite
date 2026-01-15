@@ -115,8 +115,10 @@ namespace MWBlazorPortfolioSite.Services
 
             try
             {
+                // Adding a timestamp ensures the URL is always unique, forcing a fresh download
+                string cacheBuster = DateTime.Now.Ticks.ToString();
                 // This pulls from wwwroot/data/projects.json
-                var data = await _http.GetFromJsonAsync<List<ProjectFile>>("data/projects.json", options);
+                var data = await _http.GetFromJsonAsync<List<ProjectFile>>("data/projects.json?v={cacheBuster}", options);
 
                 if (data != null)
                 {

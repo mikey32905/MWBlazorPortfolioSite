@@ -15,65 +15,73 @@
 }
 else
 {
-    <div class="identity-dossier" style="display: flex; flex-direction: column; height: 100vh; padding-top: 60px;">
-        <div class="identity-header"> ... </div>
-        
+    <div class="identity-layout">
+
         <div class="identity-grid">
-            <div class="system-stats-col">
-                <div class="photo-module">
-                    <div class="photo-frame">
-                        <div class="scan-line"></div>
-                        <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" alt="Neural Signature" />
-                    </div>
-                    <div class="stat-indicators">
-                        <p>LOGIC_PROCESSING <span class="force-blink" style="color: #FFD700;">[ACTIVE]</span></p>
-                        <p>CREATIVE_ENGINE <span class="blink-slow">[STABLE]</span></p>
-                        <p>SYSTEM_STAMINA <span class="blink-fast">[98%]</span></p>
-                    </div>
-                </div>
 
-                <div class="trace-module">
-                    <div class="trace-header">LIVE_SYSTEM_TRACE</div>
-                    <div class="trace-body">
-                        @foreach (var log in displayedLogs)
-                        {
-                            <p class="trace-line">
-                                <span class="timestamp">[@DateTime.Now.ToString("HH:mm:ss")]</span> @log
+            <div class="identity-main">
+
+                <div class="workspace-pane bio-side">
+                    <div class="pane-header">> IDENTITY_DECRYPTION</div>
+                    <div class="bio-content">
+                        <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" class="profile-frame" />
+                        <div class="bio-text">
+                            <h3 class="typewriter-text">MW_OPERATOR</h3>
+                            <p class="status-line typewriter-text" style="animation-delay: 1s;">> STATUS: ACTIVE_DEVELOPER</p>
+                           
+                            <p class="decode-fade" style="animation-delay: 2s; margin-top: 15px;">
+                                Specializing in full-stack C# architecture and WPF engineering.
+                                Passionate about building highly-performant, secure, and
+                                tactical user interfaces.
                             </p>
-                        }
+                        </div>
                     </div>
                 </div>
-            </div> <div class="data-pane">
-                <h3 class="pane-title">> RAW_SOURCE_DATA</h3>
-                <div class="code-overlay-container">
-                    @if (ProjectState.SelectedFile != null)
-                    {
-                        <div class="transparent-editor">
-                            <CodeEditorView SelectedFile="ProjectState.SelectedFile" />
+ 
+                <div class="workspace-pane skill-side">
+                    <div class="pane-header">> CORE_CAPABILITIES_DIAGNOSTIC</div>
+                        <div class="diagnostic-list">
+                            @foreach (var skill in MySkills)
+                            {
+                                <div class="skill-row">
+                                    <div class="skill-label">
+                                        <span>@skill.Name</span>
+                                        <span class="skill-percent">@skill.Value%</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: @skill.Value%; background: @skill.Color;"></div>
+                                        <div class="progress-glow" style="width: @skill.Value%; box-shadow: 0 0 10px @skill.Color;"></div>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                    }
                 </div>
+ 
             </div>
 
-            <div class="spec-pane">
-                <div class="spec-box">
-                    <label>CURRENT_LOCATION</label>
-                    <p>[REDACTED] / EARTH</p>
-                </div>
-                <div class="spec-box">
-                    <label>PRIMARY_LANGUAGE</label>
-                    <p>C# / TYPESCRIPT / ENGLISH</p>
-                </div>
-                <div class="spec-box highlight">
-                    <label>CORE_DIRECTIVE</label>
-                    <p>BUILD_BETTER_SYSTEMS</p>
-                </div>
-            </div>
+            <div class="workspace-pane contact-side">
+                  <div class="pane-header">> ESTABLISH_SECURE_UPLINK</div>
+                    <div class="terminal-form">
+                     <div class="input-line">
+                            <span class="prompt">NAME:</span>
+                            <input type="text" class="term-input" placeholder="ENTER_NAME..." />
+                     </div>
+                     <div class="input-line">
+                            <span class="prompt">EMAIL:</span>
+                            <input type="email" class="term-input" placeholder="ENTER_RETURN_PATH..." />
+                     </div>
+                     <div class="input-line">
+                            <span class="prompt">MESSAGE:</span>
+                            <textarea class="term-input" rows="4" placeholder="TRANSMIT_DATA..."></textarea>
+                     </div>
+                    <button class="transmit-btn" @onclick="HandleTransmission">EXECUTE_TRANSMISSION</button>
+                    </div>
+             </div>
         </div>
-
+       
     </div>
 
-
+    <div class="footer-spacer" style="height: 150px;"></div>
 
 }
 
@@ -83,6 +91,17 @@ else
     private ProjectFile? identityFile;
     private bool isFlipped = false;
     private System.Timers.Timer? flipTimer;
+
+    private List<SkillItem> MySkills = new()
+    {
+        new SkillItem("C#_DOTNET", 95, "#00F3FF"),
+        new SkillItem("BLAZOR_WASM", 90, "#BC13FE"),
+        new SkillItem("WPF_MVVM", 85, "#FFD700"),
+        new SkillItem("SQL_DATABASE", 80, "#00FF41"),
+        new SkillItem("REST_API_INT", 88, "#FF3E3E")
+    };
+
+    public record SkillItem(string Name, int Value, string Color);
 
     private List<string> displayedLogs = new();
     private string[] fullLogs = {
@@ -176,18 +195,29 @@ else
     {
         if (firstRender)
         {
-            // Clear any existing logs to prevent duplication
-            displayedLogs.Clear();
+            // Short delay to let the typewriter animation start first
+            await Task.Delay(500);
+            TerminalSvc.AddLog("DECRYPTING_IDENTITY_CORE...", LogType.Info);
 
-            foreach (var line in fullLogs)
-            {
-                displayedLogs.Add(line);
-                StateHasChanged(); // Force re-render
-                await Task.Delay(400);
-            }
+            await Task.Delay(1500);
+            TerminalSvc.AddLog("IDENTITY_DECRYPTED: ACCESS_GRANTED", LogType.Success);
+
+            // Triggers the terminal to scroll to the bottom
+            StateHasChanged();
         }
     }
 
+    private void HandleTransmission()
+    {
+        TerminalSvc.AddLog("DATA_PACKET_QUEUED...", LogType.Info);
+        TerminalSvc.AddLog("TRANSMITTING_VIA_SECURE_TUNNEL...", LogType.Warning);
+
+        // Simulate a successful send
+        Task.Delay(1000).ContinueWith(_ =>
+        {
+            TerminalSvc.AddLog("TRANSMISSION_COMPLETE: 200_OK", LogType.Success);
+        });
+    }
 
     public void Dispose()
     {

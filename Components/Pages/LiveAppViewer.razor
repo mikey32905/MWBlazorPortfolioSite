@@ -5,68 +5,249 @@
 @inject TerminalService TerminalSvc
 @inject IJSRuntime JS
 @implements IDisposable
+@inject NavigationManager Nav
+@inject HttpClient Http
 
-<div class="live-app-container">
-    <div class="app-toolbar">
-        <div class="status-light"></div>
-        <div class="address-bar">
-            <span class="protocol">HTTPS://</span> @ProjectUrl
+
+@if (showMobileWarning)
+{
+    <div class="mobile-warning-overlay">
+        <div class="warning-box">
+            <div class="warning-header">!! SYSTEM_DISPLAY_ALERT !!</div>
+            <div class="warning-body">
+                <p>> OPTIMAL_VIEWING_REQUIRED: DESKTOP_NODE_OFFLINE</p>
+                <p>> Current display width insufficient for multi-pane IDE simulation.</p>
+                <p>> Interface may experience layout fragmentation on mobile devices.</p>
+            </div>
+            <button class="warning-dismiss-btn" @onclick="DismissWarning">
+                CONTINUE_TO_INTERFACE_ANYWAY
+            </button>
         </div>
-        @* <button class="external-btn" @onclick="OpenTab">OUTBOUND_LINK</button> *@
     </div>
+}
 
-    @if (ProjectState.SelectedFile != null)
-    {
-        <div class="app-header">
-            <div class="header-left">
-                <span class="pulse-dot"></span>
-                DECRYPTING_HOST: @ProjectState.SelectedFile.FileName
-            </div>
-            <div class="header-right">
-                <a href="@ProjectState.SelectedFile.LiveUrl" target="_blank" class="outbound-link">
-                    [BREAKOUT_LINK] ↗
-                </a>
-            </div>
-        </div>
-
-        @* The @key here ensures the iframe reloads when the URL changes *@
-        <div class="viewport-wrapper">
-            @if (_isLoading)
-            {
-                <div class="loading-overlay">
-                    <div class="glitch-text" data-text="ESTABLISHING_UPLINK...">ESTABLISHING_UPLINK...</div>
-                    <div class="loading-bar"><div class="progress"></div></div>
+<div class="workspace-container">
+    <div class="workspace-grid">
+        <div class="workspace-pane live-side">
+            <div class="pane-header">
+                <div class="header-path">
+                    <span class="status-indicator pulse"></span>
+                    > LIVE_RENDER_CORE: @ProjectState.SelectedFile?.FileName.ToUpper()
                 </div>
-            }
+             
+            </div>
 
-            <iframe src="@ProjectState.SelectedFile.LiveUrl"
-                    @key="@ProjectState.SelectedFile.LiveUrl"
-                    @onload="OnFrameLoad"
-                    class="app-viewport @(_isLoading ? "hidden" : "visible")">
-            </iframe>
-            @* @if (ProjectState.SelectedFile != null)
-            {
-                <iframe src="@ProjectState.SelectedFile.LiveUrl"
-                        @key="ProjectState.SelectedFile.LiveUrl"
-                        class="app-viewport"></iframe>
-            } *@
-            @* <iframe src="@ProjectState.SelectedFile.LiveUrl"
-                    @key="@ProjectState.SelectedFile.LiveUrl"
-                    class="app-viewport">
-            </iframe> *@
+            <div class="remote-feed-container">
+                @if (ProjectState.SelectedFile?.FileName == "MediaMosaic")
+                {
+                    <div class="static-preview-wrapper">
+                        <img src="/img/MediaMosaic_Preview.svg" class="static-svg" />
+                        <div class="preview-overlay">
+                            <span class="warning-text">EXTERNAL_HOST_REACHED</span>
+                            <p>FRAME_EMBEDDING_RESTRICTED_BY_REMOTE_SERVER</p>
+                            <p>USE_DIRECT_UPLINK_BELOW_FOR_FULL_ACCESS</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <iframe src="@ProjectState.SelectedFile?.LiveUrl" class="app-iframe"></iframe>
+                }
+               @*  <iframe src="@ProjectState.SelectedFile?.LiveUrl"
+                        class="app-iframe"
+                        title="AppPreview">
+                </iframe> *@
+
+            </div>
         </div>
-    }
+
+        <div class="workspace-pane code-side">
+            <div class="pane-header">> SOURCE_DECRYPTION: @ProjectState.SelectedFile?.FileName</div>
+            <div class="code-container">
+                @if (isCodeLoading)
+                {
+                    <div class="loading-overlay">>> SYNCHRONIZING_BUFFER...</div>
+                }
+                else
+                {
+                    @* Pass the fetched string directly to the component *@
+                    <CodeEditorView CodeContent="@rawCode" SelectedFile="ProjectState.SelectedFile" />
+                }
+                
+            </div>
+        </div>
+
+        <div class="workspace-pane telemetry-side">
+            <div class="pane-header">> MODULE_SPECS</div>
+            <div class="telemetry-content">
+                <div class="spec-group">
+                    <label>ENVIRONMENT_ID</label>
+                    <div class="value">@ProjectState.SelectedFile?.Language.ToUpper()_RUNTIME</div>
+                </div>
+
+                <div class="spec-group">
+                    <label>SOURCE_PATH</label>
+                    <div class="value path-container">
+                        <span>@ProjectState.SelectedFile?.LiveUrl</span>
+                        <button class="copy-btn" @onclick="CopyPathToClipboard" title="COPY_TO_SYSTEM_BUFFER">
+                            <i class="bi bi-clipboard-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <label>TECH_STACK</label>
+                    <div class="tag-cloud">
+                        <span class="tag">C#</span>
+                        <span class="tag">.NET 9/10</span>
+                        <span class="tag">WASM</span>
+                    </div>
+                </div>
+
+                <div class="spec-group">
+                    <label>DESCRIPTION</label>
+                    @foreach (var line in ProjectState.SelectedFile?.Description ?? new List<string> { "NO_DATA" })
+                    {
+                        <p class="desc-line">> @line</p>
+                    }
+                </div>
+
+                <div class="telemetry-footer">
+                    <div class="stat-line">CPU_CYCLES: <span class="glow">OPTIMIZED</span></div>
+                    <div class="stat-line">DATA_FLOW: <span class="glow">STABLE</span></div>
+
+                    @if (!string.IsNullOrEmpty(ProjectState.SelectedFile?.LiveUrl))
+                    {
+                        <div class="action-area">
+                            <a href="@ProjectState.SelectedFile.LiveUrl"
+                               target="_blank"
+                               class="launch-node-btn">
+                                ESTABLISH_DIRECT_UPLINK
+                                <span class="btn-subtext">LAUNCH_EXTERNAL_BROWSER_NODE</span>
+                            </a>
+
+                            @if (!string.IsNullOrEmpty(ProjectState.SelectedFile?.GitHubUrl))
+                            {
+                                <a href="@ProjectState.SelectedFile?.GitHubUrl" target="_blank" class="github-repo-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="github-icon" viewBox="0 0 16 16">
+                                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+                                    </svg>
+                                    <span>ACCESS_FULL_REPOSITORY</span>
+                                    <span class="btn-subtext">VIEW_SOURCE_ON_GITHUB</span>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
     
 </div>
+
 
 @code {
     [Parameter] public string ProjectUrl { get; set; } = "";
     private bool _isLoading = true;
+    private string? rawCode;
+    private bool isCodeLoading = false;
+    private bool showMobileWarning = true;
 
     protected override void OnInitialized()
     {
         ProjectState.OnChange += HandleRefresh;
         ProjectState.OnSelectedFileChanged += HandleRefresh;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ProjectState.SelectedFile == null) return;
+
+        var currentFile = ProjectState.SelectedFile;
+
+        // If we have code but no URL, search the list for the matching URL
+        if (string.IsNullOrEmpty(currentFile.LiveUrl))
+        {
+            var match = ProjectState.ProjectFiles.FirstOrDefault(f => f.FileName == currentFile.FileName && !string.IsNullOrEmpty(f.LiveUrl));
+            // Manually 'patch' the missing URL for the view
+            currentFile.LiveUrl = match?.LiveUrl;
+        }
+
+        // If we have a URL but no Source (The 404 issue you have now)
+        if (string.IsNullOrEmpty(currentFile.SourceUrl))
+        {
+            var match = ProjectState.ProjectFiles.FirstOrDefault(f => f.FileName == currentFile.FileName && !string.IsNullOrEmpty(f.SourceUrl));
+            // Manually 'patch' the missing Source path
+            currentFile.SourceUrl = match?.SourceUrl;
+        }
+
+        await LoadSourceCode();
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check if they've already dismissed it in the past
+            var isDismissed = await JS.InvokeAsync<string>("localStorage.getItem", "mobileWarningDismissed");
+            if (isDismissed == "true")
+            {
+                showMobileWarning = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task DismissWarning()
+    {
+        showMobileWarning = false;
+        //StateHasChanged();
+        // Save the preference so it persists across refreshes
+        await JS.InvokeVoidAsync("localStorage.setItem", "mobileWarningDismissed", "true");
+    }
+
+    private async Task CopyPathToClipboard()
+    {
+        if (ProjectState.SelectedFile != null)
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", ProjectState.SelectedFile.LiveUrl);
+            TerminalSvc.AddLog("PATH_COPIED_TO_BUFFER", LogType.Success);
+        }
+    }
+
+    private async Task LoadSourceCode()
+    {
+        // 1. Clear previous state immediately to stop ghosting
+        rawCode = null;
+        isCodeLoading = true;
+        StateHasChanged();
+
+        if (ProjectState.SelectedFile != null)
+        {
+            try
+            {
+                // Use SourceUrl if available (from consolidated JSON)
+                // or PhysicalPath if you haven't renamed it yet
+                string path = ProjectState.SelectedFile.SourceUrl ?? ProjectState.SelectedFile.PhysicalPath;
+
+                if (!string.IsNullOrEmpty(path))
+                {
+                    // Ensure path is root-relative
+                    var finalPath = path.StartsWith("/") ? path : $"/{path}";
+                    rawCode = await Http.GetStringAsync(finalPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                rawCode = $"> ERROR: 404_FILE_NOT_FOUND_AT_{ProjectState.SelectedFile?.SourceUrl}";
+            }
+            finally
+            {
+                isCodeLoading = false;
+                StateHasChanged();
+            }
+        }
     }
 
     private void OnFrameLoad()

@@ -1,155 +1,415 @@
-﻿.live-app-container {
+﻿.workspace-grid {
+    display: grid;
+    /* Column 1 (App): 1 part | Column 2 (Code): 1.5 parts | Column 3 (Dossier): 250px */
+    grid-template-columns: 1fr 1.5fr 280px;
+    height: calc(100vh - 200px);
+    width: 100%;
+    gap: 5px;
+}
+
+.workspace-pane {
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 100%; /* Important: Takes full height of main-stage */
-    width: 100%;
-    background: #000;
-}
-
-.app-toolbar {
-    height: 40px;
-    background: #111;
-    display: flex;
-    align-items: center;
-    padding: 0 15px;
-    border-bottom: 1px solid #333;
-    gap: 15px;
-}
-
-.status-light {
-    width: 8px;
-    height: 8px;
-    background: #00FF41;
-    border-radius: 50%;
-    box-shadow: 0 0 5px #00FF41;
-}
-
-.address-bar {
-    flex-grow: 1;
-    background: #000;
-    color: #888;
-    font-size: 0.7rem;
-    padding: 5px 10px;
-    border: 1px solid #222;
-    font-family: 'Fira Code', monospace;
-}
-
-/*.iframe-wrapper {
-    width: 100%;
-    height: calc(100vh - 250px);*/ /* Leave room for terminal and header */
-    /*overflow: hidden;
-    position: relative;
-    background: #000;
-    border: 1px solid var(--accent-glow);
-}
-
-.app-frame {*/
-    /* Scale the content to 80% if it feels too big */
-    /*width: 125%;*/ /* Increase width to 125% then scale back to 100% (125 * 0.8 = 100) */
-    /*height: 125%;
-    transform: scale(0.8);
-    transform-origin: 0 0;
-    border: none;
-}
-
-.app-viewer-frame {
-    background-color: #ffffff;*/ /* Some sites expect a white background to render colors correctly */
-    /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) inset;
-    filter: contrast(1.1);*/ /* Optional: Sharpen the colors slightly */
-/*}*/
-
-.app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #111;
-    padding: 10px 20px;
-    border-bottom: 1px solid #333;
-    font-family: 'Fira Code', monospace;
-}
-
-.outbound-link {
-    color: var(--accent-glow);
-    text-decoration: none;
-    font-size: 0.75rem;
-    padding: 4px 12px;
+    background: #050505;
     border: 1px solid rgba(var(--accent-rgb), 0.3);
-    transition: 0.3s;
-}
-
-    .outbound-link:hover {
-        background: rgba(var(--accent-rgb), 0.1);
-        border-color: var(--accent-glow);
-        box-shadow: 0 0 10px var(--accent-glow);
-    }
-
-.viewport-wrapper {
-    flex-grow: 1;
-    position: relative;
-    background: #000;
-}
-
-/*.app-viewport {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-*/
-.status-blip {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: #00ff00;
-    border-radius: 50%;
-    margin-right: 10px;
-    box-shadow: 0 0 5px #00ff00;
-}
-
-.loading-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 5;
-}
-
-.loading-bar {
-    width: 200px;
-    height: 2px;
-    background: #222;
-    margin-top: 15px;
     overflow: hidden;
 }
 
-.progress {
-    width: 100%;
-    height: 100%;
-    background: var(--accent-glow);
-    animation: loading-scan 1.5s infinite;
+.code-container {
+    background-color: #050505 !important;
+    min-height: 200px;
+    position: relative;
+    /* This creates a 'Solid Layer' that blocks the ghosting from the back */
+    contain: paint;
+    z-index: 2;
 }
 
-@keyframes loading-scan {
+.pane-header {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important; /* Forces title left, button right */
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 5px 15px;
+    background: rgba(0, 243, 255, 0.05); /* Cyan tint */
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+    min-height: 40px;
+}
+
+.header-path {
+    flex: 1; /* Takes remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Courier New', monospace;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    box-shadow: 0 0 8px var(--accent-color);
+    animation: heartbeat 2s infinite;
+}
+
+@keyframes heartbeat {
     0% {
-        transform: translateX(-100%);
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.5;
     }
 
     100% {
-        transform: translateX(100%);
+        transform: scale(1);
+        opacity: 1;
     }
 }
 
-.app-viewport {
+.external-link-btn {
+    display: inline-block !important;
+    flex-shrink: 0; /* Prevents button from being squashed */
+    margin-left: 10px;
+    padding: 4px 10px;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color) !important;
+    font-size: 0.65rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    background: transparent;
+    cursor: pointer;
+    z-index: 100; /* Ensures it's above the iframe */
+}
+
+    .external-link-btn:hover {
+        background: var(--accent-color);
+        color: #000 !important;
+        box-shadow: 0 0 10px var(--accent-color);
+    }
+
+.workspace-grid {
+    display: grid;
+    /* This creates two equal columns with a small gap for the accent border */
+    grid-template-columns: 1fr 1fr;
+    height: calc(100vh - 220px); /* Leave room for header and terminal */
+    gap: 4px;
+    background: #000;
+    padding: 10px;
+}
+
+.workspace-bridge {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-size: 0.6rem;
+    color: var(--accent-color);
+    text-orientation: sideways; /* Makes text vertical for a techy look */
+}
+
+.stream-line {
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--accent-color), transparent);
+    animation: flow-down 2s infinite linear;
+}
+
+@keyframes flow-down {
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+.code-wrapper {
+    background: #050505 !important;
+    position: relative;
+    z-index: 5;
+    /* This prevents the "LOADING..." text from staying visible 
+       once the real code arrives */
+    overflow: hidden;
+}
+
+/* Ensure the app view doesn't clip */
+.app-view-port {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 20px 20px; /* Subtle tech-grid background */
+}
+
+.code-container, .preview-frame {
+    /* This ensures that even if the content fails, the box is opaque */
+    background: #000 !important;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    /* Force new layer to stop text smearing */
+    isolation: isolate;
+}
+
+/* Add a solid divider to separate the two panes visually and physically */
+.workspace-pane::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+    z-index: 5;
+}
+
+.preview-frame {
+    background-color: #000000 !important; /* Pure black to prevent bleed-through */
+    position: relative;
+    overflow: hidden;
+    /* This creates a hard clipping boundary for the iframe */
+    contain: strict;
+    /* Forces the browser to treat this as a separate layer */
+    transform: translate3d(0, 0, 0);
+}
+
+.live-side {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure the pane fills the grid row */
+    min-height: 500px; /* Force a minimum height so it can't collapse */
+    background: #000 !important;
+}
+
+.app-iframe {
     width: 100%;
     height: 100%;
     border: none;
-    transition: opacity 0.5s ease;
+    display: block;
 }
 
-    .app-viewport.hidden {
-        opacity: 0;
+.remote-feed-container {
+    flex: 1; /* Fills all vertical space in the pane */
+    position: relative;
+    width: 100%;
+    background: #000;
+}
+
+.remote-feed-container, .code-view-port {
+    flex: 1; /* This forces the content to fill the pane height */
+    position: relative;
+    width: 100%;
+}
+
+.workspace-grid {
+    display: grid;
+    /* App and Code take equal space, Telemetry takes 250px */
+    grid-template-columns: 1fr 1.2fr 250px;
+    height: calc(100vh - 200px);
+    gap: 2px;
+}
+
+.telemetry-content {
+    padding: 20px;
+    font-size: 0.7rem;
+    color: #888;
+}
+
+.spec-group {
+    margin-bottom: 25px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    margin: 2px;
+    font-size: 0.6rem;
+}
+
+.telemetry-footer {
+    margin-top: auto; /* Pushes the button to the bottom of the pane */
+    padding-top: 20px;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+}
+
+.action-area {
+    margin-top: 15px;
+    padding: 10px 0;
+}
+
+.launch-node-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color) !important;
+    padding: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+    .launch-node-btn:hover {
+        background: var(--accent-color);
+        color: #000 !important;
+        box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
     }
 
-    .app-viewport.visible {
+.btn-subtext {
+    font-size: 0.5rem;
+    opacity: 0.7;
+    margin-top: 4px;
+    letter-spacing: 1px;
+}
+
+/* Static Preview Styling */
+.static-preview-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #080808;
+    position: relative;
+}
+
+.static-svg {
+    width: 60%;
+    opacity: 0.6;
+    filter: drop-shadow(0 0 10px var(--accent-color));
+}
+
+.preview-overlay {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--accent-color);
+}
+
+/* Copy Button Styling */
+.path-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.03);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.copy-btn {
+    background: transparent;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+    .copy-btn:hover {
         opacity: 1;
+    }
+
+.github-repo-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid rgba(var(--accent-rgb), 0.5);
+    color: var(--accent-color) !important;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .github-repo-btn:hover {
+        background: rgba(var(--accent-rgb), 0.2);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+    }
+
+.github-icon {
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+.github-repo-btn:hover .github-icon {
+    color: #000;
+    filter: none; /* Icon turns black when button fills on hover */
+}
+
+/* Only show the warning on screens smaller than 1024px (Tablets/Phones) */
+.mobile-warning-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+}
+
+@media (max-width: 1024px) {
+    .mobile-warning-overlay {
+        display: flex;
+    }
+}
+
+.warning-box {
+    max-width: 400px;
+    width: 90%;
+    border: 2px solid #ff3e3e;
+    padding: 40px;
+    background: #050505;
+    text-align: left;
+}
+
+.warning-header {
+    color: #ff3e3e; /* Red Alert */
+    font-weight: bold;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.warning-dismiss-btn {
+    margin-top: 25px;
+    background: transparent;
+    border: 1px solid #ff3e3e;
+    color: #ff3e3e;
+    padding: 10px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .warning-dismiss-btn:hover {
+        background: #ff3e3e;
+        color: #000;
+        box-shadow: 0 0 15px #ff3e3e;
     }

@@ -4,6 +4,9 @@ namespace MWBlazorPortfolioSite.Models
 {
     public class ProjectFile
     {
+        [JsonPropertyName("Id")]
+        public string Id { get; set; } = "";
+
         [JsonPropertyName("FileName")]
         public string FileName { get; set; } = "";
 
@@ -21,6 +24,9 @@ namespace MWBlazorPortfolioSite.Models
 
         [JsonPropertyName("LiveUrl")]
         public string LiveUrl { get; set; } = "";
+
+        [JsonPropertyName("GitHubUrl")]
+        public string? GitHubUrl { get; set; }
 
         [JsonPropertyName("AccentColor")]
         public string AccentColor { get; set; } = "#00FF41";

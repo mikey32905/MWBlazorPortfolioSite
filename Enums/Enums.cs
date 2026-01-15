@@ -1,4 +1,4 @@
 ﻿namespace MWBlazorPortfolioSite.Enums
 {
-    public enum LogType { System, Success, Warning, Achievement, Error }
+    public enum LogType { System, Success, Warning, Achievement, Info, Error }
 }

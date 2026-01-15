@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <Content Update="wwwroot\Data\projects.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\Data\source\Identity.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

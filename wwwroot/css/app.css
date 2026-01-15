@@ -159,6 +159,25 @@ pre code {
     animation: system-blink 1s step-end infinite !important;
 }
 
+.preview-frame {
+    background: #000000 !important;
+    position: relative;
+    z-index: 1; /* Low z-index but with a solid background */
+    overflow: hidden;
+    /* This stops the browser from 'smearing' pixels from the background layer */
+    contain: strict;
+}
+
+.app-iframe {
+    width: 100%;
+    height: 100%;
+    /* Ensure the iframe itself isn't transparent */
+    background: #000;
+    border: none;
+    /* Forces the browser to render the iframe in its own hardware-accelerated layer */
+    transform: translateZ(0);
+}
+
 /* #region Blazor default CSS */
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
