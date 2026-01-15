@@ -9,11 +9,12 @@
 
 .identity-grid {
     display: grid;
-    /* This creates two columns: 60% for Bio/Skills and 40% for the Contact Form */
-    grid-template-columns: 1.5fr 1fr;
-    gap: 30px;
+    /* This keeps the form at a readable 400px while the bio/skills take the rest */
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
     align-items: start;
-    width: 100%;
+    max-width: 1200px; /* Centers the content on ultra-wide monitors */
+    margin: 0 auto;
 }
 
 ::deep .identity-grid {
@@ -228,6 +229,13 @@
     display: flex;
     gap: 20px;
     align-items: flex-start;
+}
+
+/* Ensure the form doesn't feel 'airy' */
+.contact-side {
+    width: 100%;
+    background: rgba(var(--accent-rgb), 0.02);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
 }
 
 /* Fix for the clipping at the top */
@@ -640,4 +648,22 @@
         transform: translateY(0);
         filter: blur(0);
     }
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0; /* Start at zero */
+    animation: charge-up 2s ease-out forwards;
+    animation-delay: 2s; /* Wait for the dossier to start decrypting */
+}
+
+@keyframes charge-up {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: var(--final-width);
+    }
+    /* Pass the value from Blazor */
 }

@@ -30,6 +30,7 @@
     "GitHubUrl": "https://github.com/mikey32905/TipTop",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
+    "LineCount": 850,
     "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   },
   {
@@ -52,6 +53,7 @@
     "GitHubUrl": "https://github.com/mikey32905/NowPlaying",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
+    "LineCount": 2900,
     "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   },
   {
@@ -66,6 +68,7 @@
     "GitHubUrl": "https://github.com/mikey32905/MovieMosaic-Live",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
+    "LineCount": 3400,
     "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   },
   {
@@ -156,6 +159,7 @@
     "GitHubUrl": "https://github.com/mikey32905/BlazorMortgageCalculator",
     "AccentColor": "#00F3FF",
     "Icon": "📦",
+    "LineCount": 1250,
     "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   }
 

@@ -47,7 +47,7 @@ namespace MWBlazorPortfolioSite.Models
 
         public string? DownloadUrl { get; set; }
         public string? Version { get; set; } = "v1.0.0";
-
+        public int LineCount { get; set; } // The "Neural Weight" of the module
         // This allows the JSON: "Metadata": { "KEY": "VALUE" } to be mapped automatically
         public Dictionary<string, string> Metadata { get; set; } = new();
 

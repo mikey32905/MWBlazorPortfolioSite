@@ -27,9 +27,9 @@ else
                         <img src="@($"{Nav.BaseUri}img/portfolioImages/portfolo-pic1(a).jpg")" class="profile-frame" />
                         <div class="bio-text">
                             <h3 class="typewriter-text">MW_OPERATOR</h3>
-                            <p class="status-line typewriter-text" style="animation-delay: 1s;">> STATUS: ACTIVE_DEVELOPER</p>
+                            <p class="status-line typewriter-text" style="animation-delay: 1.5s;">> STATUS: ACTIVE_DEVELOPER</p>
                            
-                            <p class="decode-fade" style="animation-delay: 2s; margin-top: 15px;">
+                            <p class="decode-fade" style="animation-delay: 3s; margin-top: 15px;">
                                 Specializing in full-stack C# architecture and WPF engineering.
                                 Passionate about building highly-performant, secure, and
                                 tactical user interfaces.
@@ -49,7 +49,8 @@ else
                                         <span class="skill-percent">@skill.Value%</span>
                                     </div>
                                     <div class="progress-container">
-                                        <div class="progress-bar" style="width: @skill.Value%; background: @skill.Color;"></div>
+                                    <div class="progress-bar"
+                                         style="--final-width: @(skill.Value)%; background: @skill.Color;"></div>
                                         <div class="progress-glow" style="width: @skill.Value%; box-shadow: 0 0 10px @skill.Color;"></div>
                                     </div>
                                 </div>
@@ -201,6 +202,9 @@ else
 
             await Task.Delay(1500);
             TerminalSvc.AddLog("IDENTITY_DECRYPTED: ACCESS_GRANTED", LogType.Success);
+
+            // Add a 'System' or 'Neural' log type that uses your current gold accent (#FFD700)
+            TerminalSvc.AddLog(">>> RECOGNIZED_USER: MICHAEL_W // IDENTITY_MODULE_MOUNTED", LogType.Success);
 
             // Triggers the terminal to scroll to the bottom
             StateHasChanged();

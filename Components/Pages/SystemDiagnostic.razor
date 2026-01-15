@@ -5,6 +5,7 @@
 @inject ThemeService ThemeSvc
 @implements IDisposable
 @inject ProjectStateService ProjectState
+@inject ProjectManifestService ManifestSvc
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Nav
 
@@ -12,8 +13,26 @@
     <div class="diag-header">
         <div class="header-main">
             <h1 class="glitch-title">SYSTEM_DIAGNOSTICS_V4.0</h1>
-            <div class="uptime-counter">UPTIME: <span class="glow-text">@UptimeString</span></div>
-        </div>
+            <div class="uptime-group">
+                <div class="uptime-counter">UPTIME: <span class="glow-text">@UptimeString</span></div>
+
+                <div class="session-info">
+                    <span class="label">SESSION_ACTIVE:</span>
+                    <span class="cyan-glow">@_sessionTime</span>
+
+                    <div class="connection-uplink">
+                        <span class="label">UPLINK:</span>
+                        <div class="signal-bars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="bar @(i <= GetBarCount() ? "active" : "")"></div>
+                            }
+                        </div>
+                        <span class="percent">@(_connectionStrength)%</span>
+                    </div>
+                </div>
+            </div>
+         </div>
         
         <div class="header-telemetry">
             <div class="core-load-group">
@@ -80,13 +99,37 @@
         <div class="diag-card">
             <h3 class="pane-title">> CORE_UTILIZATION</h3>
             <div class="radial-stats">
+                <div class="stat-main">
+                    <span class="stat-value">@ManifestSvc.Projects.Count</span>
+                    <span class="stat-label">TOTAL_ACTIVE_MODULES</span>
+                </div>
                 <div class="ring-container">
-                    <div class="ring" style="--p:85;--c:#00F3FF;">85% WEB</div>
-                    <div class="ring" style="--p:60;--c:#FFD700;">60% WPF</div>
+                    <div class="ring" style="--p:85;--c:#00F3FF;">85% WEB_DEPLOYMENTS</div>
+                    <div class="ring" style="--p:60;--c:#FFD700;">60% WPF_DESKTOP_NODES</div>
                 </div>
             </div>
         </div>
  
+        @* --- NEW NEURAL_MEMORY_STATE CARD --- *@
+        <div class="diag-card neural-memory-node">
+            <h3 class="pane-title">> NEURAL_MEMORY_STATE</h3>
+            <div class="util-content">
+                <div class="stat-main">
+                    @* This uses the helper method we discussed earlier *@
+                    <span class="stat-value">@ManifestSvc.GetFormattedNeuralWeight()</span>
+                    <span class="stat-label">TOTAL_LOC_WEIGHT</span>
+                </div>
+                <div class="memory-buffer">
+                    <div class="buffer-label">
+                        COMPLEXITY_INDEX: <span style="color: #BC13FE;">@ManifestSvc.GetSystemComplexityScore()</span>
+                    </div>
+                    <div class="buffer-bar">
+                        <div class="buffer-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="diag-card spec-list">
             <h3 class="pane-title">> HARDWARE_MANIFEST</h3>
             <div class="spec-table">
@@ -131,13 +174,28 @@
 
 </div>
 
+<div class="scroll-prompt">
+    <div class="mouse-icon">
+        <div class="wheel"></div>
+    </div>
+    <span class="prompt-text">SCROLL_FOR_TELEMETRY</span>
+</div>
+
+
 @code {
-   // [Inject] private IJSRuntime JSRuntime { get; set; }
+    private List<ProjectFile> ProjectFiles = new(); 
     private string UptimeString = "00:00:00";
     private int CpuLoad = 42;
+    private int _connectionStrength = 95; 
+    private string _sessionTime = "00:00:00";
+    private DateTime _startTime = DateTime.Now;
+    private Random _rng = new Random();
+
     private Timer? _timer;
     private Timer? logTimer;
     private Timer? cpuTimer;
+    private System.Threading.Timer? _sessonTimer;
+
     private ElementReference _logContainer;
     private int _previousLogCount = 0;
 
@@ -203,6 +261,17 @@
             InvokeAsync(StateHasChanged);
         }, null, 0, 2000);
 
+        _sessonTimer = new System.Threading.Timer(_ =>
+        {
+            var elapsed = DateTime.Now - _startTime;
+            _sessionTime = elapsed.ToString(@"hh\:mm\:ss");
+            
+            // Randomly fluctuate connection between 88 and 100
+            _connectionStrength = _rng.Next(88, 101); 
+          
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
+
         // Subscribe to state changes
         ProjectState.OnChange += HandleStateChange;
     }
@@ -220,6 +289,26 @@
         {
             
         }
+
+        if (firstRender)
+        {
+            // Attach a simple JS listener to hide the prompt on scroll
+            await JSRuntime.InvokeVoidAsync("eval", @"
+            window.addEventListener('scroll', () => {
+                const prompt = document.getElementById('scrollPrompt');
+                if (prompt) {
+                    // Hide when scrolled more than 100px
+                    if (window.scrollY > 100) {
+                        prompt.style.opacity = '0';
+                        prompt.style.visibility = 'hidden';
+                    } else {
+                        prompt.style.opacity = '0.8';
+                        prompt.style.visibility = 'visible';
+                    }
+                }
+            }, { passive: true });
+        ");
+        }
     }
 
     private void HandleStateChange()
@@ -228,6 +317,14 @@
         // We call StateHasChanged to ensure the UI stays in sync.
         InvokeAsync(StateHasChanged);
     }
+
+    private int GetBarCount() => _connectionStrength switch
+    {
+        > 98 => 5,
+        > 95 => 4,
+        > 92 => 3,
+        _ => 2
+    };
 
     private async Task ScrollToBottom()
     {
@@ -249,6 +346,7 @@
         // Make sure to dispose of the new log and cpu timers too!
         logTimer?.Dispose();
         cpuTimer?.Dispose(); 
+        _sessonTimer?.Dispose();
         ProjectState.OnChange -= HandleStateChange;
     }
 }

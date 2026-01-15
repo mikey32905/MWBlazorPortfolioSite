@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject ThemeService ThemeSvc
 @inject ProjectStateService ProjectState
-@inject ProjectManifestService Manifest
+@inject ProjectManifestService ManifestSvc
 @inject HttpClient Http
 @inject NavigationManager Nav
 
@@ -92,15 +92,11 @@
 
         await ProjectState.LoadProjects();
         // Only load if the list is currently empty
-        // if (ProjectState.ProjectFiles == null || !ProjectState.ProjectFiles.Any())
-        // {
-        //     var rawData = await Http.GetFromJsonAsync<List<ProjectFile>>("Data/projects.json");
-        //     if (rawData != null)
-        //     {
-        //         ProjectState.LoadProjects(rawData);//
-        //         StateHasChanged(); // Tell the sidebar to wake up and show the files
-        //     }
-        // }
+        // If for some reason it hasn't loaded yet, trigger it now
+        if (ManifestSvc.Projects.Count == 0)
+        {
+            await ManifestSvc.InitializeAsync();
+        }
        // await Manifest.InitializeAsync();
         // Subscribe to selection changes
         ProjectState.OnSelectedFileChanged += HandleFileSelection;
