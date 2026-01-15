@@ -1,0 +1,123 @@
+﻿@page "/loanshark"
+
+
+<div class="container-xxl my-3">
+    <h1 class="mb-2">Loan Calculator</h1>
+    <p>
+    If you’ve been thinking about borrowing money and are curious to see what payments would look like before you apply,
+    a loan calculator can be an ideal tool to help you figure this out.
+    </p>
+    <p>
+        Loan Shark’s loan calculator was designed to help borrowers calculate amortized loans. These are mortgages,
+        auto loans, student loans and other types of personal loans that are paid off in regular installments over time,
+        with fixed payments covering both the principal amount and interest. Our calculator shows you the total cost of a loan,
+        expressed as the annual percentage rate, or APR. Enter the loan amount, term and interest rate in the fields below and
+        click calculate to see your personalized results.
+    </p>
+
+    <div class="row">
+        <div class="col-12 col-md-6 loanForm p-3 rounded-3">
+            <EditForm EditContext="editContext" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                <div class="row gy-2">
+                    <div class="col-12">
+                        <label for="purchaseAmount" class="form-label">Purchase Amount:</label>
+                        <InputNumber id="purchaseAmount" @bind-Value="loan.PurchaseAmount" class="form-control" step="1000" />
+                        <ValidationMessage For="()=> loan.PurchaseAmount" />
+                    </div>
+                    <div class="col-12">
+                        <label for="loanTerm" class="form-label">Loan Term in Years:</label>
+                        <InputNumber id="loanTerm" @bind-Value="loan.Term" class="form-control" min="1" />
+                        <ValidationMessage For="()=> loan.Term" />
+                    </div>
+                    <div class="col-12">
+                        <label for="loanRate" class="form-label">Rate:</label>
+                        <InputNumber id="loanRate" @bind-Value="loan.Rate" class="form-control" min="0" step="0.1" />
+                        <ValidationMessage For="()=> loan.Rate" />
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary mt-3">Calculate</button>
+                    </div>
+                </div>
+
+            </EditForm>
+        </div>
+        <div class="col-12 col-md-6 d-flex flex-column justify-content-between px-4 mt-4 mt-md-0">
+            <div class="paymentTitle">
+                <p>Your Monthly Payments</p>
+            </div>
+
+            <div class="display-1 payment">
+                @loan.Payment.ToString("C")
+            </div>
+            <div class="row border border-1 g-0 p-3">
+                <div class="col-6">
+                    <label class="text-start">Purchase Amount</label>
+                </div>
+                <div class="col-6 text-end">
+                    @loan.PurchaseAmount.ToString("C")
+                </div>
+                <div class="col-6">
+                    <label class="text-start">Total Interest</label>
+                </div>
+                <div class="col-6 text-end">
+                    @loan.TotalInterest.ToString("C")
+                </div>
+                <div class="col-6">
+                    <label class="text-start">Total Cost</label>
+                </div>
+                <div class="col-6 text-end totalCost">
+                    @loan.TotalCost.ToString("C")
+                </div>
+            </div>
+            <div class="text-end mt-2">
+                <button class="btn btn-primary" @onclick="ShowScheduleToggle" >@showButtonText</button>
+            </div>
+        </div>
+        @if (showSchedule)
+        {
+            <div class="col-12 fade-in">
+                <PaymentSchedule Payments="loan.Payments" />
+            </div>
+        }
+
+    </div>
+</div>
+
+
+@code {
+    private Loan loan = new Loan();
+    private EditContext? editContext;
+    private bool showSchedule = false;
+    private string showButtonText = "Show Schedule";
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(loan);
+        loan.PurchaseAmount = 25000;
+        loan.Term = 5;
+        loan.Rate = 5.0;
+    }
+
+    private void HandleSubmit()
+    {
+        loan = LoanUtilities.GetPayments(loan);
+
+    }
+
+    private void ShowScheduleToggle()
+    {
+        if (showSchedule)
+        {
+            showSchedule = false;
+            showButtonText = "Show Schedule";
+        }
+        else
+        {
+            showSchedule = true;
+            showButtonText = "Hide Schedule";
+
+        }
+       
+    }
+}

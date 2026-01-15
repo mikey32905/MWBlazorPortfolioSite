@@ -19,24 +19,18 @@
     "Description": [ "RUNTIME_INTEGRITY_CHECK" ]
   },
   {
+    "Id": "tiptop_master",
     "FileName": "TipTop",
     "Extension": ".razor",
     "Category": "LIVE_APPS",
-    "LiveUrl": "https://tiptopcalculator.netlify.app/",
-    "AccentColor": "#00F3FF",
-    "Icon": "📦",
-    "Description": [ "WEB_ASSEMBLY_TIPCALCULATOR" ]
-  },
-  {
-    "FileName": "TipTop",
-    "Extension": ".razor",
-    "Category": "BLAZOR_WASM_CODE",
+    "Language": "html",
     "PhysicalPath": "Projects/TipTopApp/TipTop.razor.txt",
     "SourceUrl": "Projects/TipTopApp/TipTop.razor.txt",
-    "Language": "html",
-    "AccentColor": "#BC13FE",
-    "Icon": "🧠",
-    "Description": [ "WEB_ASSEMBLY_CODE_TIPCALCULATOR" ]
+    "LiveUrl": "https://tiptopcalculator.netlify.app/",
+    "GitHubUrl": "https://github.com/mikey32905/TipTop",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   },
   {
     "FileName": "Uplink",
@@ -47,45 +41,32 @@
     "Description": [ "SOCIAL_LINKS" ]
   },
   {
+    "Id": "nowshowing_master",
     "FileName": "NowShowing",
     "Extension": ".razor",
     "Category": "LIVE_APPS",
-    "LiveUrl": "https://mwnowshowing.netlify.app/",
-    "PhysicalPath": "Projects/NowShowing/Placeholder.txt",
-    "AccentColor": "#00F3FF",
-    "Icon": "📦",
-    "Description": [ "WEB_ASSEMBLY_USING_API" ]
-  },
-  {
-    "FileName": "NowShowing",
-    "Extension": ".razor",
-    "Category": "BLAZOR_WASM_CODE",
     "PhysicalPath": "Projects/NowShowing/NowShowing.razor.txt",
     "SourceUrl": "Projects/NowShowing/NowShowing.razor.txt",
     "Language": "html",
-    "AccentColor": "#BC13FE",
-    "Icon": "🧠",
-    "Description": [ "WEB_ASSEMBLY_CODE_MOVIE_SHOWTIME_VIEWER" ]
+    "LiveUrl": "https://mwnowshowing.netlify.app/",
+    "GitHubUrl": "https://github.com/mikey32905/NowPlaying",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   },
   {
+    "Id": "mediamosaic_master",
     "FileName": "MediaMosaic",
     "Extension": ".razor",
     "Category": "LIVE_APPS",
-    "LiveUrl": "https://moviemosaic-live-production.up.railway.app/",
-    "AccentColor": "#00F3FF",
-    "Icon": "📦",
-    "Description": [ "WEB_SERVER_APP_USING_API" ]
-  },
-  {
-    "FileName": "MediaMosaic",
-    "Extension": ".razor",
-    "Category": "BLAZOR_WASM_CODE",
     "PhysicalPath": "Projects/MediaMosaic/MediaMosaic.razor.txt",
     "SourceUrl": "Projects/MediaMosaic/MediaMosaic.razor.txt",
     "Language": "html",
-    "AccentColor": "#BC13FE",
-    "Icon": "🧠",
-    "Description": [ "WEB_SERVER_CODE_MOVIE_GUESSING_GAME" ]
+    "LiveUrl": "https://moviemosaic-live-production.up.railway.app/",
+    "GitHubUrl": "https://github.com/mikey32905/MovieMosaic-Live",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   },
   {
     "FileName": "SimpleImageViewer",
@@ -102,6 +83,7 @@
     ],
     "BlueprintUrl": "img/blueprints/SimpleImageViewer/SimpleImageViewer.png",
     "SourceUrl": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml",
+    "GitHubUrl": "https://github.com/mikey32905/SimpleImageViewerApp",
     "SupportingFiles": {
       "XAML": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml",
       "C#": "Data/source/SimpleImageViewer/SimpleImageViewer.xaml.cs",
@@ -129,6 +111,7 @@
     ],
     "BlueprintUrl": "img/blueprints/CloneHunter/CloneHunter.png",
     "SourceUrl": "Data/source/CloneHunter/CloneHunter.xaml",
+    "GitHubUrl": "https://github.com/mikey32905/CloneHunterApp",
     "SupportingFiles": {
       "XAML": "Data/source/CloneHunter/CloneHunter.xaml",
       "C#": "Data/source/CloneHunter/CloneHunter.xaml.cs",
@@ -160,7 +143,22 @@
     "SupportingFiles": {
       "XAML": "data/source/TitanVault.xaml"
     }
+  },
+  {
+    "Id": "loanshark_master",
+    "FileName": "LoanShark",
+    "Extension": ".razor",
+    "Category": "LIVE_APPS",
+    "PhysicalPath": "Projects/LoanShark/LoanSharkPage.razor.txt",
+    "SourceUrl": "Projects/LoanShark/LoanSharkPage.razor.txt",
+    "Language": "html",
+    "LiveUrl": "https://blazorloanshark.netlify.app/",
+    "GitHubUrl": "https://github.com/mikey32905/BlazorMortgageCalculator",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "Description": [ "WEB_ASSEMBLY_INTEGRATED_MODULE" ]
   }
+
 
 
 ]

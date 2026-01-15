@@ -546,22 +546,21 @@ SideBar[b-qtrtjoljry] {
 }*/
 /* /Components/Pages/IdentityView.razor.rz.scp.css */
 
-.identity-dossier[b-jkck17v7e6] {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 40px 20px 20px 20px; /* Increased top padding significantly */
+.identity-wrapper[b-jkck17v7e6] {
+    padding: 30px;
+    margin-left: 20px; /* Adjust this to match your sidebar width */
+    height: calc(100vh - 120px); /* Adjust to match your header height */
+    overflow-y: auto;
     box-sizing: border-box;
-    overflow: hidden; /* Prevent the container itself from scrolling */
 }
 
 .identity-grid[b-jkck17v7e6] {
-    flex: 1 1 auto; /* Let the grid take up remaining space */
     display: grid;
-    grid-template-columns: 260px 1fr 260px;
-    gap: 25px;
-    align-items: start; /* Vital: Aligns items to the top of the grid rows */
-    overflow: hidden;
+    /* This creates two columns: 60% for Bio/Skills and 40% for the Contact Form */
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+    align-items: start;
+    width: 100%;
 }
 
 [b-jkck17v7e6] .identity-grid {
@@ -572,6 +571,12 @@ SideBar[b-qtrtjoljry] {
     margin-top: 20px; /* Fixes the clipping at the top */
 }
 
+.identity-main[b-jkck17v7e6] {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between Bio and Skills */
+}
+
 /* Fix the 'Residue' by giving the editor a solid, non-transparent background */
 [b-jkck17v7e6] .data-pane {
     background-color: #0a0a0a !important;
@@ -579,6 +584,22 @@ SideBar[b-qtrtjoljry] {
     z-index: 5;
     position: relative;
     overflow: hidden;
+}
+
+.identity-layout[b-jkck17v7e6] {
+    /* Ensure the content starts below the header and away from the sidebar */
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    height: 100%;
+    overflow-y: auto; /* Allows scrolling if you add more skills later */
+}
+
+/* If you are using the workspace-grid, ensure it has a margin-left */
+.workspace-grid[b-jkck17v7e6] {
+    margin-top: 10px;
 }
 
 .identity-header[b-jkck17v7e6] {
@@ -668,6 +689,36 @@ SideBar[b-qtrtjoljry] {
     }
 }
 
+.progress-container[b-jkck17v7e6] {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.progress-bar[b-jkck17v7e6] {
+    height: 100%;
+    transition: width 1.5s ease-in-out;
+}
+
+.skill-label[b-jkck17v7e6] {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.profile-frame[b-jkck17v7e6] {
+    width: 150px;
+    border: 2px solid var(--accent-color);
+    padding: 5px;
+    filter: grayscale(1) contrast(1.2);
+    margin-bottom: 20px;
+}
+
 .data-pane[b-jkck17v7e6] {
     background: #000; /* Solid black background to hide anything behind it */
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -708,6 +759,37 @@ SideBar[b-qtrtjoljry] {
         gap: 12px; /* Pulls the log up close to the stats */
         justify-content: flex-start;
     }
+
+.profile-frame[b-jkck17v7e6] {
+    width: 140px;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+    margin-bottom: 10px;
+}
+
+.pane-content[b-jkck17v7e6] {
+    padding: 20px;
+}
+
+.bio-layout[b-jkck17v7e6] {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* Fix for the clipping at the top */
+.workspace-pane[b-jkck17v7e6] {
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+}
+
+.bio-text h3[b-jkck17v7e6] {
+    font-family: 'OCR A Extended', monospace;
+    color: var(--accent-color);
+    letter-spacing: 3px;
+    margin-top: 0;
+}
 
     .photo-frame[b-jkck17v7e6] {
         border: 2px solid #FFD700;
@@ -842,6 +924,16 @@ SideBar[b-qtrtjoljry] {
         white-space: nowrap;
     }
 
+.diagnostic-list[b-jkck17v7e6] {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.skill-row[b-jkck17v7e6] {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
     .timestamp[b-jkck17v7e6] {
         color: #555;
         margin-right: 8px;
@@ -960,161 +1052,557 @@ SideBar[b-qtrtjoljry] {
             opacity: 0;
         }
     }
-/* /Components/Pages/LiveAppViewer.razor.rz.scp.css */
-.live-app-container[b-jwjobzrr1p] {
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Important: Takes full height of main-stage */
-    width: 100%;
-    background: #000;
+
+.data-pane[b-jkck17v7e6], .code-viewport[b-jkck17v7e6], .code-overlay-container[b-jkck17v7e6] {
+    /* 1. Ensure absolute opacity */
+    background-color: #0b0b0b !important;
+    /* 2. Force a new stacking context */
+    z-index: 10;
+    position: relative;
+    /* 3. Hardware acceleration - forces the browser to 
+       render this on the GPU, preventing 'trail' artifacts */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    /* 4. Kill the scroll bleed */
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.app-toolbar[b-jwjobzrr1p] {
-    height: 40px;
-    background: #111;
+.terminal-form[b-jkck17v7e6] {
+    padding: 20px;
     display: flex;
-    align-items: center;
-    padding: 0 15px;
-    border-bottom: 1px solid #333;
+    flex-direction: column;
     gap: 15px;
 }
 
-.status-light[b-jwjobzrr1p] {
-    width: 8px;
-    height: 8px;
-    background: #00FF41;
-    border-radius: 50%;
-    box-shadow: 0 0 5px #00FF41;
-}
-
-.address-bar[b-jwjobzrr1p] {
-    flex-grow: 1;
-    background: #000;
-    color: #888;
-    font-size: 0.7rem;
-    padding: 5px 10px;
-    border: 1px solid #222;
-    font-family: 'Fira Code', monospace;
-}
-
-/*.iframe-wrapper {
-    width: 100%;
-    height: calc(100vh - 250px);*/ /* Leave room for terminal and header */
-    /*overflow: hidden;
-    position: relative;
-    background: #000;
-    border: 1px solid var(--accent-glow);
-}
-
-.app-frame {*/
-    /* Scale the content to 80% if it feels too big */
-    /*width: 125%;*/ /* Increase width to 125% then scale back to 100% (125 * 0.8 = 100) */
-    /*height: 125%;
-    transform: scale(0.8);
-    transform-origin: 0 0;
-    border: none;
-}
-
-.app-viewer-frame {
-    background-color: #ffffff;*/ /* Some sites expect a white background to render colors correctly */
-    /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) inset;
-    filter: contrast(1.1);*/ /* Optional: Sharpen the colors slightly */
-/*}*/
-
-.app-header[b-jwjobzrr1p] {
+.input-line[b-jkck17v7e6] {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background: #111;
-    padding: 10px 20px;
-    border-bottom: 1px solid #333;
-    font-family: 'Fira Code', monospace;
+    gap: 10px;
 }
 
-.outbound-link[b-jwjobzrr1p] {
-    color: var(--accent-glow);
-    text-decoration: none;
-    font-size: 0.75rem;
-    padding: 4px 12px;
-    border: 1px solid rgba(var(--accent-rgb), 0.3);
-    transition: 0.3s;
+.prompt[b-jkck17v7e6] {
+    color: var(--accent-color);
+    font-size: 0.8rem;
 }
 
-    .outbound-link:hover[b-jwjobzrr1p] {
-        background: rgba(var(--accent-rgb), 0.1);
-        border-color: var(--accent-glow);
-        box-shadow: 0 0 10px var(--accent-glow);
+.term-input[b-jkck17v7e6] {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    font-family: monospace;
+    width: 100%;
+    outline: none;
+}
+
+    .term-input:focus[b-jkck17v7e6] {
+        border-color: var(--accent-color);
+        box-shadow: 0 1px 0 var(--accent-color);
     }
 
-.viewport-wrapper[b-jwjobzrr1p] {
-    flex-grow: 1;
-    position: relative;
-    background: #000;
+.transmit-btn[b-jkck17v7e6] {
+    margin-top: 10px;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px;
+    cursor: pointer;
 }
 
-/*.app-viewport {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-*/
-.status-blip[b-jwjobzrr1p] {
+.typewriter-text[b-jkck17v7e6] {
     display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: #00ff00;
-    border-radius: 50%;
-    margin-right: 10px;
-    box-shadow: 0 0 5px #00ff00;
+    overflow: hidden; /* Ensures the content is not revealed until the animation */
+    border-right: .5em solid var(--accent-color); /* The typewriter cursor */
+    white-space: nowrap; /* Keeps the content on a single line */
+    margin: 0 auto;
+    letter-spacing: .1em;
+    animation: typing-b-jkck17v7e6 3.5s steps(40, end), blink-caret-b-jkck17v7e6 .75s step-end infinite;
 }
 
-.loading-overlay[b-jwjobzrr1p] {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 5;
+/* The typing effect */
+@keyframes typing-b-jkck17v7e6 {
+    from {
+        width: 0
+    }
+
+    to {
+        width: 100%
+    }
 }
 
-.loading-bar[b-jwjobzrr1p] {
-    width: 200px;
-    height: 2px;
-    background: #222;
-    margin-top: 15px;
-    overflow: hidden;
+/* The typewriter cursor effect */
+@keyframes blink-caret-b-jkck17v7e6 {
+    from, to {
+        border-color: transparent
+    }
+
+    50% {
+        border-color: var(--accent-color);
+    }
 }
 
-.progress[b-jwjobzrr1p] {
-    width: 100%;
-    height: 100%;
-    background: var(--accent-glow);
-    animation: loading-scan-b-jwjobzrr1p 1.5s infinite;
+/* For longer paragraphs that need to wrap, we use a fade-in instead */
+.decode-fade[b-jkck17v7e6] {
+    animation: decode-glitch-b-jkck17v7e6 2s ease-out forwards;
 }
 
-@keyframes loading-scan-b-jwjobzrr1p {
+@keyframes decode-glitch-b-jkck17v7e6 {
     0% {
-        transform: translateX(-100%);
+        opacity: 0;
+        filter: blur(10px);
     }
 
     100% {
-        transform: translateX(100%);
+        opacity: 1;
+        filter: blur(0);
     }
 }
 
-.app-viewport[b-jwjobzrr1p] {
+.progress-glow[b-jkck17v7e6] {
+    animation: pulse-glow-b-jkck17v7e6 2s infinite alternate;
+}
+
+@keyframes pulse-glow-b-jkck17v7e6 {
+    from {
+        opacity: 0.4;
+    }
+
+    to {
+        opacity: 0.8;
+        box-shadow: 0 0 15px var(--accent-color);
+    }
+}
+
+.decode-fade[b-jkck17v7e6] {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(5px);
+    animation: reveal-text-b-jkck17v7e6 1.5s ease-out forwards;
+}
+
+@keyframes reveal-text-b-jkck17v7e6 {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+/* /Components/Pages/LiveAppViewer.razor.rz.scp.css */
+.workspace-grid[b-jwjobzrr1p] {
+    display: grid;
+    /* Column 1 (App): 1 part | Column 2 (Code): 1.5 parts | Column 3 (Dossier): 250px */
+    grid-template-columns: 1fr 1.5fr 280px;
+    height: calc(100vh - 200px);
+    width: 100%;
+    gap: 5px;
+}
+
+.workspace-pane[b-jwjobzrr1p] {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #050505;
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    overflow: hidden;
+}
+
+.code-container[b-jwjobzrr1p] {
+    background-color: #050505 !important;
+    min-height: 200px;
+    position: relative;
+    /* This creates a 'Solid Layer' that blocks the ghosting from the back */
+    contain: paint;
+    z-index: 2;
+}
+
+.pane-header[b-jwjobzrr1p] {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important; /* Forces title left, button right */
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 5px 15px;
+    background: rgba(0, 243, 255, 0.05); /* Cyan tint */
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.3);
+    min-height: 40px;
+}
+
+.header-path[b-jwjobzrr1p] {
+    flex: 1; /* Takes remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'Courier New', monospace;
+}
+
+.status-indicator[b-jwjobzrr1p] {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+    box-shadow: 0 0 8px var(--accent-color);
+    animation: heartbeat-b-jwjobzrr1p 2s infinite;
+}
+
+@keyframes heartbeat-b-jwjobzrr1p {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.external-link-btn[b-jwjobzrr1p] {
+    display: inline-block !important;
+    flex-shrink: 0; /* Prevents button from being squashed */
+    margin-left: 10px;
+    padding: 4px 10px;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color) !important;
+    font-size: 0.65rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    background: transparent;
+    cursor: pointer;
+    z-index: 100; /* Ensures it's above the iframe */
+}
+
+    .external-link-btn:hover[b-jwjobzrr1p] {
+        background: var(--accent-color);
+        color: #000 !important;
+        box-shadow: 0 0 10px var(--accent-color);
+    }
+
+.workspace-grid[b-jwjobzrr1p] {
+    display: grid;
+    /* This creates two equal columns with a small gap for the accent border */
+    grid-template-columns: 1fr 1fr;
+    height: calc(100vh - 220px); /* Leave room for header and terminal */
+    gap: 4px;
+    background: #000;
+    padding: 10px;
+}
+
+.workspace-bridge[b-jwjobzrr1p] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-size: 0.6rem;
+    color: var(--accent-color);
+    text-orientation: sideways; /* Makes text vertical for a techy look */
+}
+
+.stream-line[b-jwjobzrr1p] {
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--accent-color), transparent);
+    animation: flow-down-b-jwjobzrr1p 2s infinite linear;
+}
+
+@keyframes flow-down-b-jwjobzrr1p {
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+.code-wrapper[b-jwjobzrr1p] {
+    background: #050505 !important;
+    position: relative;
+    z-index: 5;
+    /* This prevents the "LOADING..." text from staying visible 
+       once the real code arrives */
+    overflow: hidden;
+}
+
+/* Ensure the app view doesn't clip */
+.app-view-port[b-jwjobzrr1p] {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 20px 20px; /* Subtle tech-grid background */
+}
+
+.code-container[b-jwjobzrr1p], .preview-frame[b-jwjobzrr1p] {
+    /* This ensures that even if the content fails, the box is opaque */
+    background: #000 !important;
+    display: block;
+    position: relative;
+    overflow: hidden;
+    /* Force new layer to stop text smearing */
+    isolation: isolate;
+}
+
+/* Add a solid divider to separate the two panes visually and physically */
+.workspace-pane[b-jwjobzrr1p]::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+    z-index: 5;
+}
+
+.preview-frame[b-jwjobzrr1p] {
+    background-color: #000000 !important; /* Pure black to prevent bleed-through */
+    position: relative;
+    overflow: hidden;
+    /* This creates a hard clipping boundary for the iframe */
+    contain: strict;
+    /* Forces the browser to treat this as a separate layer */
+    transform: translate3d(0, 0, 0);
+}
+
+.live-side[b-jwjobzrr1p] {
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Ensure the pane fills the grid row */
+    min-height: 500px; /* Force a minimum height so it can't collapse */
+    background: #000 !important;
+}
+
+.app-iframe[b-jwjobzrr1p] {
     width: 100%;
     height: 100%;
     border: none;
-    transition: opacity 0.5s ease;
+    display: block;
 }
 
-    .app-viewport.hidden[b-jwjobzrr1p] {
-        opacity: 0;
+.remote-feed-container[b-jwjobzrr1p] {
+    flex: 1; /* Fills all vertical space in the pane */
+    position: relative;
+    width: 100%;
+    background: #000;
+}
+
+.remote-feed-container[b-jwjobzrr1p], .code-view-port[b-jwjobzrr1p] {
+    flex: 1; /* This forces the content to fill the pane height */
+    position: relative;
+    width: 100%;
+}
+
+.workspace-grid[b-jwjobzrr1p] {
+    display: grid;
+    /* App and Code take equal space, Telemetry takes 250px */
+    grid-template-columns: 1fr 1.2fr 250px;
+    height: calc(100vh - 200px);
+    gap: 2px;
+}
+
+.telemetry-content[b-jwjobzrr1p] {
+    padding: 20px;
+    font-size: 0.7rem;
+    color: #888;
+}
+
+.spec-group[b-jwjobzrr1p] {
+    margin-bottom: 25px;
+}
+
+.tag[b-jwjobzrr1p] {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    margin: 2px;
+    font-size: 0.6rem;
+}
+
+.telemetry-footer[b-jwjobzrr1p] {
+    margin-top: auto; /* Pushes the button to the bottom of the pane */
+    padding-top: 20px;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+}
+
+.action-area[b-jwjobzrr1p] {
+    margin-top: 15px;
+    padding: 10px 0;
+}
+
+.launch-node-btn[b-jwjobzrr1p] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color) !important;
+    padding: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+    .launch-node-btn:hover[b-jwjobzrr1p] {
+        background: var(--accent-color);
+        color: #000 !important;
+        box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.5);
     }
 
-    .app-viewport.visible[b-jwjobzrr1p] {
+.btn-subtext[b-jwjobzrr1p] {
+    font-size: 0.5rem;
+    opacity: 0.7;
+    margin-top: 4px;
+    letter-spacing: 1px;
+}
+
+/* Static Preview Styling */
+.static-preview-wrapper[b-jwjobzrr1p] {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #080808;
+    position: relative;
+}
+
+.static-svg[b-jwjobzrr1p] {
+    width: 60%;
+    opacity: 0.6;
+    filter: drop-shadow(0 0 10px var(--accent-color));
+}
+
+.preview-overlay[b-jwjobzrr1p] {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--accent-color);
+}
+
+/* Copy Button Styling */
+.path-container[b-jwjobzrr1p] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.03);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.copy-btn[b-jwjobzrr1p] {
+    background: transparent;
+    border: none;
+    color: var(--accent-color);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+    .copy-btn:hover[b-jwjobzrr1p] {
         opacity: 1;
+    }
+
+.github-repo-btn[b-jwjobzrr1p] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid rgba(var(--accent-rgb), 0.5);
+    color: var(--accent-color) !important;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .github-repo-btn:hover[b-jwjobzrr1p] {
+        background: rgba(var(--accent-rgb), 0.2);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+    }
+
+.github-icon[b-jwjobzrr1p] {
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+.github-repo-btn:hover .github-icon[b-jwjobzrr1p] {
+    color: #000;
+    filter: none; /* Icon turns black when button fills on hover */
+}
+
+/* Only show the warning on screens smaller than 1024px (Tablets/Phones) */
+.mobile-warning-overlay[b-jwjobzrr1p] {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+}
+
+@media (max-width: 1024px) {
+    .mobile-warning-overlay[b-jwjobzrr1p] {
+        display: flex;
+    }
+}
+
+.warning-box[b-jwjobzrr1p] {
+    max-width: 400px;
+    width: 90%;
+    border: 2px solid #ff3e3e;
+    padding: 40px;
+    background: #050505;
+    text-align: left;
+}
+
+.warning-header[b-jwjobzrr1p] {
+    color: #ff3e3e; /* Red Alert */
+    font-weight: bold;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+}
+
+.warning-dismiss-btn[b-jwjobzrr1p] {
+    margin-top: 25px;
+    background: transparent;
+    border: 1px solid #ff3e3e;
+    color: #ff3e3e;
+    padding: 10px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .warning-dismiss-btn:hover[b-jwjobzrr1p] {
+        background: #ff3e3e;
+        color: #000;
+        box-shadow: 0 0 15px #ff3e3e;
     }
 /* /Components/Pages/PortfolioPage.razor.rz.scp.css */
 .sidebar-area[b-gwtg38lak8] {
@@ -1170,6 +1658,19 @@ SideBar[b-qtrtjoljry] {
         background: var(--accent-glow);
         color: #000;
     }
+
+.code-container[b-vtuwjkuwjl], .workspace-pane[b-vtuwjkuwjl] {
+    /* 1. Force a solid, opaque background */
+    background-color: #080808 !important;
+    /* 2. Isolation: Creates a new stacking context */
+    isolation: isolate;
+    /* 3. Disable transparency artifacts */
+    backface-visibility: hidden;
+    /* 4. Hardware Acceleration: Move the pane to the GPU */
+    transform: translateZ(0);
+    /* 5. Fix for Chromium ghosting on GitHub */
+    contain: content;
+}
 /* /Components/Pages/SystemDiagnostic.razor.rz.scp.css */
 .diag-container[b-c0zplftz32] {
     padding: 40px;
@@ -2048,6 +2549,38 @@ SideBar[b-qtrtjoljry] {
     white-space: nowrap; /* Prevent wrapping */
     overflow: hidden;
     text-overflow: ellipsis; /* Add ... if text is too long */
+}
+
+.github-repo-btn[b-jjf4taoihk] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: transparent;
+    border: 1px solid rgba(var(--accent-rgb), 0.5);
+    color: var(--accent-color) !important;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .github-repo-btn:hover[b-jjf4taoihk] {
+        background: rgba(var(--accent-rgb), 0.2);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+    }
+
+.github-icon[b-jjf4taoihk] {
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 5px var(--accent-color));
+}
+
+.github-repo-btn:hover .github-icon[b-jjf4taoihk] {
+    color: #000;
+    filter: none; /* Icon turns black when button fills on hover */
 }
 
 /* This is the actual scrolling box */
