@@ -5,6 +5,7 @@
 @inject ThemeService ThemeSvc
 @inject IJSRuntime JS
 @inject NavigationManager Nav
+@inject CommunicationService CommsSvc
 
 <div class="uplink-container">
     <div class="identity-header">
@@ -54,21 +55,21 @@
             <div class="terminal-body">
                 <div class="input-line">
                     <span class="prompt">GUEST@PORTFOLIO:~$ IDENT_SOURCE --input</span>
-                    <input type="text" @bind="contactName" class="cmd-input" placeholder="ENTER_NAME_OR_EMAIL..." />
+                    <input type="text" @bind="contactModel.Name" class="cmd-input" placeholder="ENTER_NAME_OR_EMAIL..." />
                 </div>
 
                 <div class="input-line">
                     <span class="prompt">GUEST@PORTFOLIO:~$ SUBJECT_LINE --set</span>
-                    <input type="text" @bind="contactSubject" class="cmd-input" placeholder="REASON_FOR_CONTACT..." />
+                    <input type="text" @bind="contactModel.Email" class="cmd-input" placeholder="REASON_FOR_CONTACT..." />
                 </div>
 
                 <div class="input-line message-line">
                     <span class="prompt">GUEST@PORTFOLIO:~$ MESSAGE_BODY --write</span>
-                    <textarea @bind="contactMessage" class="cmd-input cmd-textarea" rows="6" placeholder="TYPE_MESSAGE_DATA_HERE..."></textarea>
+                    <textarea @bind="contactModel.Message" class="cmd-input cmd-textarea" rows="6" placeholder="TYPE_MESSAGE_DATA_HERE..."></textarea>
                 </div>
 
                 <div class="action-line">
-                    <button @onclick="HandleTransmission" class="transmit-btn">
+                    <button @onclick="HandleTransmission" class="transmit-btn @(isLocked ? "locked" : "")">
                         [ EXECUTE_TRANSMISSION ]
                     </button>
                 </div>
@@ -107,12 +108,16 @@
 
 @code {
 
-    private string contactName = "";
-    private string contactSubject = "";
-    private string contactMessage = "";
+    // private string contactName = "";
+    // private string contactSubject = "";
+    // private string contactMessage = "";
     private bool isTransmitting = false;
     private string progressDisplay = "";
     private int transmissionProgress = 0;
+
+    private ContactForm contactModel = new();
+    private int cooldownSeconds = 0;
+    private bool isLocked => cooldownSeconds > 0;
 
     private List<SocialLink> SocialLinks = new()
     {
@@ -137,71 +142,46 @@
 
     private async Task HandleTransmission()
     {
-        if (string.IsNullOrWhiteSpace(contactName) || string.IsNullOrWhiteSpace(contactMessage)) return;
+        if (isLocked || isTransmitting) return;
+
+
+        if (string.IsNullOrWhiteSpace(contactModel.Name) || string.IsNullOrWhiteSpace(contactModel.Message)) return;
 
         isTransmitting = true;
         transmissionProgress = 0;
 
         TerminalSvc.AddLog(">>> INITIATING_UPLINK_PROTOCOL...", LogType.System);
 
-        // Simulate a multi-stage transmission process
-        while (transmissionProgress < 100)
-        {
-            transmissionProgress += new Random().Next(5, 15);
-            if (transmissionProgress > 100) transmissionProgress = 100;
+        isTransmitting = true;
+        TerminalSvc.AddLog("ENCRYPTING_PACKET...", LogType.Info);
 
-            StateHasChanged();
-            await Task.Delay(200); // Give it that "crunchy" data feel
+        
+
+        // Call the JS function we created in step 2
+        // var success = await JS.InvokeAsync<bool>("sendEmail",
+        //     "service_lcjfrme",
+        //     "template_wxstuk8",
+        //     templateParams);
+
+        var success = await CommsSvc.SendUplinkMessage(contactModel);
+
+        if (success)
+        {
+            TerminalSvc.AddLog("DATA_PAYLOAD_SIZE: 124_BYTES", LogType.System);
+            TerminalSvc.AddLog("TRANSMISSION_SUCCESSFUL: 200_OK", LogType.Success);
+
+            // Start 60-second cooldown
+            cooldownSeconds = 60;
+            _ = StartCooldownTimer();
+
+            contactModel = new(); // Clear form
+        }
+        else
+        {
+            TerminalSvc.AddLog("TRANSMISSION_ERROR: UPLINK_FAILED", LogType.Error);
         }
 
-        TerminalSvc.AddLog($">>> PACKET_SENT: FROM_{contactName.ToUpper().Replace(" ", "_")}", LogType.Success);
-
-        // Hold the success screen for a moment
-        await Task.Delay(1000);
-
         isTransmitting = false;
-        contactName = ""; contactSubject = ""; contactMessage = "";
-        StateHasChanged();
-        // // Prevent multiple clicks while transmission is in progress
-        // if (isTransmitting) return;
-        // isTransmitting = true;
-
-        // // 1. Initial System Handshake
-        // TerminalSvc.AddToTerminal(">>> INITIATING_SECURE_UPLINK...");
-        // TerminalSvc.AddToTerminal(">>> ENCRYPTING_DATA_PACKETS (AES-256)...");
-        // await Task.Delay(400); // Brief pause for realism
-
-        // // 2. Pure C# Progress Bar Logic
-        // int totalBlocks = 20;
-        // for (int i = 1; i <= totalBlocks; i++)
-        // {
-        //     // Creates the filling bar: [■■■■      ]
-        //     string blocks = new string('■', i).PadRight(totalBlocks, ' ');
-        //     int percent = (int)((i / (float)totalBlocks) * 100);
-
-        //     // Update the terminal with the current progress
-        //     TerminalSvc.AddToTerminal($"[TRANSMISSION]: [{blocks}] {percent}%");
-
-        //     // Force the UI to refresh so we see the bar move
-        //     StateHasChanged();
-
-        //     // Control the speed of the "upload"
-        //     await Task.Delay(80);
-        // }
-
-        // // 3. Finalization
-        // TerminalSvc.AddToTerminal(">>> UPLINK_COMPLETE. HANDSHAKE_SUCCESSFUL.");
-        // TerminalSvc.AddToTerminal(">>> OPENING_EXTERNAL_MAIL_CLIENT...");
-
-        // await Task.Delay(600); // Final dramatic pause
-
-        // // 4. Trigger the Email
-        // // Using your specific email and the bound fields from your terminal form
-        // var mailto = $"mailto:mikey32905@1791.com?subject={Uri.EscapeDataString(contactSubject)}&body={Uri.EscapeDataString(contactMessage)}";
-        // Nav.NavigateTo(mailto);
-
-        // // Reset state for future messages
-        // isTransmitting = false;
     }
 
     // This method is called by the JavaScript to update the live terminal
@@ -210,6 +190,16 @@
     {
         // You'll need a way to update your terminal service here
         // e.g., TerminalService.CurrentLine = $"PROGRESS: [{progress}]";
+    }
+
+    private async Task StartCooldownTimer()
+    {
+        while (cooldownSeconds > 0)
+        {
+            await Task.Delay(1000);
+            cooldownSeconds--;
+            StateHasChanged();
+        }
     }
 
     private void LogHover(string target)

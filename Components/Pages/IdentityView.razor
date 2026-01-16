@@ -7,6 +7,7 @@
 @inject IJSRuntime JS
 @inject NavigationManager Nav
 @inject HttpClient Http
+@inject CommunicationService CommsSvc
 
 
 @if (ProjectState.SelectedFile == null)
@@ -65,17 +66,17 @@ else
                     <div class="terminal-form">
                      <div class="input-line">
                             <span class="prompt">NAME:</span>
-                            <input type="text" class="term-input" placeholder="ENTER_NAME..." />
+                        <input type="text" @bind="contactModel.Name" class="term-input" placeholder="ENTER_NAME..." />
                      </div>
                      <div class="input-line">
                             <span class="prompt">EMAIL:</span>
-                            <input type="email" class="term-input" placeholder="ENTER_RETURN_PATH..." />
+                        <input type="email" @bind="contactModel.Email" class="term-input" placeholder="ENTER_RETURN_PATH..." />
                      </div>
                      <div class="input-line">
                             <span class="prompt">MESSAGE:</span>
-                            <textarea class="term-input" rows="4" placeholder="TRANSMIT_DATA..."></textarea>
+                            <textarea @bind="contactModel.Message" class="term-input" rows="4" placeholder="TRANSMIT_DATA..."></textarea>
                      </div>
-                    <button class="transmit-btn" @onclick="HandleTransmission">EXECUTE_TRANSMISSION</button>
+                    <button class="transmit-btn @(isTransmitting ? "loading" : "")" @onclick="HandleTransmission">EXECUTE_TRANSMISSION</button>
                     </div>
              </div>
         </div>
@@ -92,6 +93,11 @@ else
     private ProjectFile? identityFile;
     private bool isFlipped = false;
     private System.Timers.Timer? flipTimer;
+
+    private ContactForm contactModel = new();
+    private bool isTransmitting = false;
+    private int cooldownSeconds = 0;
+    private bool isLocked => cooldownSeconds > 0;
 
     private List<SkillItem> MySkills = new()
     {
@@ -211,16 +217,58 @@ else
         }
     }
 
-    private void HandleTransmission()
+    private async Task HandleTransmission()
     {
+        if (isLocked || isTransmitting) return;
+
         TerminalSvc.AddLog("DATA_PACKET_QUEUED...", LogType.Info);
         TerminalSvc.AddLog("TRANSMITTING_VIA_SECURE_TUNNEL...", LogType.Warning);
 
-        // Simulate a successful send
-        Task.Delay(1000).ContinueWith(_ =>
+        if (string.IsNullOrWhiteSpace(contactModel.Email) || isTransmitting) return;
+
+        isTransmitting = true;
+        TerminalSvc.AddLog("ENCRYPTING_PACKET...", LogType.Info);
+
+        // var templateParams = new
+        // {
+        //     from_name = contactModel.Name,
+        //     reply_to = contactModel.Email,
+        //     message = contactModel.Message
+        // };
+
+        // Call the JS function we created in step 2
+        // var success = await JS.InvokeAsync<bool>("sendEmail",
+        //     "service_lcjfrme",
+        //     "template_wxstuk8",
+        //     templateParams);
+        var success = await CommsSvc.SendUplinkMessage(contactModel);
+
+        if (success)
         {
-            TerminalSvc.AddLog("TRANSMISSION_COMPLETE: 200_OK", LogType.Success);
-        });
+            TerminalSvc.AddLog("TRANSMISSION_SUCCESSFUL: 200_OK", LogType.Success);
+
+            // Start 60-second cooldown
+            cooldownSeconds = 60;
+            _ = StartCooldownTimer();
+
+            contactModel = new(); // Clear form
+        }
+        else
+        {
+            TerminalSvc.AddLog("TRANSMISSION_ERROR: UPLINK_FAILED", LogType.Error);
+        }
+
+        isTransmitting = false;
+    }
+
+    private async Task StartCooldownTimer()
+    {
+        while (cooldownSeconds > 0)
+        {
+            await Task.Delay(1000);
+            cooldownSeconds--;
+            StateHasChanged();
+        }
     }
 
     public void Dispose()

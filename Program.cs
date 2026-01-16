@@ -15,7 +15,8 @@ builder.Services.AddScoped<TerminalService>();
 builder.Services.AddScoped<ProjectStateService>();
 builder.Services.AddScoped<PortfolioImageService>();
 builder.Services.AddScoped<ProjectManifestService>();
-
+builder.Services.AddScoped<CommunicationService>();
+builder.Services.AddSingleton<AudioService>();
 builder.Services.AddScoped(sp =>
 {
     var options = new JsonSerializerOptions

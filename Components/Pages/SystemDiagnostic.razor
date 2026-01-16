@@ -8,6 +8,8 @@
 @inject ProjectManifestService ManifestSvc
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Nav
+@inject CommunicationService CommsSvc
+@inject AudioService AudioSvc
 
 <div class="diag-container">
     <div class="diag-header">
@@ -29,6 +31,19 @@
                             }
                         </div>
                         <span class="percent">@(_connectionStrength)%</span>
+                    </div>
+
+                    <div class="mute-toggle" @onclick="ToggleAudio">
+                        <span class="label">AUDIO_OUTPUT:</span>
+                        <span class="@(CommsSvc.IsMuted ? "muted-text" : "active-text")">
+                            @(CommsSvc.IsMuted ? "[DISABLED]" : "[ENABLED]")
+                        </span>
+                    </div>
+
+                    <div class="sync-indicator @(isSyncing ? "syncing" : "")">
+                        <svg viewBox="0 0 24 24" class="sync-icon">
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -106,6 +121,10 @@
                 <div class="ring-container">
                     <div class="ring" style="--p:85;--c:#00F3FF;">85% WEB_DEPLOYMENTS</div>
                     <div class="ring" style="--p:60;--c:#FFD700;">60% WPF_DESKTOP_NODES</div>
+                </div>
+                <div class="comms-stat-line">
+                    <span class="label">COMMS_TRANSFERRED:</span>
+                    <span class="val">@CommsSvc.TransmissionCount.ToString("D2")_PACKETS</span>
                 </div>
             </div>
         </div>
@@ -190,6 +209,7 @@
     private string _sessionTime = "00:00:00";
     private DateTime _startTime = DateTime.Now;
     private Random _rng = new Random();
+    private bool isSyncing = false;
 
     private Timer? _timer;
     private Timer? logTimer;
@@ -267,13 +287,57 @@
             _sessionTime = elapsed.ToString(@"hh\:mm\:ss");
             
             // Randomly fluctuate connection between 88 and 100
-            _connectionStrength = _rng.Next(88, 101); 
+            _connectionStrength = _rng.Next(85, 101); 
           
+            if (_connectionStrength < 90)
+            {
+                _logs.Insert(0, "!! SYNC_ERROR: UPLINK_DEGRADATION_DETECTED !!");
+                // Optional: play a low-frequency warning beep
+                if (!CommsSvc.IsMuted) AudioSvc.PlaySystemSound("warning");
+            }
+
+
             InvokeAsync(StateHasChanged);
         }, null, 0, 1000);
 
+        // Subscribe to the event
+        CommsSvc.OnTransmissionSuccess += RefreshUI;
         // Subscribe to state changes
         ProjectState.OnChange += HandleStateChange;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load preference on startup
+        var savedMute = await JSRuntime.InvokeAsync<string>("localStorageFunctions.getItem", "sys_audio_mute");
+        if (!string.IsNullOrEmpty(savedMute))
+        {
+            CommsSvc.IsMuted = bool.Parse(savedMute);
+        }
+
+        CommsSvc.OnTransmissionSuccess += RefreshUI;
+    }
+
+    private async void RefreshUI()
+    {
+        // This forces the page to re-render even if the user is just sitting there
+        InvokeAsync(StateHasChanged);
+
+        // Icon spins for 1 second on every new packet
+        await Task.Delay(1500);
+        isSyncing = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ToggleAudio()
+    {
+        CommsSvc.IsMuted = !CommsSvc.IsMuted;
+        // Optionally save to localStorage here using your JS helpers
+
+        // Save preference to browser storage
+        await JSRuntime.InvokeVoidAsync("localStorageFunctions.setItem", "sys_audio_mute", CommsSvc.IsMuted.ToString().ToLower());
+
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -347,6 +411,7 @@
         logTimer?.Dispose();
         cpuTimer?.Dispose(); 
         _sessonTimer?.Dispose();
+        CommsSvc.OnTransmissionSuccess -= RefreshUI;
         ProjectState.OnChange -= HandleStateChange;
     }
 }
