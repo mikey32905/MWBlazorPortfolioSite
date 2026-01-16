@@ -2184,10 +2184,27 @@ SideBar[b-qtrtjoljry] {
 .session-info[b-c0zplftz32] {
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-size: 0.65rem;
-    font-family: 'Courier New', monospace;
+    gap: 24px;
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: rgba(var(--accent-rgb), 0.05);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    border-radius: 4px;
 }
+
+    .session-info .label[b-c0zplftz32] {
+        font-size: 0.85rem; /* Increased significantly */
+        letter-spacing: 1.5px;
+        color: #888;
+    }
+
+    .session-info .cyan-glow[b-c0zplftz32],
+    .session-info .percent[b-c0zplftz32],
+    .session-info .val-text[b-c0zplftz32] {
+        font-size: 1.1rem; /* Larger numeric values */
+        font-family: 'OCR A Extended', monospace;
+        color: var(--accent-color);
+    }
 
 .connection-uplink[b-c0zplftz32] {
     display: flex;
@@ -2238,6 +2255,81 @@ SideBar[b-qtrtjoljry] {
 .cyan-glow[b-c0zplftz32] {
     color: #00F3FF;
     text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+}
+
+/* Specific targeting for the comms stat line to ensure readability */
+.comms-stat-line[b-c0zplftz32] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+    .comms-stat-line .label[b-c0zplftz32] {
+        font-size: 0.75rem;
+        letter-spacing: 3px;
+        color: #666;
+        margin-top: 8px;
+    }
+
+    .comms-stat-line .val[b-c0zplftz32] {
+        font-size: 2.2rem; /* Large impact */
+        color: var(--accent-color);
+        text-shadow: 0 0 15px rgba(var(--accent-rgb), 0.6);
+        font-family: 'OCR A Extended', monospace;
+    }
+
+.mute-toggle[b-c0zplftz32] {
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    border: 1px solid rgba(var(--accent-rgb), 0.4);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+    .mute-toggle:hover[b-c0zplftz32] {
+        background: rgba(var(--accent-rgb), 0.2);
+        box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3);
+    }
+
+.active-text[b-c0zplftz32] {
+    color: var(--accent-color);
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
+.muted-text[b-c0zplftz32] {
+    color: #ff3e3e; /* Red for disabled */
+    opacity: 0.6;
+}
+
+.sync-icon[b-c0zplftz32] {
+    color: var(--accent-color);
+    transition: transform 0.3s ease;
+}
+
+.syncing .sync-icon[b-c0zplftz32] {
+    animation: spin-b-c0zplftz32 1s linear infinite;
+}
+
+@keyframes spin-b-c0zplftz32 {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.log-entry:contains("SYNC_ERROR")[b-c0zplftz32] {
+    color: #ff3e3e;
+    font-weight: bold;
+    animation: blink 0.5s step-end infinite;
 }
 /* /Components/Pages/UplinkView.razor.rz.scp.css */
 .uplink-view[b-k03uywkta8] {

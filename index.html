@@ -94,6 +94,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <script>
         window.setTheme = (theme) => {
@@ -112,59 +113,24 @@
         };
     </script>
 
+    <script type="text/javascript">
+        (function () {
+            emailjs.init("3F1pFTcctP1jDh2qj");
+        })();
 
-    <script>
-        // Place your helper functions here
-        window.scrollToBottom = (elementId) => {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.scrollTop = element.scrollHeight;
-            }
+        window.sendEmail = (serviceId, templateId, templateParams) => {
+            return emailjs.send(serviceId, templateId, templateParams)
+                .then(response => {
+                    console.log('SUCCESS!', response.status, response.text);
+                    return true;
+                }, error => {
+                    console.log('FAILED...', error);
+                    return false;
+                });
         };
-
-        window.focusElement = (elementId) => {
-            const element = document.getElementById(elementId);
-            if (element) element.focus();
-        };
-
-        window.killDoubleScrollbars = () => {
-            // Targets the specific containers that usually cause the double bar
-            const targets = ['.main-stage', '.data-pane', '.transparent-editor'];
-
-            targets.forEach(selector => {
-                const el = document.querySelector(selector);
-                if (el) {
-                    el.style.overflow = 'hidden';
-                    // This ensures the element is exactly as tall as it needs to be
-                    // without triggering a scroll event.
-                }
-            });
-        };
-
-        // Run this whenever the location changes
-        window.onload = () => {
-            const observer = new MutationObserver(() => window.killDoubleScrollbars());
-            observer.observe(document.body, { childList: true, subtree: true });
-        };
-
-        window.scrollToBottom = (element) => {
-            if (element) {
-                element.scrollTop = element.scrollHeight;
-            }
-        };
-
-        window.localStorageFunctions = {
-            setItem: function (key, value) {
-                localStorage.setItem(key, value);
-            },
-            getItem: function (key) {
-                return localStorage.getItem(key);
-            }
-        };
-
     </script>
 
-
+    <script src="js/terminal-logic.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
