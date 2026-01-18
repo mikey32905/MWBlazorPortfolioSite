@@ -1,0 +1,36 @@
+﻿@page "/reboot"
+
+@layout PortfolioLayout
+@inject NavigationManager Nav
+@inject TerminalService TerminalSvc
+@inject IJSRuntime JS
+
+<div class="bios-container">
+    <div class="flicker-overlay"></div>
+    <div class="bios-text">
+        <p>MW_BIOS v4.0.26 (C) 2026</p>
+        <p>-----------------------------------------</p>
+        <p>CPU: @osVersion</p>
+        <p>AGENT: @browserInfo</p>
+        <p>UPLINK_LATENCY: @(new Random().Next(10, 45))ms</p>
+        <p>VIRTUAL_CORE: STABLE</p>
+        <p>-----------------------------------------</p>
+        <p class="status-msg">REINITIALIZING_NEURAL_LINK...</p>
+        <div class="progress-bar"></div>
+    </div>
+</div>
+
+@code {
+    private string browserInfo = "DETECTING...";
+    private string osVersion = ".NET 10.0.0-RUNTIME";
+
+    protected override async Task OnInitializedAsync()
+    {
+        browserInfo = await JS.InvokeAsync<string>("eval", "navigator.userAgent.split(' ')[0]");
+
+        TerminalSvc.Clear();
+        await Task.Delay(3000);
+
+        Nav.NavigateTo("/", forceLoad: true);
+    }
+}

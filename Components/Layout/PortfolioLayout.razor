@@ -2,8 +2,10 @@
 @inject ThemeService ThemeSvc
 @inject ProjectStateService ProjectState
 @inject ProjectManifestService ManifestSvc
+@inject TerminalService TerminalSvc
 @inject HttpClient Http
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 @implements IDisposable
 
@@ -20,69 +22,135 @@
 
 
 
-<div class="app-shell" style="--accent-glow: @ThemeSvc.CurrentColor;">
+<div @ref="mainContainer" 
+    class="app-shell"
+     @onkeydown="HandleGlobalKeyDown"
+     tabindex="0" 
+     style="outline:none;">
    
     <header class="system-header">
-      
-        <div class="logo">PORTFOLIO_OS // @(ThemeSvc.CurrentColor == "#39FF14" ? "WPF_MODE" : "WASM_MODE")</div>
-        <nav class="system-controls">
-            <span>RUN</span>
-            <span>DEBUG</span>
-            <div class="battery-status">100% [AC_POWER]</div>
-        </nav>
-    </header>
-
-    <div class="sidebar-wrapper">
-        <SideBar />
-    </div>
-   
-    <div class="right-side-container">
-        <main class="main-stage">
-
-            @* TEMPORARY DEBUG TEXT - Delete this once button works *@
-           @*  <div style="color:white; font-size: 10px; position: fixed; top: 45px; left: 270px; z-index: 9999;">
-                DEBUG: FileSelected = @(ProjectState.SelectedFile?.FileName ?? "NULL")
-            </div> *@
-
-            @if (ProjectState.SelectedFile != null)
-            {
-                <div class="global-action-bar">
-                    <button class="exit-btn" @onclick="CloseFile">[ESC] CLOSE_SESSION</button>
-                    <span class="file-path">SYS://@ProjectState.SelectedFile.FileName</span>
-                </div>
-            }
-
-            @Body
-
-        </main>
-
-        <div class="terminal-container">
-            <TerminalComponent />
+        <div class="header-left">
+            <span class="pulse-dot"></span>
+            <span class="system-node">NODE_01 // MW_OFFICE</span>
         </div>
+
+        <div class="header-center">
+            <div class="path-display">
+                @if (ProjectState.SelectedFile?.FileName != null)
+                {
+                    <div class="header-path-group">
+                        <button class="header-exit-btn" @onclick="CloseFile">
+                            <span class="key-hint">[ESC]</span> CLOSE_SESSION
+                        </button>
+                       
+                        <div class="path-display">
+                            <span class="path-prefix">SYS://</span>
+                            <span class="path-name">@ProjectState.SelectedFile.FileName</span>
+                        </div>
+                    </div>
+                    
+                }
+                else
+                {
+                    <div class="path-display">
+                        <span class="path-prefix">SYS://</span><span class="path-name">STANDBY</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="glitch-clock @_glitchClass">
+                <span class="time-label">LOCAL_TIME:</span>
+                <span class="time-value">@_currentTime</span>
+            </div>
+        </div>
+     </header>
+
+    <div class="main-workspace" style="display: flex; flex: 1; overflow: hidden;">
+        <div class="sidebar-wrapper @(ProjectState.IsAuthenticated ? "" : "system-locked")">
+            <SideBar />
+        </div>
+
+        <style>
+            .system-locked {
+                filter: blur(4px) grayscale(1);
+                pointer-events: none; /* Prevents clicking project files */
+                opacity: 0.5;
+                transition: all 1s ease;
+            }
+        </style>
+
+        <div class="right-side-container @_rebootClass">
+            <main class="main-stage">
+
+                @if (ProjectState.SelectedFile != null)
+                {
+                    @Body
+                }
+                else
+                {
+                    <Home />
+                }
+            </main>
+
+            <div class="terminal-container">
+                <TerminalComponent />
+            </div>
+
+            <footer class="system-footer">
+                <div class="footer-left">
+                    <span class="label">SYS_UPTIME:</span>
+                    <span class="uptime-val">@_uptimeString</span>
+                </div>
+
+                <div class="footer-center">
+                    <span class="me-1">Built By</span><span><img src="/img/MikeWilliams(2)-Wht.png" height="30" /></span>
+                </div>
+
+                <div class="footer-right">
+                    <div class="col-12">
+                        @* <a href="#"><i class="bi bi-youtube"></i></a> *@
+                        <a href="https://x.com/mikey32905"><i class="bi bi-twitter"></i></a>
+                        <a href="https://github.com/mikey32905"><i class="bi bi-github"></i></a>
+                        <a href="https://www.linkedin.com/in/mike-williams-0511835/"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
     </div>
-
-    
-
-   @*  <footer class="terminal-area">
-       
-    </footer> *@
-
+ 
 </div>
 
 <div class="crt-overlay"></div>
 
 @code {
-    // 1. Declare the missing variable
-    // bool isMenuOpen = false;
-    // private void ToggleMobileMenu() => isMenuOpen = !isMenuOpen;
-
     public ProjectFile? SelectedFile { get; set; } // The variable you saw in Line 20
+    private ElementReference mainContainer;
+
+    private DateTime _sessionStart = DateTime.Now;
+    private string _uptimeString = "00:00:00";
+    private string _currentTime = "INITIALIZING...";
+    private string _glitchClass = "";
+
+    private System.Threading.Timer? _uptimeTimer;
+    private System.Threading.Timer? _clockTimer;
+    private Random _random = new();
+    private string _rebootClass = "";
 
     protected override void OnInitialized()
     {
+        ProjectState.OnChange += HandleStateChange;
+
+        // Initial prompt
+        if (!ProjectState.IsAuthenticated)
+        {
+            TerminalSvc.AddLog(">>> [CRITICAL] SYSTEM_LOCKED", LogType.Error);
+            TerminalSvc.AddLog("TYPE 'LOGIN' TO START. IF CREDENTIALS LOST, TYPE 'FORGOTUSER'.", LogType.Warning);
+        }
         // Subscribe to changes so the button appears/disappears instantly
-        ProjectState.OnChange += StateHasChanged;
-        ProjectState.OnSelectedFileChanged += HandleFileSelection;
+         ProjectState.OnSelectedFileChanged += HandleFileSelection;
     }
 
     protected override async Task OnInitializedAsync()
@@ -97,9 +165,82 @@
         {
             await ManifestSvc.InitializeAsync();
         }
-       // await Manifest.InitializeAsync();
+      
+        // Start a timer that updates every second
+        _uptimeTimer = new System.Threading.Timer(_ =>
+        {
+            var diff = DateTime.Now - _sessionStart;
+            _uptimeString = string.Format("{0:00}:{1:00}:{2:00}",
+                (int)diff.TotalHours, diff.Minutes, diff.Seconds);
+
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
+
+        // Clock Logic
+        _clockTimer = new System.Threading.Timer(async _ =>
+        {
+            _currentTime = DateTime.Now.ToString("HH:mm:ss");
+
+            // 10% chance to glitch every second, or force it every 30 seconds
+            if (_random.Next(0, 100) < 5 || DateTime.Now.Second % 30 == 0)
+            {
+                _glitchClass = "clock-glitch";
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(200); // Duration of glitch
+                _glitchClass = "";
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }, null, 0, 1000);
+
         // Subscribe to selection changes
         ProjectState.OnSelectedFileChanged += HandleFileSelection;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Give the WASM runtime a moment to settle
+                await Task.Delay(200);
+                if (mainContainer.Context != null) // Check if reference is hooked
+                {
+                    await mainContainer.FocusAsync();
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // Fallback: wait a tiny bit and try again if the DOM was slow
+                // await Task.Delay(100);
+                // await mainContainer.FocusAsync();
+            }
+        }
+    }
+
+    [JSInvokable]
+    public void HandleEscapeKey()
+    {
+        if (ProjectState.SelectedFile != null)
+        {
+            CloseFile(); // Use your existing CloseFile logic
+            StateHasChanged();
+        }
+    }
+
+    private void HandleStateChange()
+    {
+        // Forces the UI to re-evaluate the @if (SelectedFile != null) logic
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleGlobalKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            CloseFile();
+        }
     }
 
     private void HandleFileSelection()
@@ -108,26 +249,52 @@
         StateHasChanged();  // Refresh the UI
     }
 
+    private async void HandleNavigation(string path)
+    {
+        if (path == "reboot_sequence")
+        {
+            _rebootClass = "reboot-flicker";
+            StateHasChanged();
+
+            // Wait for the animation to complete
+            await Task.Delay(800);
+
+            _rebootClass = "";
+            TerminalSvc.Clear();
+            Nav.NavigateTo("/"); // Redirect to Home/Landing
+        }
+        else
+        {
+            Nav.NavigateTo(path);
+        }
+    }
+
     private void UpdateSelection(ProjectFile file)
     {
         SelectedFile = file; // The variable is "Set" here!
     }
 
-    private void CloseFile()
+    private async Task CloseFile()
     {
-        // 1. Reset the global state so the Sidebar highlights go away
-        ProjectState.SelectFile(null);
+        if (ProjectState.SelectedFile != null)
+        {
+            // Add an immediate log so the user knows the keypress was registered
+            TerminalSvc.AddLog("> MANUAL_OVERRIDE: [ESC] PRESSED", LogType.Warning);
 
-        // Use ForceLoad: false to allow Blazor to handle the route internally
-        Nav.NavigateTo("identity");//
+            // You can either call the TerminalSvc method or just trigger the state
+            ProjectState.CloseFile();
 
-        // 3. Log it to your terminal for that extra immersion
-        // (Assuming you have a method to push to terminal)
-        Console.WriteLine(">>> SESSION_TERMINATED: Returning to Root...");
+            // Add a follow-up log
+            TerminalSvc.AddLog("SESSION_FORCE_CLOSED.", LogType.System);
+        }
     }
 
     public void Dispose()
     {
+        _uptimeTimer?.Dispose();
+
+        ProjectState.OnChange -= HandleStateChange;
+
         ProjectState.OnSelectedFileChanged -= HandleFileSelection;
     }
 }

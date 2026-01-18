@@ -94,20 +94,19 @@
 
 .tab-btn {
     background: transparent;
-    border: 1px solid #333;
-    color: #666;
+    border: 1px solid rgba(var(--accent-rgb), 0.3);
+    color: #888;
     padding: 4px 12px;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.7rem;
+    font-family: 'OCR A Extended', monospace;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: 0.2s;
 }
 
     .tab-btn.active {
-        border-color: #00F3FF;
-        color: #00F3FF;
-        background: rgba(0, 243, 255, 0.1);
-        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        color: var(--accent-color);
+        border-color: var(--accent-color);
+        background: rgba(var(--accent-rgb), 0.1);
+        box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.2);
     }
 
     .tab-btn:hover:not(.active) {
@@ -123,13 +122,12 @@
 }
 
 .editor-wrapper {
-    height: 550px; /* Match the height of your blueprint image area */
-    display: flex;
-    flex-direction: column;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid #333;
+    flex: 1;
+    background: #000;
+    overflow-y: auto; /* Allow scrolling */
+    min-height: 400px; /* Force a height so content is visible */
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
     position: relative;
-    overflow: hidden; /* Header stays still */
 }
 
     /* Ensure the text color is bright enough to see */
@@ -157,6 +155,16 @@
     .editor-wrapper::-webkit-scrollbar-track {
         background: rgba(255, 255, 255, 0.05);
     }
+
+.scrolling-content {
+    padding: 20px;
+    height: 100%;
+}
+
+pre {
+    margin: 0 !important; /* Prism often adds weird margins */
+    background: transparent !important;
+}
 
 .blueprint-img {
     max-width: 90%;
@@ -510,5 +518,120 @@
 
     100% {
         filter: none;
+    }
+}
+
+.wpf-header-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.spec-toggle.active {
+    color: #00f3ff; /* Or your preferred blue/cyan accent */
+    border-color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.manifest-dossier {
+    padding: 2rem;
+    animation: scan-in 0.5s ease-out;
+}
+
+@keyframes scan-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.label {
+    color: #888;
+    margin-right: 10px;
+}
+
+.description-block {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.log-entries {
+    margin-top: 5px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(var(--accent-rgb), 0.2);
+}
+
+.log-line {
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.log-tag {
+    color: var(--accent-color);
+    opacity: 0.6;
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+.tech-tag {
+    background: rgba(var(--accent-rgb), 0.1);
+    border: 1px solid var(--accent-color);
+    padding: 2px 8px;
+    margin-right: 5px;
+    font-size: 0.75rem;
+}
+
+.sys-metrics {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #333;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* The Shimmer Animation */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Apply this to the container when loading or switching */
+.shimmer-text {
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.1) 25%, rgba(var(--accent-rgb), 0.4) 50%, rgba(var(--accent-rgb), 0.1) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent; /* Text becomes the shimmer */
+    text-shadow: 0 0 5px rgba(var(--accent-rgb), 0.2);
+}
+
+/* A secondary "Entrance" animation for the lines */
+.manifest-row {
+    animation: reveal-line 0.4s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes reveal-line {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }

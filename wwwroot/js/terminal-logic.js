@@ -10,6 +10,21 @@ window.scrollToBottom = (elementOrId) => {
     }
 };
 
+window.terminalInterop = {
+    scrollToBottom: (element) => {
+        if (element) {
+            // Use a small timeout to ensure the DOM has finished 
+            // the 'Glitch' render and added the new log lines
+            setTimeout(() => {
+                element.scrollTo({
+                    top: element.scrollHeight,
+                    behavior: 'auto' // 'smooth' can sometimes fail if many logs arrive at once
+                });
+            }, 10);
+        }
+    }
+};
+
 window.focusElement = (elementId) => {
     const element = document.getElementById(elementId);
     if (element) element.focus();
@@ -48,16 +63,33 @@ window.playSystemAudio = (soundName) => {
         const gainNode = audioCtx.createGain();
 
         oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(soundName === 'success' ? 880 : 440, audioCtx.currentTime);
 
-        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+        if (soundName == "glitch") {
+            oscillator.frequency.setValueAtTime(120, context.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.2);
 
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+            gainNode.gain.setValueAtTime(0.1, context.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
 
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.15);
+            oscillator.connect(gain);
+            gainNode.connect(context.destination);
+
+            oscillator.start();
+            oscillator.stop(context.currentTime + 0.2);
+        }
+        else {
+            oscillator.frequency.setValueAtTime(soundName === 'success' ? 880 : 440, audioCtx.currentTime);
+
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        }
+        
     } catch (e) {
         console.warn("Audio Context blocked by browser policy. User interaction required.");
     }

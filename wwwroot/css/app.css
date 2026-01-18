@@ -178,6 +178,13 @@ pre code {
     transform: translateZ(0);
 }
 
+/* Global Reset Animation */
+.reboot-flicker {
+    pointer-events: none;
+    animation: reboot-sequence 0.8s ease-out forwards;
+    background: white !important; /* Flash white for the 'pop' */
+}
+
 /* #region Blazor default CSS */
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {

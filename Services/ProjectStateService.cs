@@ -10,6 +10,7 @@ namespace MWBlazorPortfolioSite.Services
         public ProjectFile? SelectedFile { get; private set; }
         // The full list of all projects/files from your JSON
         public List<ProjectFile> ProjectFiles { get; set; } = new();
+        public bool IsAuthenticated { get; private set; } = false;
 
         // Add this line! This is what was missing.
         public string CurrentAccentColor { get; private set; } = "#00FF41";
@@ -103,6 +104,18 @@ namespace MWBlazorPortfolioSite.Services
             NotifyStateChanged();
         }
 
+        public void Login()
+        {
+            IsAuthenticated = true;
+            NotifyStateChanged();
+        }
+
+        public void Logout() // Used during Reboot
+        {
+            IsAuthenticated = false;
+            NotifyStateChanged();
+        }
+
         public async Task LoadProjects()
         {
             // If we already have projects, don't waste bandwidth fetching again
@@ -131,6 +144,16 @@ namespace MWBlazorPortfolioSite.Services
                 Console.WriteLine($">>> ERROR: Failed to load manifest. {ex.Message}");
             }
             
+        }
+
+        // THE MISSING LINK
+        public void CloseFile()
+        {
+            //if (SelectedFile != null)
+            //{
+                SelectedFile = null;
+                NotifyStateChanged();
+           // }
         }
 
         public void NotifyStateChanged() => OnChange?.Invoke();

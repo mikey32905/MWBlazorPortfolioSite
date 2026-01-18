@@ -4,6 +4,8 @@
 @inject ThemeService ThemeSvc
 @inject TerminalService TerminalSvc
 @inject ProjectStateService ProjectState
+@inject HttpClient Http
+@inject IJSRuntime JS
 @implements IDisposable
 
 <div class="wpf-container">
@@ -105,27 +107,88 @@
                             </a>
                         }
 
-                        <div class="mini-tabs">
-                            @foreach (var file in ProjectState.SelectedFile.SupportingFiles)
-                            {
-                                @* Ensure you are capturing the current 'file' variables correctly *@
-                                var tabLabel = file.Key;
-                                var tabUrl = file.Value;
+                        <div class="wpf-header-actions">
+                            @* Manual Specs Tab *@
+                            <button class="tab-btn @(activeTab == "SPECS" ? "active" : "")"
+                                    @onclick='() => LoadTab("SPECS", "INTERNAL")'>
+                                [SPECS]
+                            </button>
 
-                                <button class="tab-btn @(activeTab == tabLabel ? "active" : "")"
-                                        @onclick="() => LoadTab(tabLabel, tabUrl)">
-                                    @tabLabel
-                                </button>
-                            }
+                            <div class="mini-tabs">
+                                @foreach (var file in ProjectState.SelectedFile.SupportingFiles)
+                                {
+                                    @* Ensure you are capturing the current 'file' variables correctly *@
+                                    var tabLabel = file.Key;
+                                    var tabUrl = file.Value;
+
+                                    <button class="tab-btn @(activeTab == tabLabel ? "active" : "")"
+                                            @onclick="() => LoadTab(tabLabel, tabUrl)">
+                                        @tabLabel
+                                    </button>
+                                }
+                            </div>
                         </div>
+                     
                     }
                 </div>
             </div>
 
             
             <div class="editor-wrapper">
-                <CodeEditorView @key="@(ProjectState.SelectedFile?.FileName + activeTab)" />
-            </div>
+                <div class="scrolling-content">
+                    @if (activeTab == "SPECS" || isDecrypting)
+                    {
+                        <div class="manifest-dossier @(isDecrypting ? "shimmer-text" : "")">
+                            <h2 class="manifest-title">> MODULE_SPECS: @ProjectState.SelectedFile?.ModuleName</h2>
+                            <div class="manifest-body">
+                                <p><span class="label">STATUS:</span> @ProjectState.SelectedFile?.Status</p>
+                                
+                                <div class="description-block">
+                                    <span class="label">DESCRIPTION:</span>
+                                    <div class="log-entries">
+                                        @if (ProjectState.SelectedFile?.Description != null)
+                                        {
+                                            @foreach (var line in ProjectState.SelectedFile.Description)
+                                            {
+                                                <p class="log-line"><span class="log-tag">[LOG]:</span> @line</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+
+                                @* <p><span class="label">DESCRIPTION:</span> @ProjectState.SelectedFile?.Description</p> *@
+
+                                <div class="tech-stack">
+                                    <span class="label">CORE_TECH:</span>
+                                    @foreach (var tech in ProjectState.SelectedFile?.CoreTech)
+                                    {
+                                        <span class="tech-tag">@tech</span>
+                                    }
+                                </div>
+
+                                <div class="sys-metrics">
+                                    <p>CPU_CYCLES: OPTIMIZED</p>
+                                    <p>DATA_FLOW: STABLE</p>
+                                    <p>RENDER_CORE: WPF_XAML</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (!string.IsNullOrEmpty(currentCodeBody))
+                    {
+                        @* Wrapping in a unique Key forces Blazor to treat this as a NEW element *@
+                        <div @key="activeTab">
+                            <pre class="line-numbers"><code class="@GetLanguageClass(activeTab)">@currentCodeBody</code></pre>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="loading-overlay">
+                            <span class="pulse">FETCHING_REMOTE_DATA...</span>
+                        </div>
+                    }
+                </div>
+             </div>
         </div>
     </div>
 </div>
@@ -134,19 +197,41 @@
     private string? xamlContent;
 
     [Parameter] public ProjectFile Project { get; set; } = new();
-    private string activeTab = "XAML";
+    [Inject] NavigationManager Nav { get; set; }
+
+    private string activeTab = "SPECS";
     private bool isGlitched = true;
+    private bool showSpecs = false;
+    private string currentCodeBody = "";
+    private bool isDecrypting = false;
 
     protected override void OnInitialized()
     {
         // Listen for when the HttpClient finishes loading the text
-        ProjectState.OnChange += HandleStateChange; ;
+        ProjectState.OnChange += HandleProjectSwitch;
     }
 
     protected override async Task OnInitializedAsync()
     {
         ProjectState.OnChange += async () => await LoadProjectData();
         await LoadProjectData();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // 1. Start the visual reset
+        activeTab = "SPECS";
+        currentCodeBody = "";
+        isDecrypting = true; // Start the shimmer
+
+        // 2. Log the change to terminal
+        TerminalSvc.AddLog($"> DECRYPTING_MANIFEST: {ProjectState.SelectedFile?.ModuleName}...", LogType.Info);
+
+        // 3. Keep the shimmer active for a brief "decryption" period
+        await Task.Delay(800);
+
+        isDecrypting = false; // Reveal the clear text
+        await InvokeAsync(StateHasChanged);
     }
 
     private async void TriggerGlitch()
@@ -160,23 +245,84 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private void HandleStateChange()
+    private void CloseFile()
     {
-        Console.WriteLine($">>> WPF_VIEWER: State changed. Content length: {ProjectState.SelectedFileContent?.Length ?? 0}");
-        // This forces the page to re-render the moment
-        // the HttpClient finishes downloading the XAML.
-        InvokeAsync(StateHasChanged);
+        ProjectState.CloseFile();
+
+        // If we are on a specific project page, kick back to Home
+        if (Nav.Uri.Contains("wpfview") || Nav.Uri.Contains("uplink"))
+        {
+            Nav.NavigateTo("/");
+        }
+
+        TerminalSvc.AddLog(">>> SESSION_CLOSED: REDIRECTING_TO_STANDBY", LogType.System);
+    }
+
+    private async void HandleProjectSwitch()
+    {
+        // 1. Force Reset
+        activeTab = "SPECS";
+        currentCodeBody = "";
+        isDecrypting = true;
+
+        // 2. Refresh UI
+        await InvokeAsync(StateHasChanged);
+
+        // 3. Shimmer for a bit then stop
+        await Task.Delay(800);
+        isDecrypting = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private string GetLanguageClass(string tabLabel)
+    {
+        // Detects language based on tab name or extension
+        if (tabLabel.Contains("XAML", StringComparison.OrdinalIgnoreCase))
+            return "language-xml"; // Prism uses 'xml' for XAML/HTML
+
+        return "language-csharp";
     }
 
     private async Task LoadTab(string label, string url)
     {
-        Console.WriteLine($">>> UI_ACTION: Switching to tab [{label}] - Target: {url}");
         activeTab = label;
+        currentCodeBody = "";
 
-        // We call a new helper method in your service to just swap the text
-        await ProjectState.UpdateActiveContent(url);
+        await InvokeAsync(StateHasChanged);
 
-        StateHasChanged();
+        if (label.Equals("SPECS", StringComparison.OrdinalIgnoreCase))
+        {
+            currentCodeBody = "";
+            activeTab = "SPECS";
+            return;
+        }
+        else
+        {
+            try
+            {
+                TerminalSvc.AddLog($"> REQUESTING_SOURCE: {label}...", LogType.Info);
+
+                // 2. Fetch the new data
+                var fetchedCode = await Http.GetStringAsync(url);
+
+                // 3. Update the variable
+                currentCodeBody = fetchedCode;
+
+                // 4. Notify Blazor to render the NEW code into the DOM
+                await InvokeAsync(StateHasChanged);
+
+                // 5. CRITICAL: Wait for the DOM to actually exist before highlighting
+                // If we call JS too fast, it highlights nothing.
+                await Task.Delay(50);
+                await JS.InvokeVoidAsync("Prism.highlightAll");
+            }
+            catch (Exception ex)
+            {
+                currentCodeBody = $"// ERROR_ACCESSING_NODE: {ex.Message}";
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+ 
     }
 
     private async Task LoadProjectData()
@@ -211,6 +357,6 @@
 
     public void Dispose()
     {
-        ProjectState.OnChange -= StateHasChanged;
+        ProjectState.OnChange -= HandleProjectSwitch;
     }
 }

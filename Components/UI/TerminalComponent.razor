@@ -1,9 +1,12 @@
 ﻿@inject TerminalService TerminalSvc
 @inject IJSRuntime JS
+@inject NavigationManager Nav
+@inject ProjectStateService ProjectState
 @implements IDisposable
 
-<div class="terminal-container" @ref="terminalRef">
-    <div class="terminal-output">
+<div class="terminal-wrapper @(TerminalSvc.IsLockedOut ? "lockout-glitch" : "")">
+    @* SCROLLABLE AREA *@
+    <div @ref="logContainer" class="terminal-container">
         @foreach (var log in TerminalSvc.Logs)
         {
             <div class="log-entry @log.Type.ToString().ToLower()">
@@ -14,32 +17,91 @@
     </div>
 
     @* THE NEW COMMAND INPUT *@
-    <div class="command-line">
+    <div class="terminal-prompt-line">
         <span class="prompt">guest@portfolio:~$</span>
-        <input @bind="userInput"
+        <input type="@(TerminalSvc.IsAwaitingPassword ? "password" : "text")"
+               @bind="userInput"
                @onkeyup="HandleKeyPress"
+               @bind:event="oninput"
+               @onkeydown="HandleKeyDown"
                placeholder="ENTER_COMMAND..."
                spellcheck="false"
                class="terminal-input" />
+
     </div>
+
 </div>
+
+
+   
 
 @code {
     ElementReference terminalRef;
+    private ElementReference logContainer;
+    private string _rebootClass = "";
+    private int historyIndex = -1;
 
     protected override void OnInitialized()
     {
         // Subscribe to the "Routine"
         TerminalSvc.OnNewLog += HandleNewLog;
+        // Listen for the service telling the UI to change pages
+        TerminalSvc.OnNavigationRequest += HandleNavigation;
     }
 
     public void Dispose()
     {
         // Unsubscribe to prevent memory leaks
         TerminalSvc.OnNewLog -= HandleNewLog;
+        TerminalSvc.OnNavigationRequest -= HandleNavigation;
     }
 
-    // Logic to auto-scroll could be added here via JS Interop
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        var history = TerminalSvc.CommandHistory;
+        if (!history.Any()) return;
+
+        if (e.Key == "Escape")
+        {
+            // If they hit escape while typing, clear the input and
+            // let the parent know to close the file.
+            userInput = "";
+            await TerminalSvc.ProcessCommand("exit"); 
+            return;
+        }
+
+        if (e.Key == "ArrowUp")
+        {
+            // Move backwards through history
+            if (historyIndex == -1) historyIndex = history.Count - 1;
+            else if (historyIndex > 0) historyIndex--;
+
+            userInput = history[historyIndex];
+        }
+        else if (e.Key == "ArrowDown")
+        {
+            // Move forwards through history
+            if (historyIndex != -1)
+            {
+                if (historyIndex < history.Count - 1)
+                {
+                    historyIndex++;
+                    userInput = history[historyIndex];
+                }
+                else
+                {
+                    // Clear the input if we go past the most recent command
+                    historyIndex = -1;
+                    userInput = "";
+                }
+            }
+        }
+        else if (e.Key == "Enter")
+        {
+            // Reset index when a command is submitted
+            historyIndex = -1;
+        }
+    }
 
     private string userInput = "";
 
@@ -52,6 +114,8 @@
         }
     }
 
+
+
     // This is the actual routine that runs when the event fires
     private async void HandleNewLog()
     {
@@ -62,6 +126,25 @@
         await JS.InvokeVoidAsync("scrollToBottom", "terminal-output-id");
     }
 
+    private async void HandleNavigation(string path)
+    {
+        if (path == "reboot_sequence")
+    {
+        _rebootClass = "reboot-flicker";
+        await InvokeAsync(StateHasChanged); // Force UI update for animation
+
+        await Task.Delay(800); // Wait for the CSS flicker
+        
+        _rebootClass = "";
+        TerminalSvc.Clear();
+        Nav.NavigateTo("/"); 
+    }
+    else
+    {
+        Nav.NavigateTo(path);
+    }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -69,7 +152,7 @@
             try
             {
                 // Only attempt JS calls if the runtime is ready
-                await JS.InvokeVoidAsync("scrollToBottom", "_logContainer");
+               // await JS.InvokeVoidAsync("terminalInterop.scrollToBottom", "logContainer");
                 await JS.InvokeVoidAsync("focusElement", "terminalInput");
             }
             catch (Exception ex)
@@ -78,5 +161,13 @@
             }
         
         }
+
+        // We call this every single time the component renders
+        // to ensure the scroll 'follows' the new logs.
+        if (logContainer.Context != null)
+        {
+            await JS.InvokeVoidAsync("terminalInterop.scrollToBottom", logContainer);
+        }
+
     }
 }

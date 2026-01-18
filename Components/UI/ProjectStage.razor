@@ -26,7 +26,7 @@
         }
         else if (file.Extension == ".xaml")
         {
-            <WPFView SelectedFile="file" />
+            <WPFView @key="ProjectState.SelectedFile?.FileName" SelectedFile="file" />
         }
         else 
         {

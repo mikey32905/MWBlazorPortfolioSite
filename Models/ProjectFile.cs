@@ -9,6 +9,9 @@ namespace MWBlazorPortfolioSite.Models
 
         [JsonPropertyName("FileName")]
         public string FileName { get; set; } = "";
+        public string ModuleName { get; set; }
+        public string Status { get; set;  }
+        public List<string> CoreTech { get; set; } = new List<string>();
 
         [JsonPropertyName("Extension")]
         public string Extension { get; set; } = "";

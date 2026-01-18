@@ -77,7 +77,18 @@ else
                             <textarea @bind="contactModel.Message" class="term-input" rows="4" placeholder="TRANSMIT_DATA..."></textarea>
                      </div>
                     <button class="transmit-btn @(isTransmitting ? "loading" : "")" @onclick="HandleTransmission">EXECUTE_TRANSMISSION</button>
+
+                    <div class="dossier-actions">
+                        <button class="view-raw-transmit-btn view-btn" @onclick="StreamResume">
+                            <span class="icon"> > </span> VIEW_RAW_DATA
+                        </button>
+
+                        <a href="downloads/Michael_Williams_Dossier.pdf" download class="transmit-btn download-btn">
+                            <span class="icon"> [↓] </span> DOWNLOAD_SYSTEM_DOSSIER
+                        </a>
                     </div>
+                    
+                 </div>
              </div>
         </div>
        
@@ -112,12 +123,38 @@ else
 
     private List<string> displayedLogs = new();
     private string[] fullLogs = {
-    "> [INIT] CORE_DRIVERS_LOADED... OK",
-    "> [SCAN] MEMORY_INTEGRITY... 100%",
-    "> [AUTH] USER_RECOGNIZED: MICHAEL_W",
-    "> [STATUS] IDENTITY_PROXIMITY_SENSORS_ACTIVE",
-    "> [READY] AWAITING_COMMAND..."
-};
+        "> [INIT] CORE_DRIVERS_LOADED... OK",
+        "> [SCAN] MEMORY_INTEGRITY... 100%",
+        "> [AUTH] USER_RECOGNIZED: MICHAEL_W",
+        "> [STATUS] IDENTITY_PROXIMITY_SENSORS_ACTIVE",
+        "> [READY] AWAITING_COMMAND..."
+    };
+
+    private string[] resumeDossier = new[]
+    {
+        "UNIT: MICHAEL_WILLIAMS // MW_DEVSTUDIO",
+        "ROLE: FULL-STACK_SYSTEMS_ENGINEER",
+        "------------------------------------------",
+        "> IDENTITY_SUMMARY",
+        "Highly disciplined Engineer specializing in secure,",
+        "high-performance C# systems and tactical UIs.",
+        "",
+        "> CORE_CAPABILITIES",
+        "SYSTEMS: C#, .NET 9, SQL_SERVER, XAML",
+        "INTERFACES: BLAZOR_WASM, WPF (MVVM), WINUI_3",
+        "INFRA: AZURE_DEVOPS, AES-256_ENCRYPTION",
+        "",
+        "> DEPLOYMENT_HISTORY",
+        "NOLAND_ENGINEERING | 2005 - PRESENT",
+        "- ARCHITECTED bespoke WPF diagnostic suites.",
+        "- MANAGED corporate web/e-commerce nodes.",
+        "",
+        "> ACADEMIC_UPLINK",
+        "STATUS: AUTODIDACTIC // FIELD_TESTED",
+        "LOGIC: 5,000+ hours independent R&D.",
+        "------------------------------------------",
+        "// END_OF_DOSSIER"
+    };
 
     private async Task HandleResumeDownload()
     {
@@ -130,7 +167,7 @@ else
 
         // 2. Trigger the actual browser download
         // Ensure your resume is at wwwroot/data/resume.pdf
-        await JS.InvokeVoidAsync("open", "data/resume.pdf", "_blank");
+        await JS.InvokeVoidAsync("open", "downloads/Michael_Williams_Dossier.pdf", "_blank");
 
         TerminalSvc.AddLog("EXTRACT_SUCCESSFUL: Local copy generated.", LogType.Success);
     }
@@ -155,6 +192,7 @@ else
         {
             // Highlight this file in the sidebar even if we arrived here via URL
             ProjectState.SelectFile(identityFile);
+            TerminalSvc.OnNewLog += CheckForDossierCommand;
         }
 
         ProjectState.OnChange += StateHasChanged;
@@ -198,6 +236,30 @@ else
         }
     }
 
+    private void CheckForDossierCommand()
+    {
+        var lastLog = TerminalSvc.Logs.LastOrDefault();
+        // Only trigger if the log message is EXACTLY the command, not just containing it
+        if (lastLog != null && lastLog.Message.Equals("> DOSSIER", StringComparison.OrdinalIgnoreCase))
+        {
+            _ = StreamResume();
+        }
+    }
+
+    private async Task StreamResume()
+    {
+        TerminalSvc.Clear();
+        TerminalSvc.AddLog("ACCESSING_RESTRICTED_DOSSIER...", LogType.Info);
+        await Task.Delay(1000);
+
+        foreach (var line in resumeDossier)
+        {
+            TerminalSvc.AddLog(line, LogType.Success);
+            await Task.Delay(40); // Speed-typing effect
+            StateHasChanged();
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -229,18 +291,6 @@ else
         isTransmitting = true;
         TerminalSvc.AddLog("ENCRYPTING_PACKET...", LogType.Info);
 
-        // var templateParams = new
-        // {
-        //     from_name = contactModel.Name,
-        //     reply_to = contactModel.Email,
-        //     message = contactModel.Message
-        // };
-
-        // Call the JS function we created in step 2
-        // var success = await JS.InvokeAsync<bool>("sendEmail",
-        //     "service_lcjfrme",
-        //     "template_wxstuk8",
-        //     templateParams);
         var success = await CommsSvc.SendUplinkMessage(contactModel);
 
         if (success)
@@ -274,5 +324,6 @@ else
     public void Dispose()
     {
         ProjectState.OnChange -= StateHasChanged;
+        TerminalSvc.OnNewLog -= CheckForDossierCommand;
     }
 }

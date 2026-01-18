@@ -2,10 +2,13 @@
 
 @layout PortfolioLayout
 @inject ProjectStateService ProjectState
+@inject TerminalService TerminalSvc
+@inject NavigationManager Nav
+@implements IDisposable
 
 <PageTitle>Home</PageTitle>
 
-<div class="stage-wrapper">
+ <div class="stage-wrapper">
   @if (ProjectState.SelectedFile == null)
     {
         <div class="welcome-container">
@@ -32,20 +35,44 @@
     else
     {
         @* The @key="ProjectState.SelectedFile.FileName" is the magic fix here *@
-        <div class="editor-container" @key="ProjectState.SelectedFile.FileName">
+         <div class="editor-container" @key="ProjectState.SelectedFile.FileName">
             <CodeEditorView SelectedFile="ProjectState.SelectedFile" />
         </div>
 
     }
-</div>
+</div>  
 
 @code {
+ 
 
     // This method runs every time the Sidebar calls SelectFile
     private void HandleStateChanged()
     {
         // This forces THIS component to refresh its HTML
         InvokeAsync(StateHasChanged);
+    }
+
+   protected override void OnInitialized()
+    {
+        // Check if it's a fresh session so we don't spam them on every navigation
+        if (!TerminalSvc.Logs.Any())
+        {
+            TerminalSvc.AddLog("SYSTEM_READY. TYPE 'HELP' FOR AVAILABLE COMMANDS.", LogType.Success);
+        }
+
+        // Listen for system reset requests from the TerminalService
+        TerminalSvc.OnNavigationRequest += HandleStandardNav;
+    }
+
+    private void HandleStandardNav(string path)
+    {
+        Nav.NavigateTo(path);
+    }
+
+    public void Dispose()
+    {
+      //  TerminalService.OnSystemResetRequested -= InitiateReboot;
+        TerminalSvc.OnNavigationRequest -= HandleStandardNav;
     }
 
 }

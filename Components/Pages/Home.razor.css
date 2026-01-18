@@ -10,23 +10,6 @@
     font-family: 'Fira Code', monospace;
 }
 
-/*.welcome-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--accent-glow);
-    font-family: 'Fira Code', monospace;
-}
-
-.pageStyle {
-    background: url(img/MWBackdropBG.jpg);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-}*/
-
 /* The Glitch Title */
 .glitch-title {
     font-size: 3rem;
@@ -106,29 +89,72 @@
     }
 }
 
-/*.subTitle{
-    font-size: 1rem;
-    font-family: var(--mw-body-font);
+.reboot-flicker {
+    animation: reboot-flicker-anim 0.5s ease-out;
 }
 
-.devicons{
-    font-size: 2rem;
+.bios-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    color: #00FF41;
+    font-family: 'Courier New', monospace;
+    padding: 40px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-shadow: 0 0 5px #00FF41;
 }
 
-@media (min-width: 992px){
-    .title {
-        font-family: var(--mw-title-font);
-        font-size: 3.5rem;
-        color: var(--mw-title-color);
-        line-height: 3rem;
+.bios-header {
+    border-bottom: 1px solid #00FF41;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+}
+
+.loader-bar {
+    width: 250px;
+    height: 4px;
+    background: #111;
+    margin-top: 20px;
+    position: relative;
+    border: 1px solid #00FF41;
+}
+
+    .loader-bar::after {
+        content: '';
+        position: absolute;
+        height: 100%;
+        background: #00FF41;
+        animation: bios-load 2s forwards;
     }
 
-    .subTitle {
-        font-size: 1.5rem;
-        font-family: var(--mw-body-font);
+@keyframes bios-load {
+    0% {
+        width: 0;
     }
 
-    .devicons {
-        font-size: 2.5rem;
+    100% {
+        width: 100%;
     }
-}*/
+}
+
+@keyframes reboot-flicker-anim {
+    0% {
+        filter: brightness(10) white;
+        opacity: 0;
+    }
+
+    50% {
+        filter: brightness(1);
+        opacity: 1;
+    }
+
+    100% {
+        filter: none;
+    }
+}

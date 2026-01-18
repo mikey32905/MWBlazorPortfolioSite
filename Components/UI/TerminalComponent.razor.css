@@ -1,11 +1,32 @@
-﻿.terminal-container {
-    background: #020202;
-    color: var(--terminal-green); /* Classic green */
-    font-family: 'Fira Code', monospace;
-    font-size: 0.85rem;
+﻿.terminal-wrapper {
+    display: flex;
+    flex-direction: column;
     height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.terminal-container {
+    display: flex;
+    flex-direction: column; /* Normal stack */
+    flex: 1;
     overflow-y: auto;
     padding: 10px;
+    /* Ensure the container behaves like a scrollable box */
+    max-height: 100%;
+}
+
+    /* Add this to force the scrollbar to the bottom if possible */
+    .terminal-container > *:last-child {
+        margin-bottom: 5px;
+        scroll-snap-align: end;
+    }
+
+.terminal-logs {
+    flex: 1; /* Grow to fill space, but allow shrinking to fit input */
+    overflow-y: auto; /* Enable the scrollbar here */
+    padding: 10px;
+    font-family: 'Consolas', monospace;
 }
 
 .log-entry.success {
@@ -53,14 +74,25 @@
     white-space: nowrap;
 }
 
+.terminal-prompt-line {
+    flex-shrink: 0; /* CRITICAL: Prevents the logs from squashing the input */
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: #050505;
+    border-top: 1px solid rgba(var(--accent-rgb), 0.2);
+    min-height: 45px;
+}
+
 .terminal-input {
+    flex: 1;
     background: transparent;
     border: none;
+    color: var(--accent-color);
     outline: none;
-    color: #fff;
-    font-family: 'Fira Code', monospace;
-    width: 100%;
-    font-size: 0.8rem;
+    font-family: inherit;
+    margin-left: 8px;
+    caret-color: var(--accent-color);
 }
 
     /* Optional: Make the placeholder look like a ghost command */
@@ -68,3 +100,77 @@
         color: #333;
         font-style: italic;
     }
+
+
+.lockout-glitch {
+    position: relative;
+    animation: shake 0.15s infinite;
+    background: rgba(50, 0, 0, 0.9) !important; /* Red alert tint */
+    border-top: 2px solid #ff003c !important;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
+}
+
+/* Red chromatic aberration effect for text during lockout */
+.lockout-glitch .log-entry {
+    text-shadow: 2px 0px 0px rgba(255,0,0,0.5), -2px 0px 0px rgba(0,255,255,0.5);
+}
+
+/* Apply this class to the terminal container when locked */
+.terminal-wrapper.lockout-active {
+    animation: terminal-glitch 0.2s infinite;
+    border-top-color: #ff003c !important; /* Flash red border */
+    background: rgba(40, 0, 0, 0.9) !important; /* Deep red tint */
+}
+
+/* Make the specific error logs pulse */
+.log-entry.error {
+    color: #ff003c;
+    text-transform: uppercase;
+    font-weight: bold;
+    animation: pulse 1s infinite;
+}
