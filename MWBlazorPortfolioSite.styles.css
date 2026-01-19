@@ -595,6 +595,16 @@ SideBar[b-qtrtjoljry] {
         box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
     }
 }
+
+@keyframes static-shift-b-qtrtjoljry {
+    0% {
+        background-position: 20% 10%;
+    }
+
+    100% {
+        background-position: 80% 90%;
+    }
+}
 /* /Components/Layout/TopNavFooter.razor.rz.scp.css */
 .footerStyle[b-0moddc6fuu]{
     background-color: var(--cf-theme-900);
@@ -4317,6 +4327,25 @@ pre code[b-4fghmiwsjv] {
     text-transform: uppercase;
     font-weight: bold;
     animation: pulse 1s infinite;
+}
+
+.destruct-mode[b-7ogj3jskfu] {
+    animation: intense-shake-b-7ogj3jskfu 0.1s infinite;
+    filter: hue-rotate(90deg) contrast(2); /* Makes colors look "broken" */
+}
+
+@keyframes intense-shake-b-7ogj3jskfu {
+    0% {
+        transform: translate(2px, 2px);
+    }
+
+    50% {
+        transform: translate(-4px, -4px);
+    }
+
+    100% {
+        transform: translate(2px, 2px);
+    }
 }
 /* /wwwroot/Projects/TipTopApp/TipTop.razor.rz.scp.css */
 .calculator-container[b-r9xtk1qr1x] {
