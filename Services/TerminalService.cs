@@ -12,7 +12,7 @@ namespace MWBlazorPortfolioSite.Services
         private const string DEFAULT_USER = "GUEST";
         private const string DEFAULT_PASS = "MIKE";
         private string _tempUsername = ""; // To store username between steps
-
+        public bool IsDissolving { get; private set; } = false;
         public List<TerminalEntry> Logs { get; } = new();
 
         private List<string> _commandHistory = new();
@@ -102,78 +102,81 @@ namespace MWBlazorPortfolioSite.Services
                 AddLog("ERR: SYSTEM_FROZEN. SECURITY_COOLDOWN_ACTIVE.", LogType.Error);
                 return;
             }
-
             if (string.IsNullOrWhiteSpace(input)) return;
 
-            // Add to history if it's not a duplicate of the last command
+            UpdateHistory(input);
+            var command = input.ToLower().Trim();
+
+            // This one block handles ALL special states (Login, Password, and Destruct)
+            if (_currentStep != LoginStep.None)
+            {
+                await HandleLoginFlow(command, input);
+                return;
+            }
+
+            if (await HandleGlobalCommands(command)) return;
+
+            await HandleStandardCommands(command, input);
+        }
+
+        private void UpdateHistory(string input)
+        {
             if (!_commandHistory.Any() || _commandHistory.Last() != input)
             {
                 _commandHistory.Add(input);
             }
-
-            // Log the user's input so it appears in the console
             AddLog($"> {input.ToUpper()}", LogType.System);
+        }
 
-            var command = input.ToLower().Trim();
-
-            if (command == "unlock" || command == "godmode")
+        private async Task<bool> HandleGlobalCommands(string command)
+        {
+            switch (command)
             {
-                AddLog(">>> EXECUTING_ADMIN_OVERRIDE...", LogType.Warning);
-                await Task.Delay(500);
-                _projectState.Login(); // Bypass authentication
-                _currentStep = LoginStep.None;
-                _failedAttempts = 0;
-                _isLockedOut = false;
-                AddLog("SYSTEM_SECURITY_DEACTIVATED. WELCOME_CREATOR.", LogType.Success);
+                case "unlock":
+                case "godmode":
+                    await ExecuteAdminOverride();
+                    return true;
+                case "forgotuser":
+                case "forgotusername":
+                    AddLog("HINT: Standard account for external contractors. 'GUEST'", LogType.Info);
+                    return true;
+                case "forgotpass":
+                case "forgotpassword":
+                    AddLog("HINT: The Architect's first name. (4 chars)", LogType.Info);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private async Task HandleLoginFlow(string command, string originalInput)
+        {
+            // Handle Self-Destruct State
+            if (_currentStep == LoginStep.AwaitingDestructConfirmation)
+            {
+                await HandleDestructConfirmation(command);
                 return;
             }
 
-            // --- PRE-AUTHENTICATION COMMANDS ---
-            switch (command)
+            if (command == "abort")
             {
-                case "forgotusername":
-                case "forgotuser":
-                    AddLog("RECOVERING_IDENT_HINT...", LogType.Warning);
-                    await Task.Delay(500);
-                    AddLog("HINT: Standard account for external contractors.", LogType.Info);
-                    AddLog("EXPECTED_INPUT: 'GUEST'", LogType.Success);
-                    return;
-
-                case "forgotpassword":
-                case "forgotpass":
-                    AddLog("RECOVERING_AUTH_HINT...", LogType.Warning);
-                    await Task.Delay(500);
-                    AddLog("HINT: The Architect's first name.", LogType.Info);
-                    AddLog("CREDENTIAL_FORMAT: 4_CHAR_STRING", LogType.System);
-                    return;
+                _currentStep = LoginStep.None;
+                _tempUsername = "";
+                AddLog("LOGIN_SEQUENCE_TERMINATED.", LogType.Error);
+                return;
             }
 
-            // --- TWO-STEP LOGIN INTERCEPTOR ---
             if (_currentStep == LoginStep.AwaitingUsername)
             {
                 _tempUsername = command.ToUpper();
                 AddLog($"> USERNAME: {_tempUsername}", LogType.Info);
                 _currentStep = LoginStep.AwaitingPassword;
                 AddLog("ENTER_PASSCODE:", LogType.Warning);
-                return;
             }
-
-            if (_currentStep == LoginStep.AwaitingPassword)
+            else if (_currentStep == LoginStep.AwaitingPassword)
             {
-                // Inside the username/password interceptor logic
-                if (_currentStep != LoginStep.None && command == "abort")
-                {
-                    _currentStep = LoginStep.None;
-                    _tempUsername = "";
-                    AddLog("LOGIN_SEQUENCE_TERMINATED_BY_OPERATOR.", LogType.Error);
-                    return;
-                }
-
-
                 AddLog("> PASSCODE: ********", LogType.Info);
-
-                // Example check: password is "GUEST" or "1234"
-                if (_tempUsername == DEFAULT_USER && input.ToUpper() == DEFAULT_PASS)
+                if (_tempUsername == DEFAULT_USER && originalInput.ToUpper() == DEFAULT_PASS)
                 {
                     _projectState.Login();
                     _currentStep = LoginStep.None;
@@ -183,126 +186,174 @@ namespace MWBlazorPortfolioSite.Services
                 else
                 {
                     _failedAttempts++;
-                    if (_failedAttempts >= 3)
-                    {
-                        _ = TriggerLockout(); // Run as fire-and-forget task
-                    }
+                    if (_failedAttempts >= 3) _ = TriggerLockout();
                     else
                     {
                         AddLog($"INVALID_CREDENTIALS. ATTEMPT {_failedAttempts}/3", LogType.Error);
-                        _currentStep = LoginStep.AwaitingUsername; // Reset to start
-                        AddLog("ENTER_USERNAME:", LogType.Warning);
+                        _currentStep = LoginStep.AwaitingUsername;
+                        AddLog("RE-ENTER_USERNAME:", LogType.Warning);
                     }
                 }
+            }
+        }
+
+        private async Task HandleStandardCommands(string command, string originalInput)
+        {
+            // Block unauthorized standard commands
+            if (!_projectState.IsAuthenticated && !new[] { "login", "init", "start", "reboot" }.Contains(command))
+            {
+                AddLog("ERR: SYSTEM_LOCKED. INITIALIZE 'LOGIN'.", LogType.Error);
                 return;
             }
 
-
-
             switch (command)
             {
-                case "whoami":
-                    AddLog("IDENTITY: MICHAEL_WILLIAMS // ARCHITECT_LEVEL", LogType.Success);
+                case "help":
+                    DisplayHelp();
                     break;
-
                 case "login":
                 case "init":
                 case "start":
                     _currentStep = LoginStep.AwaitingUsername;
-                    AddLog("INITIATING_SECURE_LOGIN...", LogType.Warning);
                     AddLog("ENTER_USERNAME:", LogType.Warning);
                     break;
-
+                case "reboot":
+                    _projectState.Logout();
+                    _currentStep = LoginStep.None;
+                    OnNavigationRequest?.Invoke("reboot");
+                    break;
+                case "exit":
+                case "close":
+                    await ExecuteSecureExit();
+                    break;
                 case "clear":
-                case "cls": // Added shorthand
+                case "cls":
                     Logs.Clear();
                     OnNewLog?.Invoke();
                     break;
-
-                case "help":
-                case "?":
-                    AddLog("--- TACTICAL_OS_COMMANDS ---", LogType.System);
-                    AddLog("HISTORY      - View all session inputs", LogType.Info);
-                    AddLog("CLEARHISTORY - Wipe command memory", LogType.Info);
-                    AddLog("CLEAR        - Flush terminal screen", LogType.Info);
-                    AddLog("REBOOT       - Cold-start system", LogType.Info);
-                    AddLog("DOSSIER      - Operator profile", LogType.Info);
-                    AddLog("----------------------------", LogType.System);
-                    AddLog("HOTKEYS:", LogType.Warning);
-                    AddLog("[ESC]        - Close active file", LogType.Warning);
-                    AddLog("[UP/DN]      - Cycle commands", LogType.Warning);
-                    break;
-
-                case "history":
-                    AddLog("--- SESSION_COMMAND_HISTORY ---", LogType.System);
-                    if (!_commandHistory.Any())
+                case "volume":
+                    var parts = originalInput.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length > 1 && double.TryParse(parts[1], out var vol))
                     {
-                        AddLog("NO_RECORDS_FOUND", LogType.Warning);
+                        // Clamp between 0.0 and 1.0
+                        _audioSvc.Volume = Math.Clamp(vol, 0.0, 1.0);
+                        AddLog($"SYSTEM_GAIN_SET: {_audioSvc.Volume * 100}%", LogType.System);
+                        await _audioSvc.PlaySystemSound("success", _audioSvc.Volume);
                     }
                     else
                     {
-                        for (int i = 0; i < _commandHistory.Count; i++)
-                        {
-                            // Displays a numbered list of previous inputs
-                            AddLog($"{i + 1}: {_commandHistory[i]}", LogType.Info);
-                        }
+                        AddLog("USAGE: VOLUME [0.0 - 1.0]", LogType.Error);
                     }
                     break;
-
-                case "clearhistory":
-                    _commandHistory.Clear();
-                    AddLog("SESSION_HISTORY_PURGED", LogType.Warning);
-                    AddLog("UP_ARROW_BUFFER: EMPTY", LogType.Info);
-                    break;
-
-                // --- NEW TACTICAL SHORTCUTS ---
-                case "hire":
-                case "contact":
-                case "message":
-                    AddLog("ESTABLISHING_SECURE_UPLINK_PROTOCOL...", LogType.Success);
-                    OnNavigationRequest?.Invoke("uplink");
-                    break;
-
                 case "mute":
-                    _audioSvc.ToggleMute(); // Ensure it sets to true
-                    AddLog("SYSTEM_AUDIO_TERMINATED", LogType.System);
-                    break;
-
                 case "unmute":
-                    _audioSvc.ToggleMute(); // Ensure it sets to false
-                    AddLog("SYSTEM_AUDIO_INITIALIZED", LogType.System);
+                    _audioSvc.ToggleMute();
+                    AddLog(_audioSvc.IsMuted ? "AUDIO_OFF" : "AUDIO_ON", LogType.System);
                     break;
-
-                case "dossier":
-                case "resume":
-                    AddLog("REDIRECTING_TO_IDENTITY_MODULE...", LogType.Success);
-                    OnNavigationRequest?.Invoke("identity");
-                    break;
-
-                 case "reboot":
-                 case "system_reset":
-                    _projectState.Logout(); // This sets IsAuthenticated to false
-                    _currentStep = LoginStep.None;
-                    _failedAttempts = 0;
-                    OnNavigationRequest?.Invoke("reboot");
-                    break;
-
-                case "exit":
-                case "close":
-                    if (_projectState.SelectedFile != null)
+                case "secrets":
+                case "dev_notes":
+                    if (_projectState.IsAuthenticated)
                     {
-                        await ExecuteSecureExit();
+                        AddLog("--- CLASSIFIED_SYSTEM_NOTES ---", LogType.Warning);
+                        AddLog("DESTRUCT - Authorized Emergency Purge Protocol.", LogType.Info);
+                        AddLog("GODMODE  - Admin Login Bypass (For Testing Only).", LogType.Info);
+                        AddLog("CREDENTIALS_RECOVERY: 'FORGOTUSER' / 'FORGOTPASS'", LogType.Info);
                     }
                     else
                     {
-                        AddLog("ERROR: NO ACTIVE SESSION TO TERMINATE", LogType.Error);
+                        AddLog("ERR: ACCESS_DENIED. AUTHENTICATION_REQUIRED.", LogType.Error);
                     }
                     break;
-
+                case "destruct":
+                case "self_destruct":
+                    _currentStep = LoginStep.AwaitingDestructConfirmation;
+                    AddLog("!!! WARNING: THIS WILL RESET THE ENTIRE ENVIRONMENT !!!", LogType.Error);
+                    AddLog("ARE YOU ABSOLUTELY SURE? (Y/N)", LogType.Warning);
+                    break;
                 default:
                     AddLog($"ERR: COMMAND '{command}' NOT RECOGNIZED.", LogType.Error);
                     break;
             }
+        }
+
+        private async Task HandleDestructConfirmation(string command)
+        {
+            if (command == "y" || command == "yes")
+            {
+                _currentStep = LoginStep.None;
+                await ExecuteSelfDestruct();
+            }
+            else
+            {
+                _currentStep = LoginStep.None;
+                AddLog("SELF_DESTRUCT_SEQUENCE_ABORTED.", LogType.Success);
+                AddLog("SYSTEM_INTEGRITY_STABLE.", LogType.Info);
+            }
+        }
+
+        private void DisplayHelp()
+        {
+            AddLog("--- TACTICAL_OS_COMMANDS ---", LogType.System);
+            AddLog("HISTORY      - View session input log", LogType.Info);
+            AddLog("CLEARHISTORY - Wipe command memory", LogType.Info);
+            AddLog("CLEAR        - Flush terminal buffer", LogType.Info);
+            AddLog("REBOOT       - Cold-start system cycle", LogType.Info);
+            AddLog("DOSSIER      - Access operator profile", LogType.Info);
+            AddLog("SECRETS      - Access Dev Notes", LogType.Info);
+            AddLog("MUTE/UNMUTE  - Toggle system acoustics", LogType.Info);
+            AddLog("EXIT/CLOSE   - Terminate active session", LogType.Info);
+            AddLog("----------------------------", LogType.System);
+            AddLog("HOTKEYS:", LogType.Warning);
+            AddLog("[ESC]        - Force close file", LogType.Warning);
+            AddLog("[UP/DN]      - Cycle command buffer", LogType.Warning);
+        }
+
+        private async Task ExecuteAdminOverride()
+        {
+            AddLog(">>> EXECUTING_ADMIN_OVERRIDE...", LogType.Warning);
+
+            // Play the success beep to signal the bypass worked
+            await _audioSvc.PlaySystemSound("success", 0.3);
+
+            await Task.Delay(800);
+
+            _projectState.Login(); // Bypass auth state
+            _currentStep = LoginStep.None;
+            _failedAttempts = 0;
+            _isLockedOut = false;
+
+            AddLog("SYSTEM_SECURITY_DEACTIVATED.", LogType.Success);
+            AddLog("WELCOME_CREATOR. ACCESS_RESTRICTIONS_LIFTED.", LogType.Success);
+        }
+
+        private async Task ExecuteSelfDestruct()
+        {
+            AddLog("!!! EMERGENCY_OVERRIDE_INITIATED !!!", LogType.Error);
+            _isLockedOut = true;
+
+            for (int i = 5; i > 0; i--)
+            {
+                AddLog($"CRITICAL_FAILURE_IN: {i}...", LogType.Error);
+
+                // Trigger the siren sound
+                await _audioSvc.PlaySystemSound("siren", 0.4);
+
+                // On the final second, trigger the dissolve
+                if (i == 1) { IsDissolving = true; NotifyStateChanged(); }
+
+                await Task.Delay(1000);
+            }
+
+            AddLog("TERMINATING_CORE_PROCESSES...", LogType.Warning);
+            await Task.Delay(1000);
+
+            // Reboot
+            _projectState.Logout();
+            OnNavigationRequest?.Invoke("reboot");
+
+            // Reset state for next boot
+            IsDissolving = false;
+            _isLockedOut = false;
         }
 
         // New helper method for the "theatrical" exit
@@ -339,7 +390,7 @@ namespace MWBlazorPortfolioSite.Services
             AddLog("BRUTE_FORCE_PREVENTION_ACTIVE.", LogType.Error);
 
             // Initial alert sound
-            await _audioSvc.PlaySystemSound("glitch");
+            await _audioSvc.PlaySystemSound("glitch", 0.3);
 
             // Live Countdown
             for (int i = 30; i > 0; i--)
@@ -348,7 +399,7 @@ namespace MWBlazorPortfolioSite.Services
                 // or every second if you want the high-pressure feel.
                 if (i % 5 == 0 || i <= 5)
                 {
-                    await _audioSvc.PlaySystemSound("glitch"); 
+                    await _audioSvc.PlaySystemSound("glitch", 0.3); 
                     AddLog($"SYSTEM_LOCK: {i}s REMAINING...", LogType.Warning);
                     OnNewLog?.Invoke();
                 }

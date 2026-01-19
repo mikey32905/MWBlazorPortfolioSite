@@ -56,41 +56,52 @@ window.localStorageFunctions = {
 };
 
 // 4. AUDIO ENGINE
-window.playSystemAudio = (soundName) => {
+window.playSystemAudio = async (soundName, volume = 0.1) => {
     try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
+
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
 
-        oscillator.type = 'square';
+        // Use the passed volume parameter
+        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
 
-        if (soundName == "glitch") {
-            oscillator.frequency.setValueAtTime(120, context.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.2);
+        if (soundName === "siren") {
+            oscillator.type = 'triangle';
+            // Slide from low to high frequency (The "Wail")
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+            oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 1.0);
 
-            gainNode.gain.setValueAtTime(0.1, context.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.2);
-
-            oscillator.connect(gain);
-            gainNode.connect(context.destination);
-
-            oscillator.start();
-            oscillator.stop(context.currentTime + 0.2);
-        }
-        else {
-            oscillator.frequency.setValueAtTime(soundName === 'success' ? 880 : 440, audioCtx.currentTime);
-
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
 
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
 
             oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.15);
+            oscillator.stop(audioCtx.currentTime + 1.0);
+            return; // Exit here so the default start/stop at bottom doesn't interfere
         }
-        
+        else if (soundName === "glitch") {
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(120, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        }
+        else {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(soundName === 'success' ? 880 : 440, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+        }
+
+        // Standard connection and start/stop for glitch and beeps
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.2);
+
     } catch (e) {
-        console.warn("Audio Context blocked by browser policy. User interaction required.");
+        console.warn("Audio Context blocked:", e);
     }
-}; // <--- FIXED: Added missing closing brace
+};

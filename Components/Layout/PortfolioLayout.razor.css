@@ -424,3 +424,13 @@ SideBar {
         box-shadow: 0 0 0 0 rgba(var(--accent-rgb), 0);
     }
 }
+
+@keyframes static-shift {
+    0% {
+        background-position: 20% 10%;
+    }
+
+    100% {
+        background-position: 80% 90%;
+    }
+}

@@ -293,7 +293,7 @@
             {
                 _logs.Insert(0, "!! SYNC_ERROR: UPLINK_DEGRADATION_DETECTED !!");
                 // Optional: play a low-frequency warning beep
-                if (!CommsSvc.IsMuted) AudioSvc.PlaySystemSound("warning");
+                if (!CommsSvc.IsMuted) AudioSvc.PlaySystemSound("warning", 0.3);
             }
 
 

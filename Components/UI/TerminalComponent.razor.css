@@ -174,3 +174,22 @@
     font-weight: bold;
     animation: pulse 1s infinite;
 }
+
+.destruct-mode {
+    animation: intense-shake 0.1s infinite;
+    filter: hue-rotate(90deg) contrast(2); /* Makes colors look "broken" */
+}
+
+@keyframes intense-shake {
+    0% {
+        transform: translate(2px, 2px);
+    }
+
+    50% {
+        transform: translate(-4px, -4px);
+    }
+
+    100% {
+        transform: translate(2px, 2px);
+    }
+}

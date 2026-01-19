@@ -105,7 +105,7 @@
                 </div>
 
                 <div class="footer-center">
-                    <span class="me-1">Built By</span><span><img src="/img/MikeWilliams(2)-Wht.png" height="30" /></span>
+                    <span class="me-1">Built By</span><span><img src="img/MikeWilliams(2)-Wht.png" height="30" /></span>
                 </div>
 
                 <div class="footer-right">
@@ -124,6 +124,33 @@
 </div>
 
 <div class="crt-overlay"></div>
+
+<div class="dissolve-overlay @(TerminalSvc.IsDissolving ? "active" : "")"></div>
+
+<style>
+    .dissolve-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 9999;
+        transition: opacity 1s ease-in-out;
+    }
+
+        .dissolve-overlay.active {
+            opacity: 1;
+            /* This creates a moving "Grain" effect without an image file */
+            background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0 / 2500px 2500px, rgba(0,0,0,0.9);
+            background-blend-mode: difference;
+            animation: static-shift .2s infinite alternate;
+        }
+
+ 
+</style>
 
 @code {
     public ProjectFile? SelectedFile { get; set; } // The variable you saw in Line 20

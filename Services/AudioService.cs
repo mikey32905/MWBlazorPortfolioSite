@@ -10,10 +10,12 @@ namespace MWBlazorPortfolioSite.Services
         public AudioService(IJSRuntime js) => _js = js;
         public void ToggleMute() => IsMuted = !IsMuted;
 
-        public async Task PlaySystemSound(string soundName)
+        public double Volume { get; set; } = 0.2; // Default 20%
+
+        public async Task PlaySystemSound(string soundName, double volume)
         {
             // Calls a JS function to play a small beep or chirp
-            await _js.InvokeVoidAsync("playSystemAudio", soundName);
+            await _js.InvokeVoidAsync("playSystemAudio", soundName, volume);
         }
     }
 }

@@ -38,7 +38,7 @@ namespace MWBlazorPortfolioSite.Services
             {
                 if (!IsMuted)
                 {
-                    await _audio.PlaySystemSound("success");
+                    await _audio.PlaySystemSound("success", 0.3);
                 }
 
                 TransmissionCount++;
