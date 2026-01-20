@@ -1,6 +1,6 @@
 # MWBlazorPortfolioSite
 
-[Live Demo]([https://mikey32905.github.io/MWBlazorPortfolioSite/)
+[Live Demo](https://mikey32905.github.io/MWBlazorPortfolioSite/)
 
 # ⚡ Tactical OS Portfolio (v4.2.0)
 
