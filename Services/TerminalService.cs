@@ -1,4 +1,6 @@
-﻿using MWBlazorPortfolioSite.Enums;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
+using MWBlazorPortfolioSite.Enums;
 
 
 namespace MWBlazorPortfolioSite.Services
@@ -8,6 +10,8 @@ namespace MWBlazorPortfolioSite.Services
     {
         ProjectStateService _projectState;
         AudioService _audioSvc;
+        private readonly IJSRuntime _js;
+        private readonly NavigationManager _navManager;
         // Define your "Factory Defaults"
         private const string DEFAULT_USER = "GUEST";
         private const string DEFAULT_PASS = "MIKE";
@@ -222,6 +226,13 @@ namespace MWBlazorPortfolioSite.Services
                     _currentStep = LoginStep.None;
                     OnNavigationRequest?.Invoke("reboot");
                     break;
+                case "dossier":
+                case "personnel_dossier":
+                case "resume":
+                    AddLog("ACCESSING_PERSONNEL_FILES...", LogType.Success);
+                    // Point this to your existing Identity route
+                    OnNavigationRequest?.Invoke("identity");
+                    break;
                 case "exit":
                 case "close":
                     await ExecuteSecureExit();
@@ -349,7 +360,12 @@ namespace MWBlazorPortfolioSite.Services
 
             // Reboot
             _projectState.Logout();
-            OnNavigationRequest?.Invoke("reboot");
+
+            // 2. Instead of location.assign, use the NavigationManager to force a reload
+            // 'true' forces a browser refresh, bypassing the internal Blazor router
+            OnNavigationRequest?.Invoke("/reboot");
+
+
 
             // Reset state for next boot
             IsDissolving = false;

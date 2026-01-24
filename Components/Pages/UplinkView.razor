@@ -18,7 +18,7 @@
         <div class="nodes-grid">
             @foreach (var link in SocialLinks)
             {
-                <div class="node-card @GetNodeClass(link.Name)" @key="link.Name">
+                <div class="node-card @GetNodeClass(link.Name)" @key="link.Name" @onclick="() => HandleNavigation(link)" style="cursor:pointer;">
                     <div class="node-header">
                         <span class="node-icon">@link.Icon</span>
                         <span class="node-title">> @link.Name</span>
@@ -27,9 +27,9 @@
                         <p class="node-desc">@link.Description</p>
                         <p class="node-path">https://ext.node/@link.Name.ToLower()</p>
                     </div>
-                    <a href="@link.Url" target="_blank" class="node-action">
+                    @* <a href="@link.Url" target="_blank" class="node-action">
                         ESTABLISH_CONNECTION →
-                    </a>
+                    </a> *@
                 </div>
             }
         </div>
@@ -108,9 +108,6 @@
 
 @code {
 
-    // private string contactName = "";
-    // private string contactSubject = "";
-    // private string contactMessage = "";
     private bool isTransmitting = false;
     private string progressDisplay = "";
     private int transmissionProgress = 0;
@@ -127,7 +124,7 @@
         new SocialLink { Name = "STACK OVERFLOW", Url = "https://stackoverflow.com/users/608583/mike", Icon = "󰓌", Description = "Problem-solving history & community reputation." },
         new SocialLink { Name = "DISCORD", Url = "https://discordapp.com/users/mikey32905_8675309", Icon = "󰙯", Description = "Real-time technical collaboration & networking." },
         new SocialLink { Name = "DEV_INTEL", Url = "https://mwdevstudio.net/", Icon = "󰖟", Description = "Technical articles, tutorials, and system logs." },
-        new SocialLink { Name = "PERSONNEL_DOSSIER", Url = "YOUR_RESUME_URL", Icon = "󰦪", Description = "High-priority technical CV & certification manifest." },
+        new SocialLink { Name = "PERSONNEL_DOSSIER", Url = "identity", Icon = "󰦪", Description = "High-priority technical CV & certification manifest." },
         new SocialLink { Name = "COFFEE_UPLINK", Url = "https://buymeacoffee.com/mikey32935", Icon = "󰄬", Description = "Professional endorsements and peer validations." }
     };
 
@@ -156,13 +153,6 @@
         TerminalSvc.AddLog("ENCRYPTING_PACKET...", LogType.Info);
 
         
-
-        // Call the JS function we created in step 2
-        // var success = await JS.InvokeAsync<bool>("sendEmail",
-        //     "service_lcjfrme",
-        //     "template_wxstuk8",
-        //     templateParams);
-
         var success = await CommsSvc.SendUplinkMessage(contactModel);
 
         if (success)
@@ -182,6 +172,21 @@
         }
 
         isTransmitting = false;
+    }
+
+    private async Task HandleNavigation(SocialLink link)
+    {
+        // If it's the internal dossier, use the NavManager without a full reload
+        if (link.Name == "PERSONNEL_DOSSIER")
+        {
+            // This keeps the C# state (Login/Projects) alive
+            Nav.NavigateTo("/identity");
+        }
+        else
+        {
+            // Open external social links in a new tab
+            await JS.InvokeVoidAsync("open", link.Url, "_blank");
+        }
     }
 
     // This method is called by the JavaScript to update the live terminal
