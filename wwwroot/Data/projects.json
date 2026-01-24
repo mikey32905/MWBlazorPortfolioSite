@@ -194,7 +194,30 @@
       "structure modeling. It utilizes a custom-built amortization algorithm to generate detailed",
       "payment schedules based on variable interest vectors and term durations."
     ]
+  },
+  {
+    "Id": "aeonregistry-api",
+    "FileName": "AeonRegistryApi",
+    "ModuleName": "AEON_REGISTRY_UPLINK",
+    "CoreTech": [ "ASP.NET Core Web API", "RESTful Architecture", "Swagger/OpenAPI" ],
+    "Status": "STABLE // BACKEND_SERVICE",
+    "Extension": ".cs",
+    "Category": "LIVE_APPS",
+    "PhysicalPath": "Projects/AeonRegistryApi/Program.cs.txt",
+    "SourceUrl": "Projects/AeonRegistryApi/Program.cs.txt",
+    "Language": "csharp",
+    "LiveUrl": "https://tender-recreation-production-7eac.up.railway.app/index.html",
+    "GitHubUrl": "https://github.com/mikey32905/AeonRegistryAPI",
+    "AccentColor": "#FFD700",
+    "Icon": "🔌",
+    "LineCount": 150,
+    "Description": [
+      "A specialized backend microservice providing high-performance REST endpoints.",
+      "This module handles core server-side logic, middleware configuration, and",
+      "data-link protocols without a frontend UI layer."
+    ]
   }
+
 
 
 

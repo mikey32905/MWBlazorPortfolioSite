@@ -49,6 +49,17 @@
                         </div>
                     </div>
                 }
+                else if (ProjectState.SelectedFile?.FileName == "AeonRegistryApi")
+                {
+                    <div class="static-preview-wrapper">
+                        <img src="img/AeonRegistry_Image.svg" class="static-svg" />
+                        <div class="preview-overlay">
+                            <span class="warning-text">EXTERNAL_HOST_REACHED</span>
+                            <p>FRAME_EMBEDDING_RESTRICTED_BY_REMOTE_SERVER</p>
+                            <p>USE_DIRECT_UPLINK_BELOW_FOR_FULL_ACCESS</p>
+                        </div>
+                    </div>
+                }
                 else
                 {
                     <iframe src="@ProjectState.SelectedFile?.LiveUrl" class="app-iframe"></iframe>
