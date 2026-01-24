@@ -31,6 +31,6 @@
         TerminalSvc.Clear();
         await Task.Delay(3000);
 
-        Nav.NavigateTo("/", forceLoad: true);
+        Nav.NavigateTo(Nav.BaseUri, forceLoad: true);
     }
 }
