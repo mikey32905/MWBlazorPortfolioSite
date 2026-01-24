@@ -363,7 +363,7 @@ namespace MWBlazorPortfolioSite.Services
 
             // 2. Instead of location.assign, use the NavigationManager to force a reload
             // 'true' forces a browser refresh, bypassing the internal Blazor router
-            OnNavigationRequest?.Invoke("/reboot");
+            OnNavigationRequest?.Invoke( "reboot");//"/reboot"_navManager.BaseUri +
 
 
 
