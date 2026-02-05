@@ -216,6 +216,27 @@
       "This module handles core server-side logic, middleware configuration, and",
       "data-link protocols without a frontend UI layer."
     ]
+  },
+  {
+    "Id": "ratemate_master",
+    "FileName": "RateMate",
+    "ModuleName": "CURRENCY_CONVERTER",
+    "CoreTech": [ "C#", ".NET WASM", "RESTful API Integration" ],
+    "Status": "OPERATIONAL // BLAZOR_WASM",
+    "Extension": ".razor",
+    "Category": "LIVE_APPS",
+    "Language": "html",
+    "PhysicalPath": "Projects/RateMate/RateMate.razor.txt",
+    "SourceUrl": "Projects/RateMate/RateMate.razor.txt",
+    "LiveUrl": "https://mwratemate.netlify.app/",
+    "GitHubUrl": "https://github.com/mikey32905/RateMate",
+    "AccentColor": "#00F3FF",
+    "Icon": "📦",
+    "LineCount": 850,
+    "Description": [
+      "A quick and easy to use currency converting application",
+      "Gets daily up to day currency conversion rates from API"
+    ]
   }
 
 
